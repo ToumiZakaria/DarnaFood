@@ -1103,7 +1103,143 @@
       .stats-row { grid-template-columns:1fr 1fr; }
       .order-row { grid-template-columns:1fr 1fr; }
     }
+
+    /* ═══════════════════════════════════════════════
+       PWA MOBILE APP MODE
+    ═══════════════════════════════════════════════ */
+
+    /* Bottom navigation bar */
+    .pwa-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      z-index: 2000;
+      align-items: stretch;
+    }
+    .pwa-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      flex: 1;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border: none;
+      background: none;
+      padding: 0;
+      transition: color 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pwa-tab:active { transform: scale(0.9); }
+    .pwa-tab.active { color: var(--primary-light); }
+    .pwa-tab-icon { font-size: 22px; line-height: 1; }
+    .pwa-tab-badge {
+      position: absolute;
+      top: 6px;
+      background: var(--error);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      margin-left: 16px;
+    }
+    .pwa-tab-wrap { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+    /* Per-page app header */
+    .pwa-app-header {
+      display: none;
+      position: sticky;
+      top: 0;
+      height: 52px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .pwa-app-title {
+      flex: 1;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .pwa-app-back {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--bg-elevated);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pwa-app-action {
+      width: 36px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    /* ── When PWA mode is active ── */
+    body.pwa .navbar        { display: none !important; }
+    body.pwa .page-footer   { display: none !important; }
+    body.pwa .pwa-bottom-nav { display: flex; }
+    body.pwa .pwa-app-header { display: flex; }
+
+    /* Content padding to avoid overlap with bottom nav */
+    body.pwa .page          { padding-bottom: 72px; }
+    body.pwa #page-home     { padding-bottom: 72px; }
+
+    /* iOS safe area (iPhone X and newer) */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      body.pwa .pwa-bottom-nav {
+        height: calc(60px + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      body.pwa .page {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom));
+      }
+    }
+    @supports (padding-top: env(safe-area-inset-top)) {
+      body.pwa { padding-top: env(safe-area-inset-top); }
+    }
+
+    /* Mobile app card style (tighter, cleaner) */
+    body.pwa .kitchen-card,
+    body.pwa .dish-card {
+      border-radius: var(--r-lg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    /* Smoother scroll feel */
+    body.pwa { -webkit-overflow-scrolling: touch; }
+
+    /* Hide PWA install banner in PWA mode */
+    body.pwa #pwa-banner { display: none !important; }
+
+    /* PWA welcome override — bigger app feel */
+    body.pwa #page-welcome .welcome-inner { padding-top: 60px; }
   </style>
+
 </head>
 <body>
 
@@ -1193,6 +1329,37 @@
   <button class="nav-cart" id="nav-cart-btn" onclick="openCart()" style="display:none;">
     🛒 Panier
     <span class="cart-badge" id="cart-badge">0</span>
+  </button>
+</nav>
+
+<!-- ================================================================
+     PWA BOTTOM NAVIGATION BAR (shown only in installed app mode)
+================================================================ -->
+<nav class="pwa-bottom-nav" id="pwa-bottom-nav">
+  <button class="pwa-tab active" id="pwa-tab-home" onclick="pwaNavigate('home')">
+    <div class="pwa-tab-wrap">
+      <span class="pwa-tab-icon">🏠</span>
+    </div>
+    <span>Accueil</span>
+  </button>
+  <button class="pwa-tab" id="pwa-tab-kitchens" onclick="pwaNavigate('kitchens')">
+    <div class="pwa-tab-wrap">
+      <span class="pwa-tab-icon">🍽️</span>
+    </div>
+    <span>Cuisines</span>
+  </button>
+  <button class="pwa-tab" id="pwa-tab-cart" onclick="pwaNavigate('cart')">
+    <div class="pwa-tab-wrap">
+      <span class="pwa-tab-icon">🛒</span>
+      <span class="pwa-tab-badge" id="pwa-cart-badge" style="display:none">0</span>
+    </div>
+    <span>Panier</span>
+  </button>
+  <button class="pwa-tab" id="pwa-tab-profile" onclick="pwaNavigate('profile')">
+    <div class="pwa-tab-wrap">
+      <span class="pwa-tab-icon">👤</span>
+    </div>
+    <span>Profil</span>
   </button>
 </nav>
 
@@ -1943,7 +2110,10 @@ function refreshCartUI() {
   } else {
     badge.classList.remove('visible');
   }
+  // Also update PWA bottom nav badge
+  pwaUpdateCartBadge(c);
 }
+
 
 /* ================================================================
    CART DRAWER
@@ -2462,7 +2632,57 @@ function initAllSelects() {
 /* ================================================================
    INIT — Splash then route
 ================================================================ */
+/* ================================================================
+   PWA — DETECT STANDALONE MODE & MOBILE NAV
+================================================================ */
+const IS_PWA = window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true
+            || document.referrer.includes('android-app://');
+
+function pwaInit() {
+  if (!IS_PWA) return;
+  document.body.classList.add('pwa');
+}
+
+function pwaNavigate(tab) {
+  if (tab === 'cart') { openCart(); return; }
+  if (tab === 'profile') {
+    if (!AUTH) { go('login'); }
+    else if (AUTH.role === 'cuisinier') { go('dashboard'); }
+    else { go('myorders'); }
+    updatePwaNav(tab);
+    return;
+  }
+  go(tab);
+  updatePwaNav(tab);
+}
+
+function updatePwaNav(active) {
+  ['home','kitchens','cart','profile'].forEach(t => {
+    const el = document.getElementById(`pwa-tab-${t}`);
+    if (el) el.classList.toggle('active', t === active);
+  });
+}
+
+function pwaUpdateCartBadge(count) {
+  const badge = document.getElementById('pwa-cart-badge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.style.display = 'flex';
+    badge.textContent = count > 9 ? '9+' : count;
+    const cartTab = document.getElementById('pwa-tab-cart');
+    if (cartTab) {
+      cartTab.style.animation = 'none';
+      cartTab.offsetHeight; // reflow
+      cartTab.style.animation = 'pwaTabBounce 0.3s ease';
+    }
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 function appInit() {
+  pwaInit();
   initAllSelects();
   updateNavForAuth();
   // Splash out after 2 seconds
@@ -2471,13 +2691,15 @@ function appInit() {
     if (splash) { splash.classList.add('hidden'); setTimeout(()=>splash.remove(), 700); }
     // Route based on auth state
     if (AUTH) {
-      if (AUTH.role === 'cuisinier') { go('dashboard'); }
-      else { renderHome(); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById('page-home').classList.add('active'); }
+      if (AUTH.role === 'cuisinier') { go('dashboard'); updatePwaNav('profile'); }
+      else { renderHome(); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById('page-home').classList.add('active'); updatePwaNav('home'); }
     } else {
       document.getElementById('page-welcome').classList.add('active');
     }
   }, 2100);
 }
+
+
 
 /* ================================================================
    AUTH — localStorage-based accounts (no server needed)
@@ -3121,6 +3343,11 @@ go = function(page, params={}) {
   const welcomeEl = document.getElementById('page-welcome');
   if (welcomeEl) welcomeEl.classList.remove('active');
 
+  // Sync PWA bottom nav active tab
+  const pwaTabMap = { home:'home', kitchens:'kitchens', login:'profile', register:'profile',
+                      dashboard:'profile', myorders:'profile', cart:'cart' };
+  if (pwaTabMap[page]) updatePwaNav(pwaTabMap[page]);
+
   // Handle new pages
   if (['login','register','dashboard','myorders','welcome'].includes(page)) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -3138,6 +3365,7 @@ go = function(page, params={}) {
   }
   _originalGo(page, params);
 };
+
 
 // Init app
 appInit();
