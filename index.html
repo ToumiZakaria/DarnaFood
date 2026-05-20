@@ -2747,20 +2747,6 @@ async function saveProfile(role) {
   }
 }
 
-// Mock order history (shared)
-const MOCK_CLIENT_ORDERS = [
-  { id:'DRC-142850', date:'18 Mai 2026', kitchen:'Dar Fatima', items:'Couscous au Poulet, Harira', total:1230, status:'livré' },
-  { id:'DRC-138741', date:'15 Mai 2026', kitchen:"Le Goût d'Oran", items:"Merguez Maison, Brochettes d'Agneau", total:1700, status:'livré' },
-  { id:'DRC-135200', date:'10 Mai 2026', kitchen:'Dar Fatima', items:'Couscous Royal', total:1450, status:'livré' },
-];
-
-// Mock incoming orders for cuisinier dashboard
-let MOCK_DASH_ORDERS = [
-  { id:'DRC-142991', client:'Karim Meziane',  items:'Couscous Royal × 1, Harira × 2',    total:2010, status:'nouveau',     time:'il y a 5 min' },
-  { id:'DRC-142850', client:'Amira Bensalem', items:'Couscous au Poulet × 2',           total:1900, status:'preparation', time:'il y a 18 min' },
-  { id:'DRC-142712', client:'Younes Tabet',   items:'Rechta × 1, Chorba Frik × 1',      total:1220, status:'livre',       time:'il y a 1h' },
-  { id:'DRC-142600', client:'Sarah Hamdi',    items:'Couscous 7 Légumes × 2',           total:1600, status:'livre',       time:'il y a 2h' },
-];
 
 
 
