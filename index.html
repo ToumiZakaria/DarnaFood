@@ -1,0 +1,3426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DarnaFood - Commandez chez les meilleurs cuisiniers à domicile en Algérie. Livraison rapide dans toutes les wilayas. Cuisine maison authentique.">
+  <meta name="theme-color" content="#E8901A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DarnaFood">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <title>DarnaFood | دارنا فود — Cuisine maison livrée chez vous</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================================
+       DESIGN TOKENS
+    ================================================================ */
+    :root {
+      --primary:        #E8901A;
+      --primary-dark:   #C4720D;
+      --primary-light:  #F5A535;
+      --primary-glow:   rgba(232,144,26,0.12);
+      --primary-glow2:  rgba(232,144,26,0.25);
+      --accent:         #2D8C64;
+      --accent-light:   #3AAF7E;
+      --danger:         #E05555;
+
+      --bg:             #0C0B09;
+      --bg-card:        #141210;
+      --bg-elevated:    #1C1A15;
+      --bg-input:       #221F18;
+
+      --text:           #F2EDE4;
+      --text-muted:     #8A7E6F;
+      --text-faint:     #3E3830;
+
+      --border:         #252018;
+      --border-light:   #332E24;
+
+      --shadow-sm:  0 2px 8px rgba(0,0,0,.35);
+      --shadow:     0 8px 28px rgba(0,0,0,.45);
+      --shadow-lg:  0 16px 48px rgba(0,0,0,.6);
+      --shadow-xl:  0 24px 64px rgba(0,0,0,.7);
+
+      --r-sm:  8px;
+      --r:     14px;
+      --r-lg:  20px;
+      --r-xl:  28px;
+
+      --ease: 0.25s cubic-bezier(.4,0,.2,1);
+      --ease-slow: 0.4s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ================================================================
+       RESET & BASE
+    ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; border: none; cursor: pointer; }
+    img { max-width: 100%; display: block; }
+    input, select, textarea { font-family: inherit; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
+
+    /* ================================================================
+       PAGE SYSTEM
+    ================================================================ */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; animation: fadeUp .35s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================================================================
+       NAVBAR
+    ================================================================ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 68px;
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 28px;
+      background: rgba(12,11,9,.88);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow var(--ease);
+    }
+    .navbar.scrolled { box-shadow: var(--shadow); }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 14px rgba(232,144,26,.35);
+    }
+    .nav-logo-wordmark { line-height: 1; }
+    .nav-logo-en {
+      font-size: 20px; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav-logo-ar {
+      font-family: 'Cairo', sans-serif;
+      font-size: 11px; color: var(--text-muted);
+      -webkit-text-fill-color: var(--text-muted);
+    }
+
+    .nav-links { display: flex; gap: 2px; list-style: none; }
+    .nav-links a {
+      padding: 8px 15px; border-radius: var(--r-sm);
+      font-size: 14px; font-weight: 500; color: var(--text-muted);
+      transition: var(--ease);
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text); background: var(--bg-elevated);
+    }
+
+    .nav-spacer { flex: 1; }
+
+    .nav-cart {
+      position: relative;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      color: var(--text);
+      padding: 9px 18px; border-radius: var(--r-sm);
+      font-size: 14px; font-weight: 600;
+      transition: var(--ease);
+    }
+    .nav-cart:hover {
+      border-color: var(--primary);
+      background: var(--primary-glow);
+      color: var(--primary-light);
+    }
+    .cart-badge {
+      position: absolute; top: -8px; right: -8px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      font-size: 11px; font-weight: 700;
+      display: none; align-items: center; justify-content: center;
+    }
+    .cart-badge.visible { display: flex; animation: badgePop .3s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes badgePop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+
+    /* ================================================================
+       BUTTONS
+    ================================================================ */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+      color: #fff; padding: 13px 26px; border-radius: var(--r);
+      font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+      transition: var(--ease);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(232,144,26,.45);
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border-light); color: var(--text);
+      padding: 13px 26px; border-radius: var(--r);
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      transition: var(--ease);
+    }
+    .btn-ghost:hover { border-color: var(--primary); color: var(--primary-light); }
+
+    /* ================================================================
+       HOME — HERO
+    ================================================================ */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 90px 32px 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-img {
+      position: absolute; inset: 0;
+      background: url('images/hero.png') center/cover no-repeat;
+      filter: brightness(.22) saturate(.7);
+    }
+    .hero-bg-gradient {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 75% 40%, rgba(232,144,26,.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 20% 70%, rgba(45,140,100,.06) 0%, transparent 60%),
+        linear-gradient(to bottom, rgba(12,11,9,.6) 0%, rgba(12,11,9,.95) 100%);
+    }
+    .hero-pattern {
+      position: absolute; inset: 0; opacity: .12;
+      background-image:
+        linear-gradient(30deg,  #2A2520 1px, transparent 1px),
+        linear-gradient(-30deg, #2A2520 1px, transparent 1px),
+        linear-gradient(90deg,  #2A2520 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at 30% 50%, black 10%, transparent 65%);
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 1180px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary-glow);
+      border: 1px solid rgba(232,144,26,.3);
+      color: var(--primary-light);
+      padding: 6px 14px; border-radius: 99px;
+      font-size: 13px; font-weight: 600; margin-bottom: 22px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 4.5vw, 62px);
+      font-weight: 800; line-height: 1.08; margin-bottom: 20px;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 17px; color: var(--text-muted); line-height: 1.75;
+      max-width: 460px; margin-bottom: 36px;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; gap: 36px;
+      margin-top: 48px; padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .stat-val { font-size: 30px; font-weight: 800; color: var(--primary-light); }
+    .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+
+    /* Floating card stack */
+    .hero-visual { position: relative; height: 480px; }
+    .fcard {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--r-lg); padding: 20px;
+      box-shadow: var(--shadow-lg);
+    }
+    .fcard-main  { top: 0; left: 0; right: 40px; animation: floatA 7s ease-in-out infinite; }
+    .fcard-track { bottom: 30px; left: 30px; right: 0; animation: floatB 9s ease-in-out infinite; }
+    .fcard-eta   { bottom: 200px; right: 0; width: 190px; animation: floatC 5.5s ease-in-out infinite; }
+    @keyframes floatA { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-14px) } }
+    @keyframes floatB { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-10px) } }
+    @keyframes floatC { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-18px) } }
+
+    .fcard-icon {
+      width: 62px; height: 62px; border-radius: var(--r);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; flex-shrink: 0;
+    }
+    .pill-green {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(45,140,100,.15); border: 1px solid rgba(45,140,100,.3);
+      color: var(--accent-light); padding: 4px 10px; border-radius: 99px;
+      font-size: 12px; font-weight: 600;
+    }
+
+    /* ================================================================
+       HOME — SECTIONS
+    ================================================================ */
+    .section { padding: 80px 32px; max-width: 1180px; margin: 0 auto; }
+
+    .section-head { text-align: center; margin-bottom: 48px; }
+    .section-badge {
+      display: inline-block; color: var(--primary);
+      font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    .section-title { font-size: clamp(26px,3.5vw,40px); font-weight: 800; margin-bottom: 14px; }
+    .section-sub { font-size: 16px; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+    /* Category pills */
+    .cat-scroll {
+      display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .cat-scroll::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text-muted); padding: 10px 18px; border-radius: 99px;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--ease);
+    }
+    .cat-pill:hover, .cat-pill.active {
+      background: var(--primary-glow); border-color: rgba(232,144,26,.4);
+      color: var(--primary-light);
+    }
+
+    /* Kitchen grid */
+    .kitchens-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 22px; }
+
+    /* Kitchen card */
+    .k-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-lg); overflow: hidden;
+      cursor: pointer; transition: var(--ease);
+    }
+    .k-card:hover { transform: translateY(-5px); border-color: var(--border-light); box-shadow: var(--shadow-lg); }
+
+    .k-cover {
+      height: 175px; position: relative;
+      display: flex; align-items: flex-end; padding: 14px;
+    }
+    .k-cover-emoji {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 68px; opacity: .75;
+    }
+    .k-cover-row { position: relative; z-index: 1; display: flex; justify-content: space-between; width: 100%; align-items: center; }
+    .k-status {
+      padding: 4px 11px; border-radius: 99px; font-size: 11px; font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+    .k-status.open  { background: rgba(45,140,100,.85); color: #fff; }
+    .k-status.closed{ background: rgba(60,50,40,.85); color: var(--text-muted); }
+    .k-cat-tag {
+      background: rgba(12,11,9,.65); border: 1px solid rgba(232,144,26,.3);
+      color: var(--primary-light); padding: 4px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 700; backdrop-filter: blur(8px);
+    }
+
+    .k-body { padding: 18px; }
+    .k-name  { font-size: 17px; font-weight: 700; margin-bottom: 3px; }
+    .k-tag   { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .k-meta  { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .k-meta-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); }
+
+    .stars { display: flex; align-items: center; gap: 1px; }
+    .star  { font-size: 12px; color: var(--primary); }
+    .star.dim { color: var(--text-faint); }
+
+    .k-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; border-top: 1px solid var(--border);
+    }
+    .k-footer-info { font-size: 12px; color: var(--text-muted); }
+    .k-footer-info b { color: var(--text); }
+    .btn-sm {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+      color: #fff; padding: 7px 15px; border-radius: var(--r-sm);
+      font-size: 12px; font-weight: 700; border: none; cursor: pointer;
+      transition: var(--ease);
+    }
+    .btn-sm:hover { box-shadow: 0 4px 14px rgba(232,144,26,.4); transform: translateY(-1px); }
+
+    /* How it works */
+    .how-section {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 80px 32px;
+    }
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; max-width: 1180px; margin: 0 auto; }
+    .step-card {
+      text-align: center; padding: 36px 24px;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--r-lg); position: relative; transition: var(--ease);
+    }
+    .step-card:hover { border-color: rgba(232,144,26,.4); box-shadow: 0 0 0 1px rgba(232,144,26,.15), var(--shadow); }
+    .step-num {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      font-size: 13px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-icon { font-size: 50px; margin: 12px 0 18px; display: block; }
+    .step-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .step-desc  { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+    /* CTA banner */
+    .cta-wrap { padding: 80px 32px; text-align: center; }
+    .cta-inner {
+      max-width: 600px; margin: 0 auto;
+      background: linear-gradient(145deg, var(--bg-elevated), var(--bg-card));
+      border: 1px solid var(--border-light); border-radius: var(--r-xl);
+      padding: 60px 48px; position: relative; overflow: hidden;
+    }
+    .cta-inner::before {
+      content: ''; position: absolute; inset: -40%;
+      background: radial-gradient(ellipse at center, rgba(232,144,26,.07) 0%, transparent 60%);
+    }
+    .cta-emoji { font-size: 60px; margin-bottom: 18px; display: block; position: relative; }
+    .cta-title { font-size: 30px; font-weight: 800; margin-bottom: 12px; position: relative; }
+    .cta-desc  { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; position: relative; }
+
+    /* Footer */
+    .footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 56px 32px 28px; }
+    .footer-grid {
+      max-width: 1180px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px;
+    }
+    .footer-brand-desc { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin: 16px 0 22px; max-width: 270px; }
+    .footer-socials { display: flex; gap: 10px; }
+    .footer-social {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: var(--ease);
+    }
+    .footer-social:hover { border-color: var(--primary); background: var(--primary-glow); }
+    .footer-col-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 16px; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a { font-size: 14px; color: var(--text-muted); transition: var(--ease); }
+    .footer-links a:hover { color: var(--primary-light); }
+    .footer-bottom {
+      max-width: 1180px; margin: 0 auto;
+      padding-top: 24px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 13px; color: var(--text-muted); }
+    .pay-badges { display: flex; gap: 8px; }
+    .pay-badge {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: var(--r-sm);
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+    }
+
+    /* ================================================================
+       PAGE: KITCHENS
+    ================================================================ */
+    .page-header {
+      padding: 100px 32px 40px;
+      background: linear-gradient(to bottom, var(--bg-card), var(--bg));
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header-inner { max-width: 1180px; margin: 0 auto; }
+    .page-title { font-size: 34px; font-weight: 800; margin-bottom: 6px; }
+    .page-sub   { font-size: 15px; color: var(--text-muted); }
+
+    .kitchens-page-body { padding: 36px 32px 80px; max-width: 1180px; margin: 0 auto; }
+
+    .controls-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+    .search-wrap { flex: 1; min-width: 220px; position: relative; }
+    .search-wrap .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+    .search-input {
+      width: 100%;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 14px 12px 42px;
+      border-radius: var(--r); font-size: 14px; transition: var(--ease);
+    }
+    .search-input:focus { outline: none; border-color: var(--primary); background: var(--bg-input); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .search-input::placeholder { color: var(--text-muted); }
+    .filter-sel {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 40px 12px 14px;
+      border-radius: var(--r); font-size: 14px; cursor: pointer;
+      appearance: none; min-width: 152px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A7E6F' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+      transition: var(--ease);
+    }
+    .filter-sel:focus { outline: none; border-color: var(--primary); }
+    .filter-sel option { background: var(--bg-elevated); }
+
+    .results-count { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
+    .results-count b { color: var(--text); }
+
+    .no-results { text-align: center; padding: 80px 24px; color: var(--text-muted); grid-column: 1/-1; }
+    .no-results .nr-icon { font-size: 56px; display: block; margin-bottom: 14px; }
+    .no-results h3 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+
+    /* ================================================================
+       PAGE: KITCHEN DETAIL
+    ================================================================ */
+    .detail-header { padding-top: 68px; }
+    .detail-cover {
+      height: 280px; position: relative;
+      display: flex; align-items: flex-end;
+    }
+    .detail-cover-emoji {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 120px; opacity: .55;
+    }
+    .detail-cover-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(12,11,9,1) 0%, rgba(12,11,9,.2) 60%, transparent 100%);
+    }
+    .detail-info-bar {
+      position: relative; max-width: 1180px;
+      margin: 0 auto; padding: 0 32px 28px;
+    }
+    .detail-top { display: flex; align-items: flex-start; gap: 18px; }
+    .detail-avatar {
+      width: 78px; height: 78px; border-radius: var(--r);
+      border: 3px solid var(--border-light);
+      background: var(--bg-elevated);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; flex-shrink: 0; margin-top: -20px;
+    }
+    .detail-name { font-size: 26px; font-weight: 800; margin-bottom: 3px; }
+    .detail-tagline { font-size: 14px; color: var(--text-muted); }
+    .detail-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+    .meta-chip { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-muted); }
+
+    .detail-layout {
+      max-width: 1180px; margin: 0 auto;
+      padding: 28px 32px 80px;
+      display: grid; grid-template-columns: 1fr 330px; gap: 28px;
+      align-items: start;
+    }
+
+    /* Menu */
+    .menu-cat-title {
+      font-size: 18px; font-weight: 700;
+      margin: 28px 0 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .menu-cat-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .dish-card {
+      display: flex; gap: 14px; align-items: center;
+      padding: 18px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--r);
+      margin-bottom: 10px; transition: var(--ease);
+    }
+    .dish-card:hover { border-color: var(--border-light); background: var(--bg-elevated); }
+    .dish-icon {
+      width: 88px; height: 88px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; flex-shrink: 0; overflow: hidden;
+    }
+    .dish-icon img { width:100%; height:100%; object-fit:cover; display:block; }
+    .dish-info { flex: 1; }
+    .dish-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .dish-desc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .dish-price { font-size: 16px; font-weight: 700; color: var(--primary-light); margin-top: 7px; }
+    .btn-add {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary-glow); border: 1px solid rgba(232,144,26,.4);
+      color: var(--primary-light); font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: var(--ease);
+    }
+    .btn-add:hover { background: var(--primary); color: #fff; transform: scale(1.1); }
+
+    /* Sidebar cart */
+    .sidebar-cart {
+      position: sticky; top: 88px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 22px;
+    }
+    .sidebar-title { font-size: 17px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+    .empty-cart { text-align: center; padding: 32px 0; color: var(--text-muted); }
+    .empty-cart .ei { font-size: 40px; display: block; margin-bottom: 10px; }
+    .empty-cart p { font-size: 13px; line-height: 1.6; }
+
+    .sidebar-items { margin-bottom: 14px; }
+    .si-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .si-item:last-child { border-bottom: none; }
+    .si-name { flex: 1; font-size: 13px; font-weight: 500; }
+    .qty-ctrl { display: flex; align-items: center; gap: 6px; }
+    .qty-btn {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text); font-size: 15px; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; transition: var(--ease);
+    }
+    .qty-btn:hover { background: var(--primary-glow); border-color: var(--primary); }
+    .qty-num { font-size: 13px; font-weight: 700; min-width: 18px; text-align: center; }
+    .si-price { font-size: 12px; font-weight: 700; color: var(--primary-light); min-width: 58px; text-align: right; }
+
+    .total-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 7px; }
+    .total-row.grand { font-size: 15px; font-weight: 700; color: var(--text); padding-top: 10px; border-top: 1px solid var(--border); }
+    .total-row.grand .amt { color: var(--primary-light); }
+    .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+    /* ================================================================
+       CART DRAWER
+    ================================================================ */
+    .cart-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none; transition: var(--ease-slow);
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+    .cart-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+      width: 410px; max-width: 100vw;
+      background: var(--bg-card); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transform: translateX(100%); transition: var(--ease-slow);
+    }
+    .cart-drawer.open { transform: translateX(0); }
+
+    .drawer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 24px; border-bottom: 1px solid var(--border);
+    }
+    .drawer-head-title { font-size: 19px; font-weight: 700; }
+    .close-btn {
+      width: 34px; height: 34px; border-radius: var(--r-sm);
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: var(--ease);
+    }
+    .close-btn:hover { color: var(--text); background: var(--border); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+    .drawer-footer { padding: 20px 24px; border-top: 1px solid var(--border); }
+
+    .d-item { display: flex; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .d-item-icon { width: 48px; height: 48px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .d-item-info { flex: 1; }
+    .d-item-name    { font-size: 14px; font-weight: 600; }
+    .d-item-kitchen { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .d-item-ctrl    { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+    .d-item-price   { font-size: 14px; font-weight: 700; color: var(--primary-light); }
+
+    /* ================================================================
+       PAGE: CHECKOUT
+    ================================================================ */
+    .checkout-wrap { padding: 100px 32px 80px; max-width: 920px; margin: 0 auto; }
+    .checkout-title { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+    .checkout-sub   { font-size: 14px; color: var(--text-muted); margin-bottom: 36px; }
+    .checkout-layout { display: grid; grid-template-columns: 1fr 350px; gap: 28px; align-items: start; }
+
+    .form-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 26px; margin-bottom: 18px; }
+    .form-card-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text-muted); margin-bottom: 7px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: var(--bg-input); border: 1px solid var(--border-light);
+      color: var(--text); padding: 12px 15px; border-radius: var(--r);
+      font-size: 14px; transition: var(--ease);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-select {
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A7E6F' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; background-size: 16px;
+    }
+    .form-select option { background: var(--bg-elevated); }
+
+    .cod-box {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--bg-elevated); border: 2px solid var(--primary);
+      border-radius: var(--r); padding: 16px;
+    }
+    .cod-icon { font-size: 26px; }
+    .cod-label { font-size: 14px; font-weight: 700; }
+    .cod-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .cod-check { margin-left: auto; font-size: 22px; }
+
+    .summary-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 22px; position: sticky; top: 88px; }
+    .summary-card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+    .sum-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .sum-item:last-child { border-bottom: none; }
+    .sum-name { font-size: 13px; }
+    .sum-name span { font-size: 11px; color: var(--text-muted); }
+    .sum-price { font-size: 13px; font-weight: 600; }
+
+    .btn-block { width: 100%; justify-content: center; padding: 15px; font-size: 15px; }
+    .secure-note { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+
+    /* ================================================================
+       PAGE: CONFIRMATION
+    ================================================================ */
+    .confirm-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    .confirm-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 56px 44px; max-width: 540px; width: 100%; text-align: center; }
+    .success-circle {
+      width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 26px;
+      background: linear-gradient(135deg, rgba(45,140,100,.2), rgba(45,140,100,.05));
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 44px;
+      animation: successPop .7s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes successPop { from { transform: scale(0) rotate(-20deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+    .conf-title { font-size: 30px; font-weight: 800; margin-bottom: 10px; }
+    .conf-desc  { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
+    .order-id-box {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 14px 20px; margin-bottom: 22px;
+      font-family: monospace; font-size: 20px; letter-spacing: 2px; color: var(--primary-light);
+    }
+    .conf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; }
+    .conf-cell { background: var(--bg-elevated); border-radius: var(--r-sm); padding: 14px; text-align: left; }
+    .conf-cell-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text-muted); margin-bottom: 4px; }
+    .conf-cell-val   { font-size: 14px; font-weight: 600; }
+    .conf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* ================================================================
+       TOAST
+    ================================================================ */
+    .toast-host { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 999; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+    .toast {
+      background: var(--bg-elevated); border: 1px solid var(--border-light);
+      color: var(--text); padding: 12px 20px; border-radius: var(--r);
+      font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg);
+      display: flex; align-items: center; gap: 8px;
+      animation: toastIn .3s ease both;
+    }
+    .toast.success { border-color: rgba(45,140,100,.5); }
+    .toast.error   { border-color: rgba(224,85,85,.5); }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ================================================================
+       BACK BUTTON
+    ================================================================ */
+    .back-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 13px; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-bottom: 22px; transition: var(--ease);
+    }
+    .back-btn:hover { color: var(--primary-light); }
+
+    /* ================================================================
+       RESPONSIVE
+    ================================================================ */
+    @media (max-width: 900px) {
+      .hero-inner        { grid-template-columns: 1fr; gap: 40px; }
+      .hero-visual       { height: 260px; }
+      .steps             { grid-template-columns: 1fr; gap: 20px; }
+      .footer-grid       { grid-template-columns: 1fr 1fr; }
+      .detail-layout     { grid-template-columns: 1fr; }
+      .sidebar-cart      { display: none; }
+      .checkout-layout   { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .navbar            { padding: 0 16px; gap: 12px; }
+      .nav-links         { display: none; }
+      .hero              { padding: 85px 16px 50px; }
+      .section           { padding: 60px 16px; }
+      .kitchens-page-body{ padding: 24px 16px 60px; }
+      .footer-grid       { grid-template-columns: 1fr; }
+      .form-row          { grid-template-columns: 1fr; }
+      .conf-grid         { grid-template-columns: 1fr; }
+      .cta-inner         { padding: 40px 24px; }
+    }
+
+    /* ================================================================
+       SPLASH SCREEN
+    ================================================================ */
+    #splash {
+      position:fixed; inset:0; z-index:9999;
+      background:var(--bg);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      transition:opacity .6s ease, visibility .6s ease;
+    }
+    #splash.hidden { opacity:0; visibility:hidden; }
+    .splash-ring {
+      width:120px; height:120px; border-radius:28px;
+      background:linear-gradient(145deg, var(--bg-elevated), var(--bg-card));
+      border:1px solid var(--border-light);
+      display:flex; align-items:center; justify-content:center;
+      font-size:56px;
+      box-shadow:0 0 60px rgba(232,144,26,.25), var(--shadow-xl);
+      animation:splashPop .7s cubic-bezier(.34,1.56,.64,1) both;
+      margin-bottom:28px;
+    }
+    @keyframes splashPop {
+      from { transform:scale(0.4) rotate(-10deg); opacity:0; }
+      to   { transform:scale(1)   rotate(0deg);   opacity:1; }
+    }
+    .splash-brand {
+      font-size:34px; font-weight:900;
+      background:linear-gradient(135deg, var(--primary-light), var(--primary));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      animation:fadeUp .5s .4s ease both;
+    }
+    .splash-ar {
+      font-family:'Cairo',sans-serif; font-size:16px;
+      color:var(--text-muted); margin-top:6px;
+      animation:fadeUp .5s .55s ease both;
+    }
+    .splash-tagline {
+      font-size:13px; color:var(--text-muted); margin-top:14px;
+      animation:fadeUp .5s .65s ease both;
+    }
+    .splash-loader {
+      width:48px; height:3px; background:var(--border);
+      border-radius:99px; margin-top:48px; overflow:hidden;
+      animation:fadeUp .4s .8s ease both;
+    }
+    .splash-loader::after {
+      content:''; display:block; height:100%;
+      background:linear-gradient(90deg, var(--primary-light), var(--primary));
+      border-radius:99px;
+      animation:loaderBar 1.4s .9s ease both;
+    }
+    @keyframes loaderBar { from{width:0} to{width:100%} }
+
+    /* ================================================================
+       WELCOME / ONBOARDING PAGE
+    ================================================================ */
+    #page-welcome {
+      min-height:100vh;
+      display:none;
+      flex-direction:column;
+      background:var(--bg);
+      position:relative; overflow:hidden;
+    }
+    #page-welcome.active { display:flex; }
+    .welcome-bg {
+      position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,144,26,.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(45,140,100,.07) 0%, transparent 50%);
+    }
+    .welcome-pattern {
+      position:absolute; inset:0; opacity:.06;
+      background-image:
+        linear-gradient(30deg, #2A2520 1px, transparent 1px),
+        linear-gradient(-30deg, #2A2520 1px, transparent 1px);
+      background-size:48px 48px;
+    }
+    .welcome-inner {
+      position:relative; z-index:1;
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:48px 28px 32px;
+      text-align:center;
+    }
+    .welcome-logo-wrap {
+      width:100px; height:100px; border-radius:24px;
+      background:linear-gradient(145deg, var(--bg-elevated), var(--bg-card));
+      border:1px solid var(--border-light);
+      display:flex; align-items:center; justify-content:center;
+      font-size:48px;
+      box-shadow:0 0 48px rgba(232,144,26,.2), var(--shadow-xl);
+      margin-bottom:24px;
+      animation:splashPop .6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .welcome-brand {
+      font-size:32px; font-weight:900;
+      background:linear-gradient(135deg, var(--primary-light), var(--primary));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      animation:fadeUp .5s .15s ease both;
+    }
+    .welcome-ar {
+      font-family:'Cairo',sans-serif; font-size:15px;
+      color:var(--text-muted); margin-top:4px;
+      animation:fadeUp .5s .25s ease both;
+    }
+    .welcome-desc {
+      font-size:15px; color:var(--text-muted); line-height:1.7;
+      max-width:320px; margin:24px auto 0;
+      animation:fadeUp .5s .35s ease both;
+    }
+    .welcome-stats {
+      display:flex; gap:24px; margin:32px 0;
+      animation:fadeUp .5s .45s ease both;
+    }
+    .welcome-stat { text-align:center; }
+    .welcome-stat-val { font-size:22px; font-weight:800; color:var(--primary-light); }
+    .welcome-stat-lbl { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .welcome-stat-sep { width:1px; background:var(--border); align-self:stretch; }
+    .welcome-actions {
+      width:100%; max-width:360px;
+      animation:fadeUp .5s .55s ease both;
+    }
+    .welcome-actions .btn-primary { width:100%; justify-content:center; padding:16px; font-size:16px; margin-bottom:12px; }
+    .welcome-actions .btn-ghost   { width:100%; justify-content:center; padding:15px; font-size:16px; }
+    .welcome-footer {
+      position:relative; z-index:1;
+      padding:16px 28px 28px;
+      font-size:11px; color:var(--text-muted); text-align:center; line-height:1.6;
+      animation:fadeUp .5s .65s ease both;
+    }
+
+    /* ================================================================
+       OFFERS SCROLL (food dish cards on home)
+    ================================================================ */
+    .offers-scroll {
+      display:flex; gap:14px; overflow-x:auto; padding-bottom:12px;
+      scrollbar-width:none;
+    }
+    .offers-scroll::-webkit-scrollbar { display:none; }
+    .offer-card {
+      flex:0 0 160px; background:var(--bg-card); border:1px solid var(--border);
+      border-radius:var(--r-lg); overflow:hidden; cursor:pointer;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .offer-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-xl); }
+    .offer-img {
+      width:100%; height:120px; object-fit:cover;
+      background:var(--bg-elevated);
+    }
+    .offer-img-placeholder {
+      width:100%; height:120px; display:flex; align-items:center;
+      justify-content:center; font-size:40px;
+    }
+    .offer-body { padding:10px 12px 12px; }
+    .offer-name { font-size:13px; font-weight:700; margin-bottom:4px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .offer-kitchen { font-size:11px; color:var(--text-muted); margin-bottom:6px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .offer-price { font-size:14px; font-weight:800; color:var(--primary-light); }
+
+    /* ================================================================
+       AUTH PAGES (LOGIN / REGISTER)
+    ================================================================ */
+    .auth-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+    .auth-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-xl); padding:48px 44px; max-width:480px; width:100%; }
+    .auth-logo { display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:32px; cursor:pointer; }
+    .auth-title { font-size:26px; font-weight:800; margin-bottom:6px; text-align:center; }
+    .auth-sub   { font-size:14px; color:var(--text-muted); text-align:center; margin-bottom:32px; }
+    .auth-footer { text-align:center; margin-top:20px; font-size:13px; color:var(--text-muted); }
+    .auth-footer a { color:var(--primary-light); cursor:pointer; }
+    .auth-divider { display:flex; align-items:center; gap:12px; margin:20px 0; }
+    .auth-divider span { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+    .auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Role picker */
+    .role-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:28px; }
+    .role-card {
+      border:2px solid var(--border); border-radius:var(--r-lg); padding:24px 16px;
+      text-align:center; cursor:pointer; transition:var(--ease); background:var(--bg-elevated);
+    }
+    .role-card:hover { border-color:rgba(232,144,26,.5); background:var(--primary-glow); }
+    .role-card.selected { border-color:var(--primary); background:var(--primary-glow); }
+    .role-icon { font-size:44px; display:block; margin-bottom:12px; }
+    .role-name { font-size:16px; font-weight:700; margin-bottom:4px; }
+    .role-desc { font-size:12px; color:var(--text-muted); line-height:1.5; }
+
+    /* Step indicator */
+    .steps-indicator { display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:28px; }
+    .step-dot { width:8px; height:8px; border-radius:50%; background:var(--border-light); transition:var(--ease); }
+    .step-dot.active { background:var(--primary); width:24px; border-radius:4px; }
+
+    /* Navbar user menu */
+    .nav-user-wrap { position:relative; }
+    .nav-user-btn {
+      display:flex; align-items:center; gap:8px;
+      background:var(--bg-elevated); border:1px solid var(--border-light);
+      color:var(--text); padding:7px 14px; border-radius:var(--r-sm);
+      font-size:13px; font-weight:600; cursor:pointer; transition:var(--ease);
+    }
+    .nav-user-btn:hover { border-color:var(--primary); }
+    .nav-user-avatar { width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--primary-light),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#fff; }
+    .user-dropdown {
+      position:absolute; top:calc(100% + 8px); right:0; z-index:300;
+      background:var(--bg-elevated); border:1px solid var(--border-light);
+      border-radius:var(--r); padding:6px; min-width:180px;
+      box-shadow:var(--shadow-lg); display:none;
+    }
+    .user-dropdown.open { display:block; animation:fadeUp .2s ease both; }
+    .user-drop-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:var(--r-sm);
+      font-size:13px; font-weight:500; cursor:pointer; transition:var(--ease);
+      color:var(--text-muted);
+    }
+    .user-drop-item:hover { background:var(--bg-card); color:var(--text); }
+    .user-drop-item.danger:hover { color:var(--danger); }
+    .user-drop-sep { height:1px; background:var(--border); margin:4px 0; }
+    .role-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px;
+      text-transform:uppercase; letter-spacing:.5px;
+    }
+    .role-badge.client    { background:rgba(45,140,100,.15); color:var(--accent-light); }
+    .role-badge.cuisinier { background:var(--primary-glow); color:var(--primary-light); }
+
+    /* ================================================================
+       CUISINIER DASHBOARD
+    ================================================================ */
+    .dashboard-layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; padding-top:68px; }
+    .dash-sidebar {
+      background:var(--bg-card); border-right:1px solid var(--border);
+      padding:28px 16px; position:sticky; top:68px; height:calc(100vh - 68px);
+      overflow-y:auto; display:flex; flex-direction:column; gap:4px;
+    }
+    .dash-sidebar-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:4px 12px; margin:12px 0 4px; }
+    .dash-nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:var(--r-sm);
+      font-size:14px; font-weight:500; cursor:pointer;
+      color:var(--text-muted); transition:var(--ease);
+    }
+    .dash-nav-item:hover { background:var(--bg-elevated); color:var(--text); }
+    .dash-nav-item.active { background:var(--primary-glow); color:var(--primary-light); border:1px solid rgba(232,144,26,.25); }
+    .dash-nav-icon { font-size:18px; }
+
+    .dash-main { padding:32px; overflow-y:auto; }
+    .dash-panel { display:none; }
+    .dash-panel.active { display:block; animation:fadeUp .3s ease both; }
+
+    .dash-header { margin-bottom:28px; }
+    .dash-title { font-size:26px; font-weight:800; margin-bottom:4px; }
+    .dash-subtitle { font-size:14px; color:var(--text-muted); }
+
+    /* Stats */
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+    .stat-card {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg);
+      padding:20px; transition:var(--ease);
+    }
+    .stat-card:hover { border-color:var(--border-light); }
+    .stat-card-icon { font-size:28px; margin-bottom:12px; display:block; }
+    .stat-card-val { font-size:26px; font-weight:800; color:var(--primary-light); }
+    .stat-card-label { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .stat-card-delta { font-size:11px; color:var(--accent-light); margin-top:4px; }
+
+    /* Toggle */
+    .toggle-wrap { display:flex; align-items:center; gap:14px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:18px 22px; margin-bottom:24px; }
+    .toggle-label { flex:1; }
+    .toggle-label strong { font-size:15px; font-weight:700; display:block; margin-bottom:2px; }
+    .toggle-label span { font-size:12px; color:var(--text-muted); }
+    .toggle-switch { position:relative; width:48px; height:26px; cursor:pointer; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-slider {
+      position:absolute; inset:0; background:var(--border-light); border-radius:13px;
+      transition:var(--ease);
+    }
+    .toggle-slider::before {
+      content:''; position:absolute; width:20px; height:20px; border-radius:50%;
+      background:#fff; top:3px; left:3px; transition:var(--ease);
+    }
+    .toggle-switch input:checked + .toggle-slider { background:var(--accent); }
+    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(22px); }
+
+    /* Orders table */
+    .orders-list { display:flex; flex-direction:column; gap:12px; }
+    .order-row {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r);
+      padding:16px 20px; display:grid; grid-template-columns:auto 1fr auto auto; gap:16px; align-items:center;
+      transition:var(--ease);
+    }
+    .order-row:hover { border-color:var(--border-light); }
+    .order-id-tag { font-family:monospace; font-size:13px; color:var(--primary-light); font-weight:700; }
+    .order-info-name { font-size:14px; font-weight:600; }
+    .order-info-items { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .order-amount { font-size:15px; font-weight:700; color:var(--text); }
+    .order-status-select {
+      background:var(--bg-elevated); border:1px solid var(--border);
+      color:var(--text); padding:6px 28px 6px 10px; border-radius:var(--r-sm);
+      font-size:12px; font-weight:600; cursor:pointer; appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A7E6F' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 8px center; background-size:12px;
+      transition:var(--ease);
+    }
+    .order-status-select.nouveau     { border-color:rgba(232,144,26,.5); color:var(--primary-light); }
+    .order-status-select.preparation { border-color:rgba(45,140,100,.5); color:var(--accent-light); }
+    .order-status-select.livre       { border-color:var(--border); color:var(--text-muted); }
+
+    /* Dashboard menu list */
+    .menu-list-item {
+      display:flex; align-items:center; gap:14px;
+      background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r);
+      padding:14px 18px; margin-bottom:10px;
+    }
+    .menu-list-icon { width:48px; height:48px; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; }
+    .menu-list-icon img { width:100%; height:100%; object-fit:cover; }
+    .menu-list-info { flex:1; }
+    .menu-list-name { font-size:14px; font-weight:600; }
+    .menu-list-cat  { font-size:12px; color:var(--text-muted); }
+    .menu-list-price { font-size:15px; font-weight:700; color:var(--primary-light); }
+
+    /* My orders (client) */
+    .my-orders-page { padding:100px 32px 80px; max-width:800px; margin:0 auto; }
+    .order-hist-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:22px; margin-bottom:14px; }
+    .order-hist-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .order-hist-id   { font-family:monospace; font-size:14px; color:var(--primary-light); font-weight:700; }
+    .order-hist-date { font-size:12px; color:var(--text-muted); }
+    .order-hist-status {
+      padding:4px 12px; border-radius:99px; font-size:11px; font-weight:700;
+    }
+    .status-livré     { background:rgba(45,140,100,.15); color:var(--accent-light); }
+    .status-en-cours  { background:var(--primary-glow); color:var(--primary-light); }
+    .status-nouveau   { background:rgba(100,100,100,.15); color:var(--text-muted); }
+
+    @media(max-width:900px) {
+      .dashboard-layout { grid-template-columns:1fr; }
+      .dash-sidebar { position:static; height:auto; flex-direction:row; flex-wrap:wrap; }
+      .stats-row { grid-template-columns:1fr 1fr; }
+      .order-row { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================
+     SPLASH SCREEN
+================================================================ -->
+<div id="splash">
+  <div class="splash-ring">🍽️</div>
+  <div class="splash-brand">DarnaFood</div>
+  <div class="splash-ar">دارنا فود</div>
+  <div class="splash-tagline">Cuisine maison livrée chez vous 🇩🇿</div>
+  <div class="splash-loader"></div>
+</div>
+
+<!-- ================================================================
+     WELCOME / ONBOARDING
+================================================================ -->
+<div id="page-welcome">
+  <div class="welcome-bg"></div>
+  <div class="welcome-pattern"></div>
+  <div class="welcome-inner">
+    <div class="welcome-logo-wrap">🍽️</div>
+    <div class="welcome-brand">DarnaFood</div>
+    <div class="welcome-ar">دارنا فود</div>
+    <p class="welcome-desc">La première plateforme de livraison de cuisine maison en Algérie. Des plats authentiques, préparés avec amour.</p>
+    <div class="welcome-stats">
+      <div class="welcome-stat"><div class="welcome-stat-val">6+</div><div class="welcome-stat-lbl">Cuisines</div></div>
+      <div class="welcome-stat-sep"></div>
+      <div class="welcome-stat"><div class="welcome-stat-val">40+</div><div class="welcome-stat-lbl">Plats</div></div>
+      <div class="welcome-stat-sep"></div>
+      <div class="welcome-stat"><div class="welcome-stat-val">58</div><div class="welcome-stat-lbl">Wilayas</div></div>
+      <div class="welcome-stat-sep"></div>
+      <div class="welcome-stat"><div class="welcome-stat-val">4.9★</div><div class="welcome-stat-lbl">Note</div></div>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn-primary" onclick="go('register')">Créer un compte gratuit →</button>
+      <button class="btn-ghost" onclick="go('login')">J'ai déjà un compte</button>
+    </div>
+  </div>
+  <div class="welcome-footer">
+    En continuant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.<br>
+    🔒 Vos données sont protégées et ne sont jamais partagées.
+  </div>
+</div>
+
+<!-- ================================================================
+     NAVBAR
+================================================================ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-logo" onclick="go('home')">
+    <div class="nav-logo-icon">🍽️</div>
+    <div class="nav-logo-wordmark">
+      <div class="nav-logo-en">DarnaFood</div>
+      <div class="nav-logo-ar">دارنا فود</div>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#" id="nl-home"     onclick="go('home');return false"    class="active">Accueil</a></li>
+    <li><a href="#" id="nl-kitchens" onclick="go('kitchens');return false">Cuisines</a></li>
+    <li><a href="#" onclick="scrollHow();return false">Comment ça marche</a></li>
+  </ul>
+  <div class="nav-spacer"></div>
+  <!-- Not logged in -->
+  <div id="nav-auth" style="display:flex;gap:8px;">
+    <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" onclick="go('login')">Se connecter</button>
+    <button class="btn-primary" style="padding:8px 16px;font-size:13px;" onclick="go('register')">S'inscrire</button>
+  </div>
+  <!-- Logged in -->
+  <div id="nav-user" class="nav-user-wrap" style="display:none;">
+    <button class="nav-user-btn" onclick="toggleUserMenu()" id="nav-user-btn">
+      <div class="nav-user-avatar" id="nav-user-initial">?</div>
+      <span id="nav-user-name">Utilisateur</span>
+      <span style="font-size:10px;color:var(--text-muted)">▾</span>
+    </button>
+    <div class="user-dropdown" id="user-dropdown">
+      <div style="padding:10px 12px 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+        <div style="font-size:13px;font-weight:700;" id="dd-name"></div>
+        <div id="dd-badge"></div>
+      </div>
+      <div class="user-drop-item" id="dd-dashboard" onclick="go('dashboard');closeUserMenu()" style="display:none;">📊 Tableau de bord</div>
+      <div class="user-drop-item" id="dd-myorders" onclick="go('myorders');closeUserMenu()" style="display:none;">📦 Mes commandes</div>
+      <div class="user-drop-sep"></div>
+      <div class="user-drop-item danger" onclick="logout()">🚪 Se déconnecter</div>
+    </div>
+  </div>
+  <!-- Cart (clients only) -->
+  <button class="nav-cart" id="nav-cart-btn" onclick="openCart()" style="display:none;">
+    🛒 Panier
+    <span class="cart-badge" id="cart-badge">0</span>
+  </button>
+</nav>
+
+<!-- ================================================================
+     CART OVERLAY + DRAWER
+================================================================ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="drawer-head">
+    <span class="drawer-head-title">🛒 Votre Panier</span>
+    <button class="close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-footer" id="drawer-footer"></div>
+</div>
+
+<!-- ================================================================
+     TOAST
+================================================================ -->
+<div class="toast-host" id="toast-host"></div>
+
+<!-- ================================================================
+     PAGE: HOME
+================================================================ -->
+<div class="page active" id="page-home">
+
+  <section class="hero">
+    <div class="hero-bg-img"></div>
+    <div class="hero-bg-gradient"></div>
+    <div class="hero-pattern"></div>
+    <div class="hero-inner">
+
+      <div>
+        <div class="hero-badge">🌟 &nbsp;N°1 de la cuisine maison en Algérie</div>
+        <h1 class="hero-title">Des repas faits<br>maison,<br><span class="highlight">livrés chez vous</span></h1>
+        <p class="hero-sub">Découvrez les meilleurs cuisiniers à domicile dans votre wilaya. Couscous, tagines, pâtisseries traditionnelles — préparés avec amour.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="go('kitchens')">🍳 Voir les cuisines</button>
+          <button class="btn-ghost" onclick="scrollHow()">Comment ça marche</button>
+        </div>
+        <div class="hero-stats">
+          <div><div class="stat-val">120+</div><div class="stat-lbl">Cuisines actives</div></div>
+          <div><div class="stat-val">58</div><div class="stat-lbl">Wilayas couvertes</div></div>
+          <div><div class="stat-val">4.8 ★</div><div class="stat-lbl">Note moyenne</div></div>
+        </div>
+      </div>
+
+      <div class="hero-visual" id="hero-visual"><!-- rendered by JS --></div>
+    </div>
+  </section>
+
+  <!-- NEAR YOU -->
+  <div class="section" id="section-near" style="display:none;padding-bottom:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div class="section-badge" style="margin-bottom:8px;">📍 Autour de vous</div>
+        <h2 id="near-title" style="font-size:20px;font-weight:800;">Cuisiniers de votre commune</h2>
+      </div>
+      <a onclick="go('kitchens');return false" style="color:var(--primary-light);font-size:13px;font-weight:600;cursor:pointer;">Voir tout →</a>
+    </div>
+    <div class="kitchens-grid" id="near-grid"></div>
+  </div>
+
+  <!-- FOOD OFFERS -->
+  <div class="section" id="section-offers" style="display:none;padding-bottom:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div class="section-badge" style="margin-bottom:8px;">🔥 Populaire</div>
+        <h2 style="font-size:20px;font-weight:800;">Offres du moment</h2>
+      </div>
+    </div>
+    <div class="offers-scroll" id="offers-grid"></div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section" style="padding-bottom:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h2 style="font-size:20px;font-weight:700;">Parcourir par catégorie</h2>
+      <a href="#" onclick="go('kitchens');return false" style="color:var(--primary);font-size:13px;font-weight:600;">Voir tout →</a>
+    </div>
+    <div class="cat-scroll" id="home-cats"></div>
+  </div>
+
+  <!-- FEATURED KITCHENS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-badge">⭐ En vedette</div>
+      <h2 class="section-title">Les favorites de la semaine</h2>
+      <p class="section-sub">Les cuisines maison les mieux notées par notre communauté</p>
+    </div>
+    <div class="kitchens-grid" id="featured-grid"></div>
+    <div style="text-align:center;margin-top:36px;">
+      <button class="btn-ghost" onclick="go('kitchens')" style="padding:13px 32px;font-size:15px;">Voir toutes les cuisines →</button>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-section" id="how-section">
+    <div style="max-width:1180px;margin:0 auto;">
+      <div class="section-head" style="margin-bottom:40px;">
+        <div class="section-badge">📖 Guide rapide</div>
+        <h2 class="section-title">Comment ça marche ?</h2>
+        <p class="section-sub">Commander un repas maison n'a jamais été aussi simple</p>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <span class="step-icon">🔍</span>
+          <h3 class="step-title">Choisissez votre cuisine</h3>
+          <p class="step-desc">Parcourez les cuisines maison de votre wilaya. Filtrez par catégorie, note ou spécialité.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <span class="step-icon">🛒</span>
+          <h3 class="step-title">Composez votre panier</h3>
+          <p class="step-desc">Ajoutez vos plats au panier, personnalisez vos quantités et notez vos instructions spéciales.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <span class="step-icon">🏠</span>
+          <h3 class="step-title">Recevez à domicile</h3>
+          <p class="step-desc">Votre repas est préparé et livré chaud chez vous. Payez à la livraison, en espèces.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <div class="cta-inner">
+      <span class="cta-emoji">👩‍🍳</span>
+      <h2 class="cta-title">Vous cuisinez bien ?</h2>
+      <p class="cta-desc">Rejoignez notre communauté de cuisiniers, vendez vos plats maison dans votre quartier. Inscription gratuite, commissions réduites.</p>
+      <button class="btn-primary" style="font-size:15px;padding:14px 30px;">Devenir cuisinier →</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="nav-logo" style="margin-bottom:2px;">
+          <div class="nav-logo-icon">🍽️</div>
+          <div class="nav-logo-wordmark">
+            <div class="nav-logo-en">DarnaFood</div>
+            <div class="nav-logo-ar">دارنا فود</div>
+          </div>
+        </div>
+        <p class="footer-brand-desc">La première plateforme de livraison de cuisine maison en Algérie. Des plats authentiques, préparés avec amour, livrés directement chez vous.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social" title="Facebook">📘</a>
+          <a href="#" class="footer-social" title="Instagram">📸</a>
+          <a href="#" class="footer-social" title="TikTok">🎵</a>
+          <a href="#" class="footer-social" title="WhatsApp">💬</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Plateforme</h4>
+        <ul class="footer-links">
+          <li><a href="#">Cuisines</a></li>
+          <li><a href="#">Catégories</a></li>
+          <li><a href="#">Promotions</a></li>
+          <li><a href="#">Blog recettes</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Cuisiniers</h4>
+        <ul class="footer-links">
+          <li><a href="#">Devenir partenaire</a></li>
+          <li><a href="#">Tableau de bord</a></li>
+          <li><a href="#">Formation</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Aide</h4>
+        <ul class="footer-links">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Conditions</a></li>
+          <li><a href="#">Confidentialité</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 DarnaFood. Tous droits réservés. 🇩🇿 Made in Algeria</p>
+      <div class="pay-badges">
+        <span class="pay-badge">💵 Cash</span>
+        <span class="pay-badge">📦 Livraison</span>
+        <span class="pay-badge">✅ Paiement à réception</span>
+      </div>
+    </div>
+  </footer>
+</div><!-- /page-home -->
+
+<!-- ================================================================
+     PAGE: KITCHENS
+================================================================ -->
+<div class="page" id="page-kitchens">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <button class="back-btn" onclick="go('home')">← Retour à l'accueil</button>
+      <h1 class="page-title">🍳 Cuisines maison</h1>
+      <p class="page-sub">Découvrez les meilleures cuisines à domicile dans toute l'Algérie</p>
+    </div>
+  </div>
+  <div class="kitchens-page-body">
+    <div class="controls-row">
+      <div class="search-wrap">
+        <span class="ico">🔍</span>
+        <input type="text" class="search-input" id="search-q" placeholder="Rechercher une cuisine ou un plat..." oninput="filterKitchens()">
+      </div>
+      <select class="filter-sel" id="f-wilaya" onchange="filterKitchens()">
+        <option value="">Toutes les wilayas</option>
+      </select>
+      <select class="filter-sel" id="f-cat" onchange="filterKitchens()">
+        <option value="">Toutes catégories</option>
+      </select>
+      <select class="filter-sel" id="f-sort" onchange="filterKitchens()">
+        <option value="rating">Mieux notées</option>
+        <option value="time">Livraison rapide</option>
+        <option value="min">Prix min. bas</option>
+      </select>
+    </div>
+    <div class="cat-scroll" id="kitchens-cats" style="margin-bottom:20px;"></div>
+    <div class="results-count" id="results-count"></div>
+    <div class="kitchens-grid" id="kitchens-grid"></div>
+  </div>
+</div><!-- /page-kitchens -->
+
+<!-- ================================================================
+     PAGE: KITCHEN DETAIL
+================================================================ -->
+<div class="page" id="page-detail">
+  <div class="detail-header">
+    <div class="detail-cover" id="detail-cover">
+      <div class="detail-cover-emoji" id="detail-cover-emoji"></div>
+      <div class="detail-cover-overlay"></div>
+    </div>
+    <div class="detail-info-bar">
+      <div class="detail-top">
+        <div class="detail-avatar" id="detail-avatar"></div>
+        <div>
+          <h1 class="detail-name" id="detail-name"></h1>
+          <p class="detail-tagline" id="detail-tagline"></p>
+          <div class="detail-meta" id="detail-meta"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-layout">
+    <div id="menu-area"><!-- rendered by JS --></div>
+    <aside class="sidebar-cart" id="sidebar-cart">
+      <h3 class="sidebar-title">🛒 Votre commande</h3>
+      <div id="sidebar-content">
+        <div class="empty-cart">
+          <span class="ei">🍽️</span>
+          <p>Votre panier est vide.<br>Ajoutez des plats pour commencer.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div><!-- /page-detail -->
+
+<!-- ================================================================
+     PAGE: CHECKOUT
+================================================================ -->
+<div class="page" id="page-checkout">
+  <div class="checkout-wrap">
+    <button class="back-btn" id="checkout-back" onclick="go('detail')">← Retour au menu</button>
+    <h1 class="checkout-title">💳 Finaliser la commande</h1>
+    <p class="checkout-sub">Remplissez vos informations de livraison</p>
+    <div class="checkout-layout">
+      <div>
+        <div class="form-card">
+          <h3 class="form-card-title">📍 Adresse de livraison</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Prénom *</label>
+              <input type="text" class="form-input" id="f-fn" placeholder="Votre prénom">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom *</label>
+              <input type="text" class="form-input" id="f-ln" placeholder="Votre nom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone *</label>
+            <input type="tel" class="form-input" id="f-ph" placeholder="06 XX XX XX XX">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Wilaya *</label>
+              <select class="form-select" id="f-wil"><option value="">Sélectionner...</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Commune *</label>
+              <input type="text" class="form-input" id="f-com" placeholder="Votre commune">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse complète *</label>
+            <input type="text" class="form-input" id="f-addr" placeholder="Numéro, rue, quartier...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes de livraison</label>
+            <textarea class="form-textarea" id="f-note" placeholder="Instructions spéciales, interphone, étage..."></textarea>
+          </div>
+        </div>
+        <div class="form-card">
+          <h3 class="form-card-title">💰 Mode de paiement</h3>
+          <div class="cod-box">
+            <span class="cod-icon">💵</span>
+            <div>
+              <div class="cod-label">Paiement à la livraison (Cash)</div>
+              <div class="cod-desc">Payez en espèces à la réception de votre commande</div>
+            </div>
+            <span class="cod-check">✅</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="summary-card">
+          <h3 class="summary-card-title">📋 Récapitulatif</h3>
+          <div id="checkout-summary"></div>
+          <div class="divider"></div>
+          <button class="btn-primary btn-block" onclick="placeOrder()">✅ Confirmer la commande</button>
+          <p class="secure-note">🔒 Paiement sécurisé · Paiement à réception</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /page-checkout -->
+
+<!-- ================================================================
+     PAGE: CONFIRMATION
+================================================================ -->
+<div class="page" id="page-confirm">
+  <div class="confirm-page">
+    <div class="confirm-card">
+      <div class="success-circle">✅</div>
+      <h1 class="conf-title">Commande confirmée !</h1>
+      <p class="conf-desc">Votre commande a été reçue et transmise au cuisinier. Vous serez contacté par téléphone pour confirmer la livraison.</p>
+      <div class="order-id-box" id="conf-order-id">DRC-000000</div>
+      <div class="conf-grid" id="conf-grid"></div>
+      <div class="conf-actions">
+        <button class="btn-primary" onclick="go('home')">🏠 Retour à l'accueil</button>
+        <button class="btn-ghost" onclick="go('kitchens')">🍳 Commander encore</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /page-confirm -->
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+/* ================================================================
+   DATA
+================================================================ */
+const WILAYAS = [
+  /* 01 */ "Adrar",
+  /* 02 */ "Chlef",
+  /* 03 */ "Laghouat",
+  /* 04 */ "Oum El Bouaghi",
+  /* 05 */ "Batna",
+  /* 06 */ "Béjaïa",
+  /* 07 */ "Biskra",
+  /* 08 */ "Béchar",
+  /* 09 */ "Blida",
+  /* 10 */ "Bouira",
+  /* 11 */ "Tamanrasset",
+  /* 12 */ "Tébessa",
+  /* 13 */ "Tlemcen",
+  /* 14 */ "Tiaret",
+  /* 15 */ "Tizi Ouzou",
+  /* 16 */ "Alger",
+  /* 17 */ "Djelfa",
+  /* 18 */ "Jijel",
+  /* 19 */ "Sétif",
+  /* 20 */ "Saïda",
+  /* 21 */ "Skikda",
+  /* 22 */ "Sidi Bel Abbès",
+  /* 23 */ "Annaba",
+  /* 24 */ "Guelma",
+  /* 25 */ "Constantine",
+  /* 26 */ "Médéa",
+  /* 27 */ "Mostaganem",
+  /* 28 */ "M'Sila",
+  /* 29 */ "Mascara",
+  /* 30 */ "Ouargla",
+  /* 31 */ "Oran",
+  /* 32 */ "El Bayadh",
+  /* 33 */ "Illizi",
+  /* 34 */ "Bordj Bou Arréridj",
+  /* 35 */ "Boumerdès",
+  /* 36 */ "El Tarf",
+  /* 37 */ "Tindouf",
+  /* 38 */ "Tissemsilt",
+  /* 39 */ "El Oued",
+  /* 40 */ "Khenchela",
+  /* 41 */ "Souk Ahras",
+  /* 42 */ "Tipaza",
+  /* 43 */ "Mila",
+  /* 44 */ "Aïn Defla",
+  /* 45 */ "Naâma",
+  /* 46 */ "Aïn Témouchent",
+  /* 47 */ "Ghardaïa",
+  /* 48 */ "Relizane",
+  /* 49 */ "Timimoun",
+  /* 50 */ "Bordj Badji Mokhtar",
+  /* 51 */ "Ouled Djellal",
+  /* 52 */ "Béni Abbès",
+  /* 53 */ "In Salah",
+  /* 54 */ "In Guezzam",
+  /* 55 */ "Touggourt",
+  /* 56 */ "Djanet",
+  /* 57 */ "El M'Ghair",
+  /* 58 */ "El Meniaa",
+];
+const COMMUNES = {
+  "Adrar":["Adrar","Aoulef","Reggane","Timimoun","Zaouiet Kounta","Fenoughil","Tsabit","Aougrout","Bordj Badji Mokhtar"],
+  "Chlef":["Chlef","Ténès","Oued Fodda","Boukadir","El Karimia","Beni Haoua","Ouled Fares","Abou El Hassan","Zeboudja"],
+  "Laghouat":["Laghouat","Aflou","Ksar El Hirane","Hassi R'Mel","Aïn Madhi","Brida","Sidi Makhlouf","El Ghicha"],
+  "Oum El Bouaghi":["Oum El Bouaghi","Aïn Beïda","Aïn M'Lila","Souk Naamane","El Amiria","Bir Chouhada","Fkirina","Aïn Fakroun"],
+  "Batna":["Batna","Biskra","Arris","Barika","Merouana","N'Gaous","Timgad","Lambese","Aïn Touta","Boulhilet","Tazoult"],
+  "Béjaïa":["Béjaïa","Akbou","Amizour","Aokas","Kherrata","El Kseur","Sidi Aich","Souk El Ténine","Tichy","Chemini","Adekar"],
+  "Biskra":["Biskra","Ouled Djellal","Tolga","Sidi Okba","Zeribet El Oued","El Kantara","M'Chouneche","Foughala","Djamorah"],
+  "Béchar":["Béchar","Abadla","Beni Ounif","Kenadsa","Igli","Lahmar","El Ouata","Tabelbala","Meridja"],
+  "Blida":["Blida","Boufarik","Larbaa","Meftah","Chréa","Bouinan","Bougara","El Affroun","Oued El Alleug","Beni Tamou","Chiffa"],
+  "Bouira":["Bouira","Lakhdaria","M'Chedallah","Kadiria","Sour El Ghozlane","Aïn Bessem","El Asnam","Bordj Okhriss","Haizer"],
+  "Tamanrasset":["Tamanrasset","Abalessa","In Ghar","In Guezzam","Tazrouk","Idles","Tinhert"],
+  "Tébessa":["Tébessa","Bir El Ater","Cheria","El Aouinet","Ouenza","El Milia","Boulhaf Dyr","El Ogla","Negrine"],
+  "Tlemcen":["Tlemcen","Remchi","Ghazaouet","Maghnia","Nedroma","Sebdou","Beni Snous","Aïn Tallout","Aïn Fetah","Hennaya","Mansourah"],
+  "Tiaret":["Tiaret","Ksar Chellala","Sougueur","Frenda","Mahdia","Rahouia","Medrissa","Dahmouni","Meghila"],
+  "Tizi Ouzou":["Tizi Ouzou","Azazga","Beni Douala","Boghni","Draa Ben Khedda","Draa El Mizan","Larbaa Nath Irathen","Maatkas","Ouacifs","Ouadhias","Tigzirt","Ain El Hammam"],
+  "Alger":["Alger Centre","Bab El Oued","Hussein Dey","El Harrach","Kouba","Rouïba","Dar El Beïda","Bab Ezzouar","Ben Aknoun","Hydra","Bir Mourad Raïs","El Biar","Belouizdad","El Madania","Baraki","Bachdjerrah","Birtouta","Eucalyptus","Oued Smar","Sidi M'Hamed","Bourouba","Cheraga","Dely Ibrahim","El Achour","Ouled Fayet","Ain Benian","Gue de Constantine","Bordj El Kiffan","Bouzareah","Casbah"],
+  "Djelfa":["Djelfa","Aïn Oussera","Messaad","Hassi Bahbah","Birine","El Idrissia","Charef","Selmana","Aïn El Ibel"],
+  "Jijel":["Jijel","El Milia","Taher","Chekfa","Texenna","Ziamma Mansouriah","El Aouana","Settara","Ouled Yahia Khedrouche"],
+  "Sétif":["Sétif","Aïn Azel","Aïn El Kebira","Aïn Oulmene","Bougaa","El Eulma","Guenzet","Maoklane","Salah Bey","Bouandas","Bir El Arch"],
+  "Saïda":["Saïda","Aïn El Hadjar","Youb","Hassasna","Moulay Larbi","El Sehala","Doui Thabet"],
+  "Skikda":["Skikda","Azzaba","Collo","El Harrouch","Filfila","Ramdane Djamel","Tamalous","Ben Azzouz","El Hadaiek","Hamadi Krouma"],
+  "Sidi Bel Abbès":["Sidi Bel Abbès","Telagh","Aïn El Berd","Ben Badis","Marhoum","Mostefa Ben Brahim","Ras El Ma","Tessala","Tenira"],
+  "Annaba":["Annaba","El Bouni","El Hadjar","Aïn Berda","Berrahhal","Chetaibi","Eulma","Sidi Amar","Treat"],
+  "Guelma":["Guelma","Bouchegouf","Heliopolis","Oued Zenati","Aïn Makhlouf","Sellaoua Announa","Khezaras","Houari Boumediene"],
+  "Constantine":["Constantine","El Khroub","Aïn Abid","Didouche Mourad","Hamma Bouziane","Ibn Ziad","Ouled Rahmoune","Zighoud Youcef"],
+  "Médéa":["Médéa","Berrouaghia","Ksar El Boukhari","Tablat","Aïn Boucif","Cheniguel","El Azizia","Ouled Antar","Si Mahdjoub"],
+  "Mostaganem":["Mostaganem","Aïn Tedeles","Aïn Nouissy","Mazagran","Mesra","Sidi Ali","Stidia","Kheir Eddine","Hadjaj"],
+  "M'Sila":["M'Sila","Aïn El Melh","Aïn El Rich","Bou Saada","Ouled Derradj","Sidi Aïssa","Magra","Berhoum","Ouanougha"],
+  "Mascara":["Mascara","Sig","Tighennif","Oued El Abtal","Ain Fares","Froha","Ghriss","Hachem","Oggaz","El Hachem"],
+  "Ouargla":["Ouargla","Hassi Messaoud","Touggourt","El Hadjira","N'Goussa","Rouissat","Sidi Khouiled","Témacine","Ain Beida Ahriche"],
+  "Oran":["Oran","Es Senia","Bir El Djir","Aïn El Turck","Arzew","Bethioua","El Kerma","Gdyel","Hassi Ben Okba","Hassi Mefsoukh","Boutlelis","Ain El Bya","Oued Tlelat","Ain El Kerma"],
+  "El Bayadh":["El Bayadh","Rogassa","Aïn El Orak","Boualem","Cheguig","El Bnoud","Krakda","Sidi Ameur"],
+  "Illizi":["Illizi","Djanet","In Amenas","Bordj Omar Driss"],
+  "Bordj Bou Arréridj":["Bordj Bou Arréridj","Ras El Oued","El Ansour","Bir Kasdali","Djaafra","El Main","Haraza","Mansoura","Medjana"],
+  "Boumerdès":["Boumerdès","Boudouaou","Khemis El Khechna","Bordj Menaïel","Dellys","Naciria","Thenia","Ouled Moussa","Si Mustapha","Tidjelabine","Isser"],
+  "El Tarf":["El Tarf","Ben M'Hidi","Bouchegouf","Bouteldja","Chebaita Mokhtar","Dréan","El Aïoun","El Kala","Zerizer"],
+  "Tindouf":["Tindouf","Oum El Assel"],
+  "Tissemsilt":["Tissemsilt","Bordj Bou Naama","Theniet El Had","Lazharia","Ammari","Bouchaid","Sidi Lantri","Youssoufia"],
+  "El Oued":["El Oued","Biskra","Guemar","Debila","Djamaa","Hassi Khalifa","Kouinine","Magrane","Robbah","Reguiba","Sidi Aoun","Still","Taghzout","Tendla"],
+  "Khenchela":["Khenchela","Aïn Touila","Babar","Chechar","El Hamma","Kais","M'Toussa","Ouled Rechache","Tamza"],
+  "Souk Ahras":["Souk Ahras","Sedrata","Aïn Soltane","Mechroha","Merahna","M'Daourouch","Ouillen","Ouled Driss","Taoura"],
+  "Tipaza":["Tipaza","Aïn Tagourait","Bou Ismail","Cherchell","Fouka","Hadjout","Koléa","Mahelma","Sidi Rached","Zeralda","Damous","Gouraya"],
+  "Mila":["Mila","Chelghoum Laïd","El Mechira","Ferdjioua","Grarem Gouga","Oued Athmania","Rouached","Sidi Merouane","Tassadane Haddada"],
+  "Aïn Defla":["Aïn Defla","Khemis Miliana","El Attaf","Djendel","Rouina","El Abadia","Aïn Lechiekh","Bourached","Hammam Righa"],
+  "Naâma":["Naâma","Aïn Sefra","Mecheria","Sfissifa","Moghrar","Tiout","El Biod","Aïn Ben Khelil"],
+  "Aïn Témouchent":["Aïn Témouchent","Beni Saf","El Amria","El Malah","Hammam Bou Hadjar","Oulhassa Gheraba","Sidi Ben Adda","Terny Beni Hdiel"],
+  "Ghardaïa":["Ghardaïa","Berriane","Bounoura","El Atteuf","Guerrara","Metlili","Mansoura","Dhayet Bendhahoua","Sebseb","Zelfana"],
+  "Relizane":["Relizane","Aïn Tarek","El Hamadna","Mazouna","Oued Rhiou","Sidi M'Hamed Ben Ali","Souk El Had","Yellel","Zemmoura"],
+  "Timimoun":["Timimoun","Aougrout","Charouine","Deldoul","Ouled Saïd","Talmine","Tinerkouk","Zaouiet Debagh"],
+  "Bordj Badji Mokhtar":["Bordj Badji Mokhtar","Timiaouine"],
+  "Ouled Djellal":["Ouled Djellal","Sidi Khaled","Ras El Miad"],
+  "Béni Abbès":["Béni Abbès","Erg Ferradj","Kerzaz","Oulad Khodeir","Tamtert"],
+  "In Salah":["In Salah","Foggaret Ezzaouia","In Ghar"],
+  "In Guezzam":["In Guezzam","Tin Zaouatine"],
+  "Touggourt":["Touggourt","Blidet Amor","El Hadjira","Nezla","Taibet","Témacine","Zaouia El Abidia"],
+  "Djanet":["Djanet","Bordj El Haouas"],
+  "El M'Ghair":["El M'Ghair","Djamaa","Sidi Aoun","Still","Tendla"],
+  "El Meniaa":["El Meniaa","Hassi Gara"]
+};
+
+function populateCommunes(wilayaId, communeId) {
+  const wilaya = document.getElementById(wilayaId);
+  const commune = document.getElementById(communeId);
+  if (!wilaya || !commune) return;
+  const w = wilaya.value;
+  commune.innerHTML = '<option value="">Sélectionner commune...</option>';
+  if (w && COMMUNES[w]) {
+    COMMUNES[w].forEach(c => {
+      const o = document.createElement('option');
+      o.value = o.textContent = c;
+      commune.appendChild(o);
+    });
+    commune.disabled = false;
+  } else {
+    commune.disabled = true;
+  }
+}
+
+
+const CATS = [
+  {name:"Couscous",   icon:"🥘"},
+  {name:"Tagine",     icon:"🫕"},
+  {name:"Grillades",  icon:"🥩"},
+  {name:"Pâtisseries",icon:"🧁"},
+  {name:"Soupes",     icon:"🍲"},
+  {name:"Kabyle",     icon:"🫙"},
+  {name:"Sandwich",   icon:"🥪"},
+  {name:"Salades",    icon:"🥗"},
+];
+
+/* Map dish IDs to real food photos */
+const DISH_PHOTOS = {
+  101:'images/dish_couscous.png', 102:'images/dish_couscous.png', 103:'images/dish_couscous.png',
+  104:'images/dish_couscous.png', 105:'images/dish_couscous.png', 602:'images/dish_couscous.png',
+  601:'images/dish_couscous.png',
+  201:'images/dish_grillades.png',202:'images/dish_grillades.png',203:'images/dish_grillades.png',
+  204:'images/dish_grillades.png',
+  205:'images/dish_tagine.png',  501:'images/dish_tagine.png',  502:'images/dish_tagine.png',
+  503:'images/dish_tagine.png',
+  401:'images/dish_baklawa.png', 402:'images/dish_baklawa.png', 403:'images/dish_baklawa.png',
+  404:'images/dish_baklawa.png', 405:'images/dish_baklawa.png',
+};
+
+const KITCHENS = [
+  {
+    id:1, name:"Dar Fatima", tagline:"Cuisine algéroise authentique depuis 1995",
+    wilaya:"Alger", commune:"Bab El Oued", rating:4.9, reviews:237, cat:"Couscous",
+    minOrder:500, deliveryFee:200, deliveryTime:45, open:true,
+    gradient:"linear-gradient(135deg,#6B2D0F,#C4632A,#7A3010)", emoji:"🥘",
+    desc:"Fatima prépare la meilleure cuisine algéroise depuis plus de 25 ans. Ses couscous et rechta sont légendaires à Bab El Oued.",
+    menu:[
+      { cat:"Couscous", dishes:[
+        {id:101,name:"Couscous au Poulet",    desc:"Semoule fine, légumes de saison et poulet fermier mijoté aux épices",             price:950,  emoji:"🥘",gradient:"linear-gradient(135deg,#7A5A0A,#C89520)"},
+        {id:102,name:"Couscous Royal",        desc:"Couscous festif avec merguez maison, kefta grillée et brochettes d'agneau",       price:1450, emoji:"👑",gradient:"linear-gradient(135deg,#6A1010,#B83030)"},
+        {id:103,name:"Couscous 7 Légumes",    desc:"Version végétarienne généreuse, pois chiches et raisins secs de la région",      price:800,  emoji:"🌿",gradient:"linear-gradient(135deg,#1A5C2E,#2D8C4E)"},
+      ]},
+      { cat:"Plats traditionnels", dishes:[
+        {id:104,name:"Rechta",                desc:"Pâtes fines maison, sauce blanche, poulet fondant et navet caramélisé",          price:900,  emoji:"🍜",gradient:"linear-gradient(135deg,#4A3520,#8B6840)"},
+        {id:105,name:"Chakhchoukha",          desc:"Galettes émiettées avec sauce tomate-légumes et viande d'agneau tendre",         price:850,  emoji:"🫙",gradient:"linear-gradient(135deg,#6B2410,#B84020)"},
+        {id:106,name:"Berkoukes",             desc:"Petites boulettes de semoule en sauce parfumée au ras el hanout",               price:780,  emoji:"🍛",gradient:"linear-gradient(135deg,#5C4020,#9A6A30)"},
+      ]},
+      { cat:"Soupes", dishes:[
+        {id:107,name:"Harira",                desc:"Soupe réconfortante aux tomates, lentilles rouges, coriandre et citron",         price:280,  emoji:"🍲",gradient:"linear-gradient(135deg,#8B2020,#CC4C20)"},
+        {id:108,name:"Chorba Frik",           desc:"Soupe épaisse au blé concassé, agneau et légumes mijotés lentement",            price:320,  emoji:"🫕",gradient:"linear-gradient(135deg,#4A4010,#8B7820)"},
+      ]},
+    ]
+  },
+  {
+    id:2, name:"Le Goût d'Oran", tagline:"Saveurs méditerranéennes & grillades oranaises",
+    wilaya:"Oran", commune:"Es Senia", rating:4.7, reviews:189, cat:"Grillades",
+    minOrder:600, deliveryFee:150, deliveryTime:35, open:true,
+    gradient:"linear-gradient(135deg,#0D2B4A,#1A5FA0,#0E3A70)", emoji:"🥩",
+    desc:"La famille Bensalem perpétue les traditions culinaires oranaises. Grillades et spécialités du littoral méditerranéen.",
+    menu:[
+      { cat:"Grillades", dishes:[
+        {id:201,name:"Merguez Maison",        desc:"Saucisses d'agneau épicées grillées, sauce harissa et pain kesra maison",       price:750,  emoji:"🌭",gradient:"linear-gradient(135deg,#6B1010,#B82020)"},
+        {id:202,name:"Brochettes d'Agneau",   desc:"Brochettes marinées 24h, grillées au charbon de bois avec légumes",            price:950,  emoji:"🍢",gradient:"linear-gradient(135deg,#5C3010,#A05020)"},
+        {id:203,name:"Poulet Grillé",         desc:"Demi-poulet mariné aux épices oranaises, pommes de terre et salade",           price:850,  emoji:"🍗",gradient:"linear-gradient(135deg,#6B5010,#B08020)"},
+        {id:204,name:"Kefta Grillée",         desc:"Boulettes de viande hachée épicées, servies en sauce tomate",                  price:700,  emoji:"🥙",gradient:"linear-gradient(135deg,#5C2020,#9A4020)"},
+      ]},
+      { cat:"Plats", dishes:[
+        {id:205,name:"Tajine Zitoun",         desc:"Poulet aux olives et citron confit, ras el hanout maison",                     price:900,  emoji:"🫕",gradient:"linear-gradient(135deg,#2A4A10,#4A8020)"},
+        {id:206,name:"Calamar Farci",         desc:"Calmars de Méditerranée farcis au riz et herbes fraîches, sauce tomate",       price:1100, emoji:"🦑",gradient:"linear-gradient(135deg,#10304A,#206080)"},
+      ]},
+      { cat:"Accompagnements", dishes:[
+        {id:207,name:"Salade Oranaise",       desc:"Tomates, poivrons grillés, oignons, olives et huile d'olive première pression",price:200,  emoji:"🥗",gradient:"linear-gradient(135deg,#1A5C1A,#2E8C2E)"},
+        {id:208,name:"Pain Kesra Maison",     desc:"Pain traditionnel kesra chaud sorti du four à bois",                          price:100,  emoji:"🫓",gradient:"linear-gradient(135deg,#6B5020,#A07830)"},
+      ]},
+    ]
+  },
+  {
+    id:3, name:"Tizi Kitchen", tagline:"Authenticité kabyle, saveurs des montagnes du Djurdjura",
+    wilaya:"Tizi Ouzou", commune:"Tizi Ouzou", rating:4.8, reviews:156, cat:"Kabyle",
+    minOrder:450, deliveryFee:180, deliveryTime:50, open:true,
+    gradient:"linear-gradient(135deg,#1A3A1A,#2E6E2A,#1A4A18)", emoji:"🫙",
+    desc:"Tassadit vous invite à découvrir la richesse de la cuisine kabyle, préparée avec les produits frais des montagnes du Djurdjura.",
+    menu:[
+      { cat:"Spécialités Kabyles", dishes:[
+        {id:301,name:"Ith Meksayen",          desc:"Plat kabyle traditionnel aux haricots blancs, huile d'olive et épices du village",price:720, emoji:"🫘",gradient:"linear-gradient(135deg,#3A5020,#6A8040)"},
+        {id:302,name:"Aakoul (Couscous Kabyle)",desc:"Couscous d'orge kabyle aux légumes du jardin et beurre de chèvre frais",     price:800,  emoji:"🌾",gradient:"linear-gradient(135deg,#6B5A10,#A08A20)"},
+        {id:303,name:"Lemsamen au Miel",      desc:"Crêpes feuilletées kabyles nappées de miel de montagne et d'huile d'olive",    price:350,  emoji:"🥞",gradient:"linear-gradient(135deg,#7A4A10,#C08020)"},
+        {id:304,name:"Tafraout",              desc:"Galettes de semoule grillées, spécialité des villages du Djurdjura",           price:250,  emoji:"🫓",gradient:"linear-gradient(135deg,#5C4A20,#907830)"},
+      ]},
+      { cat:"Plats montagnards", dishes:[
+        {id:305,name:"Agneau aux Herbes Sauvages",desc:"Agneau de montagne mijoté aux herbes sauvages du Djurdjura",              price:1200, emoji:"🍖",gradient:"linear-gradient(135deg,#5C2020,#9A4030)"},
+        {id:306,name:"Soupe d'Orge",          desc:"Soupe épaisse à l'orge, légumineuses et aromatiques sauvages cueillis en altitude",price:300,emoji:"🍲",gradient:"linear-gradient(135deg,#4A4020,#7A6830)"},
+      ]},
+    ]
+  },
+  {
+    id:4, name:"Baya Sweets", tagline:"Pâtisseries orientales de Constantine — 3 générations de savoir-faire",
+    wilaya:"Constantine", commune:"Constantine", rating:4.9, reviews:312, cat:"Pâtisseries",
+    minOrder:300, deliveryFee:120, deliveryTime:30, open:true,
+    gradient:"linear-gradient(135deg,#4A1A6A,#8A3AAC,#5A1A8A)", emoji:"🧁",
+    desc:"Baya perpétue l'art des pâtisseries constantinoises depuis 3 générations. Ses baklawa et makrout sont reconnus dans tout le nord-est algérien.",
+    menu:[
+      { cat:"Pâtisseries traditionnelles", dishes:[
+        {id:401,name:"Baklawa Royale (12 pcs)",desc:"Feuilletage de pâte filo aux amandes et pistaches, sirop de fleur d'oranger", price:680,  emoji:"🍯",gradient:"linear-gradient(135deg,#6B4A10,#B08030)"},
+        {id:402,name:"Makrout aux Dattes (1kg)",desc:"Semoule fine farcie aux dattes Deglet Nour, frite et trempée au miel pur",  price:580,  emoji:"🌙",gradient:"linear-gradient(135deg,#5C3A10,#9A6020)"},
+        {id:403,name:"Chebakia (500g)",        desc:"Gâteaux frits en rosette, miel et graines de sésame torréfiées",             price:420,  emoji:"🌹",gradient:"linear-gradient(135deg,#7A2A20,#C04A30)"},
+        {id:404,name:"Qalb Louz",             desc:"Gâteau d'amandes et semoule parfumé à l'eau de rose de Damas",               price:380,  emoji:"💛",gradient:"linear-gradient(135deg,#7A6A10,#C0A820)"},
+        {id:405,name:"Bourak Sucrés (6 pcs)", desc:"Bricks croustillantes fourrées à la crème de lait et pistaches concassées",  price:350,  emoji:"🥐",gradient:"linear-gradient(135deg,#5C4A20,#907830)"},
+      ]},
+      { cat:"Boissons traditionnelles", dishes:[
+        {id:406,name:"Thé à la Menthe",       desc:"Thé vert Gunpowder à la menthe fraîche avec pignons de pin et sucre candi",   price:150,  emoji:"🍵",gradient:"linear-gradient(135deg,#1A5C2A,#2E8C40)"},
+        {id:407,name:"Café Turc",             desc:"Café moulu à la cardamome, préparé à la turque dans la zezwa en cuivre",      price:120,  emoji:"☕",gradient:"linear-gradient(135deg,#2A1A0A,#5A3A1A)"},
+      ]},
+    ]
+  },
+  {
+    id:5, name:"Sahara Flavors", tagline:"Les saveurs authentiques du désert algérien",
+    wilaya:"Ghardaïa", commune:"Ghardaïa", rating:4.6, reviews:98, cat:"Tagine",
+    minOrder:550, deliveryFee:200, deliveryTime:60, open:false,
+    gradient:"linear-gradient(135deg,#4A3010,#8B6020,#6A4010)", emoji:"🏜️",
+    desc:"Fatma du M'Zab vous invite à découvrir les traditions culinaires du désert. Plats mijotés lentement avec les épices rares du Sahara.",
+    menu:[
+      { cat:"Tagines du désert", dishes:[
+        {id:501,name:"Tagine d'Agneau",       desc:"Agneau du Sahara aux pruneaux, amandes et épices mzabites rares",              price:1100, emoji:"🫕",gradient:"linear-gradient(135deg,#6B3020,#AA5030)"},
+        {id:502,name:"Tagine Kefta",          desc:"Boulettes de viande en sauce tomate épicée, œufs pochés et herbes",            price:750,  emoji:"🥚",gradient:"linear-gradient(135deg,#5C2010,#9A4020)"},
+        {id:503,name:"Tagine Légumes",        desc:"Légumes du désert confits, pois chiches et mélange d'épices du Mzab",          price:600,  emoji:"🥬",gradient:"linear-gradient(135deg,#1A4A1A,#2E7A2E)"},
+      ]},
+      { cat:"Spécialités Mzab", dishes:[
+        {id:504,name:"Tchicha",               desc:"Soupe d'orge concassé aux légumes secs, spécialité ancestrale du M'Zab",       price:320,  emoji:"🍲",gradient:"linear-gradient(135deg,#4A4010,#7A6820)"},
+        {id:505,name:"Assidat Zgougou",       desc:"Dessert crémeux aux pignons de pin, fleur d'oranger et pistaches du désert",   price:280,  emoji:"🍮",gradient:"linear-gradient(135deg,#5A3A10,#9A6A20)"},
+        {id:506,name:"Dattes Deglet Nour",    desc:"Dattes premium du Sahara, nature ou fourrées aux amandes et pâte d'amandes",   price:400,  emoji:"🌴",gradient:"linear-gradient(135deg,#5C3A10,#9A6020)"},
+      ]},
+    ]
+  },
+  {
+    id:6, name:"Dar Khadidja", tagline:"Spécialités des Hauts Plateaux sétifiens",
+    wilaya:"Sétif", commune:"Sétif", rating:4.7, reviews:143, cat:"Couscous",
+    minOrder:480, deliveryFee:160, deliveryTime:40, open:true,
+    gradient:"linear-gradient(135deg,#1A1A3A,#2E2E6A,#1A1A4A)", emoji:"🥗",
+    desc:"Khadidja perpétue la cuisine des Hautes Plaines sétifiennes. Ses plats mijotés à l'agneau des Hauts Plateaux sont incontournables.",
+    menu:[
+      { cat:"Couscous", dishes:[
+        {id:601,name:"Couscous Sétifien",     desc:"Couscous aux 7 légumes et agneau des hauts plateaux, façon sétifienne",        price:900,  emoji:"🥘",gradient:"linear-gradient(135deg,#6B5010,#A08020)"},
+        {id:602,name:"Chakhchoukha Sétifienne",desc:"Version sétifienne avec morceaux de pain grillé, légumes et viande fondante", price:820,  emoji:"🫙",gradient:"linear-gradient(135deg,#6B3010,#AA5020)"},
+      ]},
+      { cat:"Plats de résistance", dishes:[
+        {id:603,name:"Garantita",             desc:"Tarte de farine de pois chiche aux épices locales, sauce harissa rouge",       price:200,  emoji:"🟡",gradient:"linear-gradient(135deg,#6B5A10,#A08820)"},
+        {id:604,name:"Cherchem",              desc:"Pois chiches en sauce tomate épicée, spécialité des Aurès-Sétif",              price:380,  emoji:"🫘",gradient:"linear-gradient(135deg,#5C3010,#9A5020)"},
+        {id:605,name:"Rfiss",                 desc:"Dattes et semoule au beurre fondu, plat traditionnel des fêtes familiales",   price:450,  emoji:"🍯",gradient:"linear-gradient(135deg,#6B4A10,#A07030)"},
+      ]},
+    ]
+  },
+];
+
+/* ================================================================
+   STATE
+================================================================ */
+let S = {
+  page: 'home',
+  kitchenId: null,
+  cart: [],
+  catFilter: '',
+  order: null,
+};
+
+/* ================================================================
+   NAVIGATION
+================================================================ */
+function go(page, data={}) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+  S.page = page;
+  window.scrollTo({top:0,behavior:'instant'});
+
+  if (page==='home') {
+    document.getElementById('page-home').classList.add('active');
+    document.getElementById('nl-home').classList.add('active');
+    renderHome();
+  } else if (page==='kitchens') {
+    document.getElementById('page-kitchens').classList.add('active');
+    document.getElementById('nl-kitchens').classList.add('active');
+    renderKitchens();
+  } else if (page==='detail') {
+    if (data.id) S.kitchenId = data.id;
+    document.getElementById('page-detail').classList.add('active');
+    renderDetail(S.kitchenId);
+  } else if (page==='checkout') {
+    document.getElementById('page-checkout').classList.add('active');
+    renderCheckout();
+  } else if (page==='confirm') {
+    document.getElementById('page-confirm').classList.add('active');
+    renderConfirm();
+  }
+}
+
+function scrollHow() {
+  if (S.page !== 'home') { go('home'); setTimeout(()=>document.getElementById('how-section').scrollIntoView({behavior:'smooth'}),400); }
+  else document.getElementById('how-section').scrollIntoView({behavior:'smooth'});
+}
+
+/* ================================================================
+   CART
+================================================================ */
+function cartCount() { return S.cart.reduce((a,i)=>a+i.qty,0); }
+function cartSub()   { return S.cart.reduce((a,i)=>a+i.price*i.qty,0); }
+function cartFee()   {
+  if (!S.cart.length) return 0;
+  const k = KITCHENS.find(k=>k.id===S.cart[0].kid);
+  return k ? k.deliveryFee : 200;
+}
+function cartTotal() { return cartSub() + cartFee(); }
+
+function addToCart(dishId, kitchenId) {
+  const kitchen = KITCHENS.find(k=>k.id===kitchenId);
+  let dish = null;
+  kitchen.menu.forEach(c=>c.dishes.forEach(d=>{ if(d.id===dishId) dish=d; }));
+  if (!dish||!kitchen) return;
+
+  if (S.cart.length && S.cart[0].kid !== kitchenId) {
+    if (!confirm(`Votre panier contient des articles de "${KITCHENS.find(k=>k.id===S.cart[0].kid).name}".\nVider le panier pour commander chez "${kitchen.name}" ?`)) return;
+    S.cart = [];
+  }
+  const ex = S.cart.find(i=>i.id===dishId);
+  if (ex) ex.qty++;
+  else S.cart.push({id:dishId, name:dish.name, price:dish.price, emoji:dish.emoji, gradient:dish.gradient, qty:1, kid:kitchenId, kname:kitchen.name});
+
+  refreshCartUI();
+  toast(`✅ ${dish.name} ajouté`,'success');
+  if (S.page==='detail') renderSidebarCart();
+}
+
+function changeQty(id, delta) {
+  const item = S.cart.find(i=>i.id===id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) S.cart = S.cart.filter(i=>i.id!==id);
+  refreshCartUI();
+  renderCartDrawer();
+  if (S.page==='detail') renderSidebarCart();
+  if (S.page==='checkout') renderCheckoutSummary();
+}
+
+function refreshCartUI() {
+  const c = cartCount();
+  const badge = document.getElementById('cart-badge');
+  if (c > 0) {
+    badge.textContent = c;
+    badge.classList.add('visible');
+    badge.style.animation = 'none';
+    void badge.offsetHeight;
+    badge.style.animation = '';
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+
+/* ================================================================
+   CART DRAWER
+================================================================ */
+function openCart()  {
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderCartDrawer();
+}
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderCartDrawer() {
+  const body   = document.getElementById('drawer-body');
+  const footer = document.getElementById('drawer-footer');
+
+  if (!S.cart.length) {
+    body.innerHTML = `
+      <div class="empty-cart" style="padding:60px 0;">
+        <span class="ei">🛒</span>
+        <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;">Votre panier est vide</p>
+        <p>Parcourez nos cuisines et ajoutez des plats délicieux.</p>
+        <button class="btn-primary" style="margin-top:20px;" onclick="closeCart();go('kitchens')">Voir les cuisines</button>
+      </div>`;
+    footer.innerHTML = '';
+    return;
+  }
+
+  body.innerHTML = `
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">🍳 ${S.cart[0].kname} · ${cartCount()} article(s)</div>
+    ${S.cart.map(it=>`
+      <div class="d-item">
+        <div class="d-item-icon" style="background:${it.gradient}">${it.emoji}</div>
+        <div class="d-item-info">
+          <div class="d-item-name">${it.name}</div>
+          <div class="d-item-kitchen">🍳 ${it.kname}</div>
+          <div class="d-item-ctrl">
+            <button class="qty-btn" onclick="changeQty(${it.id},-1)">−</button>
+            <span class="qty-num">${it.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${it.id},1)">+</button>
+          </div>
+        </div>
+        <div class="d-item-price">${dzd(it.price*it.qty)}</div>
+      </div>`).join('')}
+    <div style="padding:14px 0 6px;">
+      <div class="total-row"><span>Sous-total</span><span>${dzd(cartSub())}</span></div>
+      <div class="total-row"><span>Livraison</span><span>${dzd(cartFee())}</span></div>
+      <div class="total-row grand"><span>Total</span><span class="amt">${dzd(cartTotal())}</span></div>
+    </div>`;
+
+  footer.innerHTML = `
+    <button class="btn-primary btn-block" style="margin-bottom:10px;" onclick="closeCart();go('checkout')">
+      ✅ Commander · ${dzd(cartTotal())}
+    </button>
+    <button class="btn-ghost btn-block" style="padding:10px;font-size:13px;" onclick="S.cart=[];refreshCartUI();renderCartDrawer();">
+      🗑️ Vider le panier
+    </button>`;
+}
+
+/* ================================================================
+   HOME
+================================================================ */
+/* ================================================================
+   USER KITCHENS — real registered cuisiniers from localStorage
+================================================================ */
+const CAT_EMOJI = {
+  'Couscous':'🥘','Tagine':'🫕','Grillades':'🥩','Pâtisseries':'🧁',
+  'Soupes':'🍲','Kabyle':'🫙','Sandwich':'🥪','Salades':'🥗'
+};
+const CAT_GRADIENT = {
+  'Couscous':'linear-gradient(135deg,#6B5010,#B89020)',
+  'Tagine':'linear-gradient(135deg,#4A2010,#8B4030)',
+  'Grillades':'linear-gradient(135deg,#5C1010,#A03020)',
+  'Pâtisseries':'linear-gradient(135deg,#5C1050,#A03090)',
+  'Soupes':'linear-gradient(135deg,#104A3C,#208C6A)',
+  'Kabyle':'linear-gradient(135deg,#1A3A5C,#2A6AAA)',
+  'Sandwich':'linear-gradient(135deg,#4A3010,#8A6020)',
+  'Salades':'linear-gradient(135deg,#1A4A1A,#2A8A2A)'
+};
+
+function loadUserKitchens() {
+  try {
+    const accounts = JSON.parse(localStorage.getItem('darnafood_accounts')||'[]');
+    return accounts
+      .filter(a => a.role === 'cuisinier')
+      .map((a, i) => ({
+        id: 'u_' + (a.email || i),
+        name: a.name,
+        tagline: a.desc || `Cuisine ${a.cat||'maison'} préparée avec amour`,
+        wilaya: a.wilaya || '',
+        commune: a.commune || '',
+        rating: null,
+        reviews: 0,
+        cat: a.cat || 'Couscous',
+        minOrder: 500,
+        deliveryFee: 200,
+        deliveryTime: 45,
+        open: true,
+        emoji: CAT_EMOJI[a.cat] || '🍽️',
+        gradient: CAT_GRADIENT[a.cat] || 'linear-gradient(135deg,#3A2010,#7A5020)',
+        desc: a.desc || '',
+        phone: a.phone || '',
+        email: a.email || '',
+        menu: a.menu || [],
+        isUserKitchen: true
+      }));
+  } catch(e) { return []; }
+}
+
+function getAllKitchens() {
+  return [...KITCHENS, ...loadUserKitchens()];
+}
+
+function getProximityScore(k) {
+  if (!AUTH || !AUTH.wilaya) return 0;
+  if (AUTH.commune && k.commune === AUTH.commune) return 2;
+  if (k.wilaya === AUTH.wilaya) return 1;
+  return 0;
+}
+
+function proximityBadge(k) {
+  if (!AUTH || !AUTH.wilaya) return '';
+  if (AUTH.commune && k.commune === AUTH.commune)
+    return '<span style="background:rgba(45,140,100,.15);color:#2D8C64;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid rgba(45,140,100,.3);">📍 Près de chez vous</span>';
+  if (k.wilaya === AUTH.wilaya)
+    return '<span style="background:rgba(232,144,26,.1);color:var(--primary-light);font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid rgba(232,144,26,.2);">🗺️ Même wilaya</span>';
+  return '';
+}
+
+function renderHome() {
+  // Personalized hero greeting
+  if (AUTH) {
+    const badge = document.querySelector('.hero-badge');
+    if (badge) badge.textContent = `👋 Bonjour, ${AUTH.name.split(' ')[0]} !`;
+    const sub = document.querySelector('.hero-sub');
+    if (sub && AUTH.commune) sub.textContent = `Découvrez les cuisines maison de ${AUTH.commune}, ${AUTH.wilaya||''}. Couscous, tagines, pâtisseries — préparés avec amour.`;
+  }
+
+  // Hero visual floating cards
+  const hv = document.getElementById('hero-visual');
+  const open = getAllKitchens().filter(k=>k.open);
+  const top = open[0] || getAllKitchens()[0];
+  hv.innerHTML = `
+    <div class="fcard fcard-main">
+      <div style="display:flex;gap:14px;align-items:center;">
+        <div class="fcard-icon" style="background:${top.gradient}">${top.emoji}</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;">${top.name}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin:3px 0;">${top.wilaya} · ${top.commune}</div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="color:var(--primary);font-size:13px;">★ ${top.rating}</span>
+            <span style="font-size:11px;color:var(--text-muted);">(${top.reviews} avis)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fcard fcard-eta">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">🚴 Livraison estimée</div>
+      <div style="font-size:24px;font-weight:800;color:var(--primary-light);">${top.deliveryTime} min</div>
+      <div class="pill-green" style="margin-top:8px;font-size:11px;">✓ En cours</div>
+    </div>
+    <div class="fcard fcard-track">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">📦 Commandes récentes</div>
+      ${open.slice(0,3).map(k=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-size:18px;">${k.emoji}</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;">${k.name}</div>
+            <div style="font-size:10px;color:var(--text-muted);">${k.wilaya}</div>
+          </div>
+          <div class="pill-green" style="margin-left:auto;font-size:10px;padding:3px 8px;">✓ Livré</div>
+        </div>`).join('')}
+    </div>`;
+
+  // Category pills
+  document.getElementById('home-cats').innerHTML =
+    `<div class="cat-pill" onclick="go('kitchens')">🍽️ Tout voir</div>` +
+    CATS.map(c=>`<div class="cat-pill" onclick="goWithCat('${c.name}')">${c.icon} ${c.name}</div>`).join('');
+
+  // === NEAR YOU section ===
+  const nearSection = document.getElementById('section-near');
+  const nearGrid    = document.getElementById('near-grid');
+  const nearTitle   = document.getElementById('near-title');
+  if (AUTH && AUTH.commune) {
+    // Same commune first, then same wilaya
+    const nearby = getAllKitchens()
+      .filter(k => k.commune === AUTH.commune || k.wilaya === AUTH.wilaya)
+      .sort((a,b) => getProximityScore(b) - getProximityScore(a))
+      .slice(0, 4);
+    if (nearby.length) {
+      nearTitle.textContent = `Cuisiniers de ${AUTH.commune}`;
+      nearGrid.innerHTML = nearby.map(kcard).join('');
+      nearSection.style.display = '';
+    } else {
+      nearSection.style.display = 'none';
+    }
+  } else if (AUTH && AUTH.wilaya) {
+    const nearby = getAllKitchens().filter(k => k.wilaya === AUTH.wilaya).slice(0,4);
+    if (nearby.length) {
+      nearTitle.textContent = `Cuisiniers de ${AUTH.wilaya}`;
+      nearGrid.innerHTML = nearby.map(kcard).join('');
+      nearSection.style.display = '';
+    } else { nearSection.style.display = 'none'; }
+  } else {
+    nearSection.style.display = 'none';
+  }
+
+  // === OFFERS section — collect all dishes from open kitchens ===
+  const offersSection = document.getElementById('section-offers');
+  const offersGrid    = document.getElementById('offers-grid');
+  const offerKitchens = AUTH && AUTH.wilaya
+    ? getAllKitchens().filter(k => k.open).sort((a,b) => getProximityScore(b) - getProximityScore(a))
+    : getAllKitchens().filter(k => k.open);
+
+  const offerDishes = [];
+  offerKitchens.forEach(k => {
+    k.menu.forEach(cat => {
+      cat.dishes.forEach(d => {
+        offerDishes.push({ ...d, kitchenId:k.id, kitchenName:k.name, kitchenEmoji:k.emoji });
+      });
+    });
+  });
+
+  if (offerDishes.length) {
+    offersGrid.innerHTML = offerDishes.slice(0,10).map(d => {
+      const photo = DISH_PHOTOS[d.id];
+      const imgHtml = photo
+        ? `<img class="offer-img" src="${photo}" alt="${d.name}" loading="lazy">`
+        : `<div class="offer-img-placeholder" style="background:${d.gradient}">${d.emoji}</div>`;
+      return `<div class="offer-card" onclick="go('detail',{id:'${d.kitchenId}'})">
+        ${imgHtml}
+        <div class="offer-body">
+          <div class="offer-name">${d.name}</div>
+          <div class="offer-kitchen">🍽️ ${d.kitchenName}</div>
+          <div class="offer-price">${dzd(d.price)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    offersSection.style.display = '';
+  } else {
+    offersSection.style.display = 'none';
+  }
+
+  // Featured kitchens (proximity sorted)
+  const featured = [...getAllKitchens().filter(k=>k.open)]
+    .sort((a,b) => getProximityScore(b) - getProximityScore(a))
+    .slice(0,3);
+  document.getElementById('featured-grid').innerHTML = featured.map(kcard).join('');
+}
+
+function goWithCat(cat) { S.catFilter = cat; go('kitchens'); }
+
+
+
+function setCat(cat) {
+  S.catFilter = cat;
+  document.getElementById('f-cat').value = cat;
+  renderKitchens();
+}
+
+function filterKitchens() {
+  const q   = (document.getElementById('search-q')?.value||'').toLowerCase();
+  const wil = document.getElementById('f-wilaya')?.value||'';
+  const cat = document.getElementById('f-cat')?.value||'';
+  const srt = document.getElementById('f-sort')?.value||'rating';
+  S.catFilter = cat;
+
+  let list = getAllKitchens().filter(k => {
+    const ms = !q || k.name.toLowerCase().includes(q)||k.wilaya.toLowerCase().includes(q)||k.cat.toLowerCase().includes(q)||(k.tagline||'').toLowerCase().includes(q);
+    const mw = !wil || k.wilaya===wil;
+    const mc = !cat || k.cat===cat;
+    return ms&&mw&&mc;
+  });
+  if (srt==='rating') list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else if (srt==='time') list.sort((a,b)=>a.deliveryTime-b.deliveryTime);
+  else list.sort((a,b)=>a.minOrder-b.minOrder);
+
+  list.sort((a,b) => getProximityScore(b) - getProximityScore(a));
+
+  document.getElementById('results-count').innerHTML = `<b>${list.length}</b> cuisine${list.length!==1?'s':''} trouvée${list.length!==1?'s':''}`;
+  document.getElementById('kitchens-grid').innerHTML = list.length
+    ? list.map(kcard).join('')
+    : `<div class="no-results"><span class="nr-icon">🍽️</span><h3>Aucune cuisine trouvée</h3><p>Essayez de modifier vos filtres.</p></div>`;
+
+}
+
+
+/* ================================================================
+   KITCHEN CARD HTML
+================================================================ */
+function kcard(k) {
+  const badge = proximityBadge(k);
+  return `
+    <div class="k-card" onclick="go('detail',{id:${k.id}})">
+      <div class="k-cover" style="background:${k.gradient}">
+        <div class="k-cover-emoji">${k.emoji}</div>
+        <div class="k-cover-row">
+          <span class="k-status ${k.open?'open':'closed'}">${k.open?'🟢 Ouvert':'🔴 Fermé'}</span>
+          <span class="k-cat-tag">${k.cat}</span>
+        </div>
+      </div>
+      <div class="k-body">
+        <h3 class="k-name">${k.name}</h3>
+        ${badge ? `<div style="margin:4px 0 8px;">${badge}</div>` : ''}
+        <p class="k-tag">${k.tagline}</p>
+        <div class="k-meta">
+          <div class="k-meta-item">${k.rating ? stars(k.rating)+` <b style="margin-left:4px">${k.rating}</b><span style="color:var(--text-faint);margin-left:3px;">(${k.reviews})</span>` : '<span style="color:var(--primary-light);font-size:11px;font-weight:700;">✨ Nouveau</span>'}</div>
+          <div class="k-meta-item">📍 ${k.commune ? k.commune + ', ' : ''}${k.wilaya}</div>
+          <div class="k-meta-item">⏱️ ${k.deliveryTime} min</div>
+        </div>
+      </div>
+      <div class="k-footer">
+        <div class="k-footer-info">Min. <b>${dzd(k.minOrder)}</b> · Livr. <b>${dzd(k.deliveryFee)}</b></div>
+        <button class="btn-sm" onclick="event.stopPropagation();go('detail',{id:'${k.id}'})">Voir le menu</button>
+      </div>
+    </div>`;
+}
+
+/* ================================================================
+   KITCHEN DETAIL
+================================================================ */
+function renderDetail(id) {
+  const k = getAllKitchens().find(x=>x.id===id);
+  if (!k) return;
+
+  document.getElementById('detail-cover').style.background = k.gradient;
+  document.getElementById('detail-cover-emoji').textContent = k.emoji;
+  document.getElementById('detail-avatar').textContent = k.emoji;
+  document.getElementById('detail-name').textContent = k.name;
+  document.getElementById('detail-tagline').textContent = k.tagline;
+  document.getElementById('detail-meta').innerHTML = `
+    <div class="meta-chip">${stars(k.rating)} <b style="margin-left:5px">${k.rating}</b>&nbsp;<span style="color:var(--text-faint)">(${k.reviews} avis)</span></div>
+    <div class="meta-chip">📍 ${k.wilaya}, ${k.commune}</div>
+    <div class="meta-chip">⏱️ ${k.deliveryTime} min</div>
+    <div class="meta-chip">🚴 Livraison ${dzd(k.deliveryFee)}</div>
+    <div class="meta-chip">💵 Min. ${dzd(k.minOrder)}</div>
+    <span class="k-status ${k.open?'open':'closed'}" style="font-size:12px">${k.open?'🟢 Ouvert':'🔴 Fermé'}</span>`;
+
+  // Add back button inside detail layout
+  document.getElementById('menu-area').innerHTML =
+    `<button class="back-btn" onclick="go('kitchens')">← Retour aux cuisines</button>` +
+    k.menu.map(c=>`
+      <div>
+        <h3 class="menu-cat-title">${c.cat}</h3>
+        ${c.dishes.map(d=>{
+          const photo = DISH_PHOTOS[d.id];
+          const iconHtml = photo
+            ? `<div class="dish-icon"><img src="${photo}" alt="${d.name}"></div>`
+            : `<div class="dish-icon" style="background:${d.gradient}">${d.emoji}</div>`;
+          return `
+          <div class="dish-card">
+            ${iconHtml}
+            <div class="dish-info">
+              <div class="dish-name">${d.name}</div>
+              <div class="dish-desc">${d.desc}</div>
+              <div class="dish-price">${dzd(d.price)}</div>
+            </div>
+            <button class="btn-add" onclick="addToCart(${d.id},${k.id})" title="Ajouter au panier">+</button>
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+
+  renderSidebarCart();
+}
+
+function renderSidebarCart() {
+  const sc = document.getElementById('sidebar-content');
+  if (!sc) return;
+  if (!S.cart.length || S.cart[0].kid !== S.kitchenId) {
+    sc.innerHTML = `<div class="empty-cart"><span class="ei">🍽️</span><p>Votre panier est vide.<br>Ajoutez des plats pour commencer.</p></div>`;
+    return;
+  }
+  sc.innerHTML = `
+    <div class="sidebar-items">
+      ${S.cart.map(it=>`
+        <div class="si-item">
+          <span style="font-size:18px">${it.emoji}</span>
+          <span class="si-name">${it.name}</span>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(${it.id},-1)">−</button>
+            <span class="qty-num">${it.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${it.id},1)">+</button>
+          </div>
+          <span class="si-price">${dzd(it.price*it.qty)}</span>
+        </div>`).join('')}
+    </div>
+    <div class="total-row"><span>Sous-total</span><span>${dzd(cartSub())}</span></div>
+    <div class="total-row"><span>Livraison</span><span>${dzd(cartFee())}</span></div>
+    <div class="total-row grand"><span>Total</span><span class="amt">${dzd(cartTotal())}</span></div>
+    <div class="divider"></div>
+    <button class="btn-primary btn-block" onclick="go('checkout')">✅ Commander · ${dzd(cartTotal())}</button>`;
+}
+
+/* ================================================================
+   CHECKOUT
+================================================================ */
+function renderCheckout() {
+  // Fill wilaya
+  const fw = document.getElementById('f-wil');
+  if (fw.children.length<=1) WILAYAS.forEach(w=>{ const o=document.createElement('option'); o.value=o.textContent=w; fw.appendChild(o); });
+  renderCheckoutSummary();
+}
+
+function renderCheckoutSummary() {
+  const el = document.getElementById('checkout-summary');
+  if (!el) return;
+  if (!S.cart.length) { el.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:20px">Panier vide.</p>'; return; }
+  const k = KITCHENS.find(x=>x.id===S.cart[0].kid);
+  el.innerHTML = `
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">🍳 ${k?.name||''} · ${cartCount()} article(s)</div>
+    ${S.cart.map(it=>`
+      <div class="sum-item">
+        <div class="sum-name">${it.emoji} ${it.name} <span>×${it.qty}</span></div>
+        <div class="sum-price">${dzd(it.price*it.qty)}</div>
+      </div>`).join('')}
+    <div style="margin-top:10px">
+      <div class="total-row"><span>Sous-total</span><span>${dzd(cartSub())}</span></div>
+      <div class="total-row"><span>Livraison</span><span>${dzd(cartFee())}</span></div>
+      <div class="total-row grand"><span>Total</span><span class="amt">${dzd(cartTotal())}</span></div>
+    </div>`;
+}
+
+function placeOrder() {
+  const fn   = document.getElementById('f-fn').value.trim();
+  const ln   = document.getElementById('f-ln').value.trim();
+  const ph   = document.getElementById('f-ph').value.trim();
+  const wil  = document.getElementById('f-wil').value;
+  const com  = document.getElementById('f-com').value.trim();
+  const addr = document.getElementById('f-addr').value.trim();
+  if (!fn||!ln||!ph||!wil||!com||!addr) { toast('⚠️ Veuillez remplir tous les champs obligatoires.','error'); return; }
+  if (!S.cart.length) { toast('⚠️ Votre panier est vide.','error'); return; }
+
+  const k = KITCHENS.find(x=>x.id===S.cart[0].kid);
+  S.order = {
+    id: 'DRC-'+Math.floor(100000+Math.random()*900000),
+    kitchen: k?.name||'',
+    deliveryTime: k?.deliveryTime||45,
+    total: cartTotal(),
+    customer: {fn,ln,ph,wil,com,addr},
+    items: [...S.cart],
+  };
+  S.cart = [];
+  refreshCartUI();
+  go('confirm');
+}
+
+/* ================================================================
+   CONFIRMATION
+================================================================ */
+function renderConfirm() {
+  const o = S.order;
+  if (!o) return;
+  document.getElementById('conf-order-id').textContent = o.id;
+  document.getElementById('conf-grid').innerHTML = `
+    <div class="conf-cell"><div class="conf-cell-label">🍳 Cuisine</div><div class="conf-cell-val">${o.kitchen}</div></div>
+    <div class="conf-cell"><div class="conf-cell-label">⏱️ Délai estimé</div><div class="conf-cell-val">${o.deliveryTime} min</div></div>
+    <div class="conf-cell"><div class="conf-cell-label">💵 Total</div><div class="conf-cell-val" style="color:var(--primary-light)">${dzd(o.total)}</div></div>
+    <div class="conf-cell"><div class="conf-cell-label">📍 Wilaya</div><div class="conf-cell-val">${o.customer.wil}</div></div>`;
+}
+
+/* ================================================================
+   HELPERS
+================================================================ */
+function dzd(n) { return n.toLocaleString('fr-DZ')+ ' DA'; }
+
+function stars(rating) {
+  let h=''; const full=Math.floor(rating);
+  for(let i=0;i<5;i++) h+=`<span class="star${i>=full?' dim':''}">${i<full?'★':'★'}</span>`;
+  return `<div class="stars">${h}</div>`;
+}
+
+function toast(msg, type='default') {
+  const host = document.getElementById('toast-host');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = msg;
+  host.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+/* ================================================================
+   NAVBAR SCROLL EFFECT
+================================================================ */
+window.addEventListener('scroll', ()=>{
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+}, {passive:true});
+
+/* ================================================================
+   PRE-LOAD ALL SELECT DROPDOWNS
+================================================================ */
+function initAllSelects() {
+  function fill(id, arr, label) {
+    const el = document.getElementById(id);
+    if (!el || el.options.length > 1) return;
+    arr.forEach(item => {
+      const o = document.createElement('option');
+      o.value = o.textContent = label ? label(item) : item;
+      el.appendChild(o);
+    });
+  }
+  // All wilaya selects
+  ['r-wilaya','r-kwilaya','r-kbwilaya','f-wilaya'].forEach(id => fill(id, WILAYAS));
+  // Category select
+  fill('r-kcat', CATS, c => c.name);
+  // Commune selects start disabled
+  ['r-commune','r-kcommune'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+}
+
+/* ================================================================
+   INIT — Splash then route
+================================================================ */
+function appInit() {
+  initAllSelects();
+  updateNavForAuth();
+  // Splash out after 2 seconds
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    if (splash) { splash.classList.add('hidden'); setTimeout(()=>splash.remove(), 700); }
+    // Route based on auth state
+    if (AUTH) {
+      if (AUTH.role === 'cuisinier') { go('dashboard'); }
+      else { renderHome(); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById('page-home').classList.add('active'); }
+    } else {
+      document.getElementById('page-welcome').classList.add('active');
+    }
+  }, 2100);
+}
+
+/* ================================================================
+   AUTH — localStorage-based accounts (no server needed)
+================================================================ */
+let AUTH = null;
+
+// Load session from localStorage on startup
+(function initSession() {
+  try {
+    const token = localStorage.getItem('darnafood_token');
+    const saved = localStorage.getItem('darnafood_session');
+    if (token && saved) AUTH = JSON.parse(saved);
+  } catch(e) { AUTH = null; }
+})();
+
+function saveSession(user) {
+  AUTH = user;
+  try { localStorage.setItem('darnafood_session', JSON.stringify(user)); } catch(e) {}
+}
+
+// Kept for backward-compat with renderDashboard/renderClientProfile
+function getAccounts() {
+  try { return JSON.parse(localStorage.getItem('darnafood_accounts') || '[]'); } catch(e) { return []; }
+}
+function saveAccounts(accounts) {
+  try { localStorage.setItem('darnafood_accounts', JSON.stringify(accounts)); } catch(e) {}
+}
+
+function getToken() {
+  return localStorage.getItem('darnafood_token') || '';
+}
+
+async function apiCall(action, method, body) {
+  try {
+    const opts = {
+      method: method || 'GET',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch('/api/auth?action=' + action, opts);
+    return await res.json();
+  } catch(e) {
+    return { success: false, error: 'Erreur réseau. Vérifiez votre connexion.' };
+  }
+}
+
+// Mock order history (shared)
+const MOCK_CLIENT_ORDERS = [
+  { id:'DRC-142850', date:'18 Mai 2026', kitchen:'Dar Fatima', items:'Couscous au Poulet, Harira', total:1230, status:'livré' },
+  { id:'DRC-138741', date:'15 Mai 2026', kitchen:"Le Goût d'Oran", items:"Merguez Maison, Brochettes d'Agneau", total:1700, status:'livré' },
+  { id:'DRC-135200', date:'10 Mai 2026', kitchen:'Dar Fatima', items:'Couscous Royal', total:1450, status:'livré' },
+];
+
+// Mock incoming orders for cuisinier dashboard
+let MOCK_DASH_ORDERS = [
+  { id:'DRC-142991', client:'Karim Meziane',  items:'Couscous Royal × 1, Harira × 2',    total:2010, status:'nouveau',     time:'il y a 5 min' },
+  { id:'DRC-142850', client:'Amira Bensalem', items:'Couscous au Poulet × 2',           total:1900, status:'preparation', time:'il y a 18 min' },
+  { id:'DRC-142712', client:'Younes Tabet',   items:'Rechta × 1, Chorba Frik × 1',      total:1220, status:'livre',       time:'il y a 1h' },
+  { id:'DRC-142600', client:'Sarah Hamdi',    items:'Couscous 7 Légumes × 2',           total:1600, status:'livre',       time:'il y a 2h' },
+];
+
+function updateNavForAuth() {
+  const loggedIn = !!AUTH;
+  document.getElementById('nav-auth').style.display = loggedIn ? 'none' : 'flex';
+  document.getElementById('nav-user').style.display = loggedIn ? '' : 'none';
+  const cartBtn = document.getElementById('nav-cart-btn');
+  if (cartBtn) cartBtn.style.display = (loggedIn && AUTH.role === 'client') ? '' : 'none';
+
+  if (loggedIn) {
+    document.getElementById('nav-user-initial').textContent = AUTH.name.charAt(0).toUpperCase();
+    document.getElementById('nav-user-name').textContent    = AUTH.name.split(' ')[0];
+    document.getElementById('dd-name').textContent          = AUTH.name;
+    document.getElementById('dd-badge').innerHTML =
+      `<span class="role-badge ${AUTH.role}">${AUTH.role === 'client' ? '🛒 Client' : '👩‍🍳 Cuisinier'}</span>`;
+    document.getElementById('dd-dashboard').style.display = AUTH.role === 'cuisinier' ? '' : 'none';
+    document.getElementById('dd-myorders').style.display  = AUTH.role === 'client'    ? '' : 'none';
+  }
+}
+
+function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('open'); }
+function closeUserMenu()  { document.getElementById('user-dropdown').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('#nav-user')) closeUserMenu(); });
+
+/* ================================================================
+   AUTH — LOGIN
+================================================================ */
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim().toLowerCase();
+  const pwd   = document.getElementById('l-pwd').value;
+  if (!email || !pwd) { toast('⚠️ Veuillez remplir tous les champs', 'error'); return; }
+
+  const btn = document.querySelector('#page-login .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Connexion...'; }
+
+  const result = await apiCall('login', 'POST', { email, password: pwd });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+
+  if (result.success) {
+    localStorage.setItem('darnafood_token', result.token);
+    const u = result.user;
+    saveSession({ name:u.name, email:u.email, role:u.role, wilaya:u.wilaya, commune:u.commune });
+    // Also save full account locally for dashboard
+    const accounts = getAccounts();
+    const idx = accounts.findIndex(a => a.email === u.email);
+    if (idx >= 0) accounts[idx] = { ...accounts[idx], ...u };
+    else accounts.push(u);
+    saveAccounts(accounts);
+    updateNavForAuth();
+    toast(`✅ Bienvenue, ${AUTH.name.split(' ')[0]} !`, 'success');
+    go(AUTH.role === 'cuisinier' ? 'dashboard' : 'home');
+  } else {
+    toast('❌ ' + (result.error || 'Identifiants incorrects'), 'error');
+  }
+}
+
+function demoLogin(role) {
+  AUTH = DEMO_ACCOUNTS[role];
+  updateNavForAuth();
+  toast(`✅ Bienvenue, ${AUTH.name.split(' ')[0]} !`, 'success');
+  go(role === 'cuisinier' ? 'dashboard' : 'home');
+}
+
+function logout() {
+  AUTH = null;
+  localStorage.removeItem('darnafood_token');
+  localStorage.removeItem('darnafood_session');
+  updateNavForAuth();
+  closeUserMenu();
+  toast('👋 Vous avez été déconnecté', 'default');
+  go('welcome');
+}
+
+/* ================================================================
+   AUTH — REGISTER
+================================================================ */
+let regRole = null;
+
+function selectRole(r) {
+  regRole = r;
+  document.getElementById('rc-client').classList.toggle('selected', r === 'client');
+  document.getElementById('rc-cuisinier').classList.toggle('selected', r === 'cuisinier');
+}
+
+function nextRegStep() {
+  if (!regRole) { toast('⚠️ Veuillez choisir votre rôle', 'error'); return; }
+  document.getElementById('reg-step1').style.display = 'none';
+  document.getElementById('reg-step2').style.display = '';
+  document.getElementById('reg-form-client').style.display    = regRole === 'client'    ? '' : 'none';
+  document.getElementById('reg-form-cuisinier').style.display = regRole === 'cuisinier' ? '' : 'none';
+  document.getElementById('reg-dot-1').classList.remove('active');
+  document.getElementById('reg-dot-2').classList.add('active');
+}
+
+function prevRegStep() {
+  document.getElementById('reg-step2').style.display = 'none';
+  document.getElementById('reg-step1').style.display = '';
+  document.getElementById('reg-dot-2').classList.remove('active');
+  document.getElementById('reg-dot-1').classList.add('active');
+}
+
+async function doRegister() {
+  let payload = {};
+
+  if (regRole === 'client') {
+    const fn = document.getElementById('r-fn').value.trim();
+    const ln = document.getElementById('r-ln').value.trim();
+    const em = document.getElementById('r-email').value.trim().toLowerCase();
+    const ph = document.getElementById('r-phone').value.trim();
+    const wi = document.getElementById('r-wilaya').value;
+    const co = document.getElementById('r-commune').value;
+    const pw = document.getElementById('r-pwd').value;
+    if (!fn || !ln || !em || !ph || !wi || !pw) { toast('⚠️ Veuillez remplir tous les champs obligatoires', 'error'); return; }
+    if (pw.length < 6) { toast('⚠️ Le mot de passe doit faire au moins 6 caractères', 'error'); return; }
+    payload = { name:`${fn} ${ln}`, firstName:fn, lastName:ln, email:em, password:pw, role:'client', phone:ph, wilaya:wi, commune:co };
+  } else {
+    const kn   = document.getElementById('r-kname').value.trim();
+    const kfn  = document.getElementById('r-kfn').value.trim();
+    const kln  = document.getElementById('r-kln').value.trim();
+    const kdob = document.getElementById('r-kdob').value;
+    const kbw  = document.getElementById('r-kbwilaya').value;
+    const kcin = document.getElementById('r-kcin').value.trim();
+    const kc   = document.getElementById('r-kcat').value;
+    const kw   = document.getElementById('r-kwilaya').value;
+    const kco  = document.getElementById('r-kcommune').value;
+    const kd   = document.getElementById('r-kdesc').value.trim();
+    const ph   = document.getElementById('r-kphone').value.trim();
+    const em   = document.getElementById('r-kemail').value.trim().toLowerCase();
+    const pw   = document.getElementById('r-kpwd').value;
+    if (!kfn || !kln || !kdob || !kbw || !kcin) { toast('⚠️ Veuillez remplir vos informations d\'identité', 'error'); return; }
+    if (kcin.replace(/\s/g,'').length < 6) { toast('⚠️ Numéro CIN invalide', 'error'); return; }
+    if (!kn || !kc || !kw || !ph || !em || !pw) { toast('⚠️ Veuillez remplir tous les champs obligatoires', 'error'); return; }
+    if (pw.length < 6) { toast('⚠️ Le mot de passe doit faire au moins 6 caractères', 'error'); return; }
+    payload = { name:kn, firstName:kfn, lastName:kln, dob:kdob, birthWilaya:kbw, cin:kcin,
+                email:em, password:pw, role:'cuisinier', cat:kc, wilaya:kw, commune:kco, desc:kd, phone:ph };
+  }
+
+  const btn = document.querySelector('#page-register .btn-primary:not([onclick*="prev"])');
+  if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+
+  const result = await apiCall('register', 'POST', payload);
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Créer mon compte'; }
+
+  if (result.success) {
+    localStorage.setItem('darnafood_token', result.token);
+    const u = result.user;
+    saveSession({ name:u.name, email:u.email, role:u.role, wilaya:u.wilaya, commune:u.commune });
+    // Save locally for dashboard
+    const accounts = getAccounts();
+    accounts.push(u);
+    saveAccounts(accounts);
+    updateNavForAuth();
+    toast(`🎉 Compte créé ! Bienvenue, ${AUTH.name.split(' ')[0]} !`, 'success');
+    regRole = null;
+    go(AUTH.role === 'cuisinier' ? 'dashboard' : 'home');
+  } else {
+    toast('❌ ' + (result.error || 'Erreur lors de la création'), 'error');
+  }
+}
+
+/* ================================================================
+   SAVE PROFILE via API
+================================================================ */
+async function saveProfile(role) {
+  let update = {};
+
+  if (role === 'cuisinier') {
+    update = {
+      name:    document.getElementById('edit-kname')?.value.trim(),
+      cat:     document.getElementById('edit-kcat')?.value.trim(),
+      desc:    document.getElementById('edit-kdesc')?.value.trim(),
+      wilaya:  document.getElementById('edit-wilaya')?.value,
+      commune: document.getElementById('edit-commune')?.value,
+      phone:   document.getElementById('edit-phone')?.value.trim(),
+    };
+    if (!update.name) { toast('⚠️ Le nom est requis', 'error'); return; }
+  } else {
+    const fname = document.getElementById('cp-fname')?.value.trim();
+    const lname = document.getElementById('cp-lname')?.value.trim();
+    if (!fname || !lname) { toast('⚠️ Prénom et nom requis', 'error'); return; }
+    update = {
+      name:    fname + ' ' + lname,
+      firstName: fname,
+      lastName: lname,
+      phone:   document.getElementById('cp-phone')?.value.trim(),
+      wilaya:  document.getElementById('cp-wilaya')?.value,
+      commune: document.getElementById('cp-commune')?.value,
+    };
+  }
+
+  const result = await apiCall('profile', 'PUT', update);
+
+  if (result.success) {
+    const u = result.user;
+    saveSession({ ...AUTH, name:u.name, wilaya:u.wilaya, commune:u.commune });
+    // Update local cache
+    const accounts = getAccounts();
+    const idx = accounts.findIndex(a => a.email === AUTH.email);
+    if (idx >= 0) accounts[idx] = { ...accounts[idx], ...u };
+    saveAccounts(accounts);
+    toast('✅ Profil mis à jour !', 'success');
+    if (role === 'cuisinier') renderDashboard();
+    else renderClientProfile();
+  } else {
+    toast('❌ ' + (result.error || 'Erreur de mise à jour'), 'error');
+  }
+}
+
+// Mock order history (shared)
+const MOCK_CLIENT_ORDERS = [
+  { id:'DRC-142850', date:'18 Mai 2026', kitchen:'Dar Fatima', items:'Couscous au Poulet, Harira', total:1230, status:'livré' },
+  { id:'DRC-138741', date:'15 Mai 2026', kitchen:"Le Goût d'Oran", items:"Merguez Maison, Brochettes d'Agneau", total:1700, status:'livré' },
+  { id:'DRC-135200', date:'10 Mai 2026', kitchen:'Dar Fatima', items:'Couscous Royal', total:1450, status:'livré' },
+];
+
+// Mock incoming orders for cuisinier dashboard
+let MOCK_DASH_ORDERS = [
+  { id:'DRC-142991', client:'Karim Meziane',  items:'Couscous Royal × 1, Harira × 2',    total:2010, status:'nouveau',     time:'il y a 5 min' },
+  { id:'DRC-142850', client:'Amira Bensalem', items:'Couscous au Poulet × 2',           total:1900, status:'preparation', time:'il y a 18 min' },
+  { id:'DRC-142712', client:'Younes Tabet',   items:'Rechta × 1, Chorba Frik × 1',      total:1220, status:'livre',       time:'il y a 1h' },
+  { id:'DRC-142600', client:'Sarah Hamdi',    items:'Couscous 7 Légumes × 2',           total:1600, status:'livre',       time:'il y a 2h' },
+];
+
+
+
+
+function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('open'); }
+function closeUserMenu()  { document.getElementById('user-dropdown').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('#nav-user')) closeUserMenu(); });
+function renderDashboard() {
+  // Get real account from localStorage
+  const accounts = getAccounts();
+  const acct = AUTH ? accounts.find(a => a.email === AUTH.email) : null;
+  if (!acct) return;
+
+  // Header — use real account data
+  document.getElementById('dash-chef-name').textContent     = (acct.firstName || acct.name.split(' ')[0]);
+  document.getElementById('dash-kitchen-name').textContent  = acct.name;
+  document.getElementById('dash-kitchen-wilaya').textContent = acct.commune
+    ? `📍 ${acct.commune}, ${acct.wilaya}`
+    : (acct.wilaya ? `📍 ${acct.wilaya}` : '');
+
+  // Stats
+  const todayOrders = MOCK_DASH_ORDERS.filter(o => o.status !== 'livre');
+  const revenue     = MOCK_DASH_ORDERS.reduce((s,o) => s+o.total, 0);
+  document.getElementById('sc-orders').textContent  = MOCK_DASH_ORDERS.length;
+  document.getElementById('sc-revenue').textContent = dzd(revenue + 2900);
+  document.getElementById('sc-rating').textContent  = '—';
+
+  const newCount = MOCK_DASH_ORDERS.filter(o => o.status === 'nouveau').length;
+  const badge = document.getElementById('new-orders-badge');
+  if (newCount > 0) { badge.style.display=''; badge.textContent=newCount; }
+  else { badge.style.display='none'; }
+
+  // Overview & all orders (mock for now)
+  const overviewEl = document.getElementById('overview-orders');
+  if (overviewEl) overviewEl.innerHTML = MOCK_DASH_ORDERS.slice(0,3).map(o => orderRowHtml(o)).join('');
+  const allEl = document.getElementById('all-orders-list');
+  if (allEl) allEl.innerHTML = MOCK_DASH_ORDERS.map(o => orderRowHtml(o)).join('');
+
+  // Menu — show real menu if the cuisinier has added dishes
+  const menuEl = document.getElementById('dash-menu-list');
+  if (menuEl) {
+    const menu = acct.menu || [];
+    if (menu.length === 0) {
+      menuEl.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">
+        <div style="font-size:40px;margin-bottom:12px;">🍽️</div>
+        <div style="font-weight:700;margin-bottom:8px;">Aucun plat pour l'instant</div>
+        <div style="font-size:13px;">Ajoutez vos spécialités pour que les clients puissent commander.</div>
+      </div>`;
+    } else {
+      menuEl.innerHTML = menu.map(cat => `
+        <h3 style="font-size:15px;font-weight:700;margin:18px 0 10px;color:var(--text-muted);">${cat.cat}</h3>
+        ${cat.dishes.map(d => {
+          const photo = DISH_PHOTOS[d.id];
+          const iconHtml = photo
+            ? `<div class="menu-list-icon"><img src="${photo}" alt="${d.name}"></div>`
+            : `<div class="menu-list-icon" style="background:${d.gradient||'var(--bg-elevated)'}">${d.emoji||'🍽️'}</div>`;
+          return `<div class="menu-list-item">${iconHtml}<div class="menu-list-info"><div class="menu-list-name">${d.name}</div><div class="menu-list-cat">${cat.cat}</div></div><div class="menu-list-price">${dzd(d.price)}</div></div>`;
+        }).join('')}
+      `).join('');
+    }
+  }
+
+  // Settings — editable profile
+  const settingsEl = document.getElementById('settings-info');
+  if (settingsEl) {
+    const cinDisplay = acct.cin ? acct.cin.replace(/\d(?=\d{4})/g, '•') : '—';
+    const dobDisplay = acct.dob ? new Date(acct.dob).toLocaleDateString('fr-DZ') : '—';
+
+    settingsEl.innerHTML = `
+      <!-- IDENTITY (readonly) -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);">🪪 Identité personnelle</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" value="${acct.firstName||'—'}" readonly></div>
+        <div class="form-group"><label class="form-label">Nom</label><input class="form-input" value="${acct.lastName||'—'}" readonly></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date de naissance</label><input class="form-input" value="${dobDisplay}" readonly></div>
+        <div class="form-group"><label class="form-label">Wilaya de naissance</label><input class="form-input" value="${acct.birthWilaya||'—'}" readonly></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">N° CIN</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input class="form-input" id="cin-field" value="${cinDisplay}" readonly style="font-family:monospace;letter-spacing:2px;flex:1;">
+          <button class="btn-ghost" style="padding:10px 14px;font-size:12px;white-space:nowrap;" onclick="toggleCin('${acct.cin||''}')">👁 Voir</button>
+        </div>
+      </div>
+
+      <!-- KITCHEN (editable) -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);">🍽️ Ma cuisine</div>
+      <div class="form-group"><label class="form-label">Nom de la cuisine</label><input class="form-input" id="edit-kname" value="${acct.name||''}"></div>
+      <div class="form-group">
+        <label class="form-label">Spécialité principale</label>
+        <input class="form-input" id="edit-kcat" list="kcat-suggestions-edit" value="${acct.cat||''}" placeholder="Ex: Couscous, Berkoukes...">
+        <datalist id="kcat-suggestions-edit">
+          <option value="Couscous"><option value="Rechta"><option value="Chakhchoukha"><option value="Berkoukes">
+          <option value="Tchicha"><option value="Tagine"><option value="Tagine Zitoune"><option value="Grillades">
+          <option value="Merguez Maison"><option value="Brochettes d'Agneau"><option value="Kefta Grillée">
+          <option value="Méchoui"><option value="Cuisine Kabyle"><option value="Aftit"><option value="Tafraout">
+          <option value="Cuisine Saharienne"><option value="Tibkhine"><option value="Assida">
+          <option value="Chorba Frik"><option value="Harira"><option value="Pâtisseries Orientales">
+          <option value="Baklawa"><option value="Makrout"><option value="Zlabia"><option value="Sfinj">
+          <option value="Sandwichs Maison"><option value="M'hadjeb"><option value="Salades &amp; Entrées">
+        </datalist>
+      </div>
+      <div class="form-group"><label class="form-label">Description de votre cuisine</label><textarea class="form-textarea" id="edit-kdesc" placeholder="Décrivez vos spécialités...">${acct.desc||''}</textarea></div>
+
+      <!-- LOCATION (editable) -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);">📍 Localisation</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Wilaya</label>
+          <select class="form-select" id="edit-wilaya" onchange="populateCommunes('edit-wilaya','edit-commune')">
+            <option value="">Sélectionner...</option>
+            ${WILAYAS.map(w=>`<option value="${w}" ${acct.wilaya===w?'selected':''}>${w}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Commune</label>
+          <select class="form-select" id="edit-commune">
+            <option value="${acct.commune||''}">${acct.commune||'Sélectionner...'}</option>
+            ${acct.wilaya && COMMUNES[acct.wilaya] ? COMMUNES[acct.wilaya].filter(c=>c!==acct.commune).map(c=>`<option value="${c}">${c}</option>`).join('') : ''}
+          </select>
+        </div>
+      </div>
+
+      <!-- CONTACT (editable) -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);">📞 Contact</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" id="edit-phone" value="${acct.phone||''}"></div>
+        <div class="form-group"><label class="form-label">Email (non modifiable)</label><input class="form-input" value="${acct.email||''}" readonly></div>
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:12px;">
+        <button class="btn-primary" style="flex:1;justify-content:center;" onclick="saveProfile('cuisinier')">💾 Enregistrer les modifications</button>
+      </div>
+    `;
+  }
+}
+
+function toggleCin(realCin) {
+  const field = document.getElementById('cin-field');
+  if (!field || !realCin) return;
+  const masked = realCin.replace(/\d(?=\d{4})/g, '•');
+  field.value = field.value === masked ? realCin : masked;
+}
+
+function orderRowHtml(o) {
+  return `<div class="order-row">
+    <div class="order-id-tag">${o.id}<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${o.time}</div></div>
+    <div><div class="order-info-name">👤 ${o.client}</div><div class="order-info-items">${o.items}</div></div>
+    <div class="order-amount">${dzd(o.total)}</div>
+    <select class="order-status-select ${o.status}" onchange="updateOrderStatus('${o.id}',this.value,this)">
+      <option value="nouveau"     ${o.status==='nouveau'     ?'selected':''}>🟡 Nouveau</option>
+      <option value="preparation" ${o.status==='preparation' ?'selected':''}>🟢 En préparation</option>
+      <option value="livre"       ${o.status==='livre'       ?'selected':''}>✅ Livré</option>
+    </select>
+  </div>`;
+}
+
+function updateOrderStatus(id, newStatus, sel) {
+  const order = MOCK_DASH_ORDERS.find(o => o.id === id);
+  if (order) {
+    order.status = newStatus;
+    sel.className = `order-status-select ${newStatus}`;
+    const labels = { nouveau:'🟡 Nouveau', preparation:'🟢 En préparation', livre:'✅ Livré' };
+    toast(`Commande ${id} → ${labels[newStatus]}`, 'success');
+    // Update badge
+    const newCount = MOCK_DASH_ORDERS.filter(o => o.status === 'nouveau').length;
+    const badge = document.getElementById('new-orders-badge');
+    if (newCount > 0) { badge.style.display=''; badge.textContent=newCount; } else badge.style.display='none';
+  }
+}
+
+function toggleKitchenStatus() {
+  const isOpen = document.getElementById('kitchen-toggle').checked;
+  document.getElementById('toggle-status-label').textContent =
+    isOpen ? 'Votre cuisine est actuellement ouverte aux commandes'
+           : 'Votre cuisine est fermée — les clients ne peuvent pas commander';
+  toast(isOpen ? '🟢 Votre cuisine est maintenant ouverte' : '🔴 Votre cuisine est maintenant fermée', isOpen ? 'success' : 'default');
+}
+
+function showDashPanel(panel) {
+  ['overview','orders','menu','settings'].forEach(p => {
+    document.getElementById(`dp-${p}`).classList.toggle('active', p === panel);
+    document.getElementById(`dn-${p}`).classList.toggle('active', p === panel);
+  });
+}
+
+/* ================================================================
+   CLIENT — MES COMMANDES
+================================================================ */
+function switchClientTab(tab) {
+  const profilePanel = document.getElementById('client-tab-profile');
+  const ordersPanel  = document.getElementById('client-tab-orders');
+  const profileBtn   = document.getElementById('tab-profile-btn');
+  const ordersBtn    = document.getElementById('tab-orders-btn');
+  if (tab === 'profile') {
+    profilePanel.style.display = '';
+    ordersPanel.style.display  = 'none';
+    profileBtn.style.color = 'var(--primary-light)';
+    profileBtn.style.borderBottom = '2px solid var(--primary-light)';
+    ordersBtn.style.color = 'var(--text-muted)';
+    ordersBtn.style.borderBottom = 'none';
+  } else {
+    profilePanel.style.display = 'none';
+    ordersPanel.style.display  = '';
+    ordersBtn.style.color = 'var(--primary-light)';
+    ordersBtn.style.borderBottom = '2px solid var(--primary-light)';
+    profileBtn.style.color = 'var(--text-muted)';
+    profileBtn.style.borderBottom = 'none';
+  }
+}
+
+function renderMyOrders() {
+  const el = document.getElementById('my-orders-list');
+  if (!el) return;
+  if (!AUTH) { el.innerHTML = `<div style="text-align:center;padding:60px;color:var(--text-muted);">Veuillez vous <a onclick="go('login')" style="color:var(--primary-light);cursor:pointer;">connecter</a> pour voir vos commandes.</div>`; return; }
+  const orders = AUTH.role === 'client' ? MOCK_CLIENT_ORDERS : [];
+  if (!orders.length) { el.innerHTML = `<div style="text-align:center;padding:60px;color:var(--text-muted);">Aucune commande pour l'instant. <a onclick="go('kitchens')" style="color:var(--primary-light);cursor:pointer;">Commander maintenant →</a></div>`; return; }
+  el.innerHTML = orders.map(o => `
+    <div class="order-hist-card">
+      <div class="order-hist-head">
+        <div><div class="order-hist-id">${o.id}</div><div class="order-hist-date">${o.date} · ${o.kitchen}</div></div>
+        <span class="order-hist-status status-${o.status}">${o.status === 'livré' ? '✅ Livré' : o.status === 'en-cours' ? '🟡 En cours' : '🕐 Nouveau'}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">🍽️ ${o.items}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:15px;font-weight:700;">Total : ${dzd(o.total)}</div>
+        <button class="btn-sm" onclick="go('kitchens')">Recommander</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ================================================================
+   UPDATED go() ROUTER — extended with new pages
+================================================================ */
+// Patch the existing go() to handle new pages
+const _originalGo = go;
+go = function(page, params={}) {
+  // Hide welcome page when navigating away
+  const welcomeEl = document.getElementById('page-welcome');
+  if (welcomeEl) welcomeEl.classList.remove('active');
+
+  // Handle new pages
+  if (['login','register','dashboard','myorders','welcome'].includes(page)) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    if (page === 'welcome') {
+      if (welcomeEl) welcomeEl.classList.add('active');
+      return;
+    }
+    const pageMap = { login:'page-login', register:'page-register', dashboard:'page-dashboard', myorders:'page-myorders' };
+    const el = document.getElementById(pageMap[page]);
+    if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+    if (page === 'dashboard') renderDashboard();
+    if (page === 'myorders')  { renderMyOrders(); renderClientProfile(); }
+    if (page === 'register') { regRole=null; document.getElementById('reg-step1').style.display=''; document.getElementById('reg-step2').style.display='none'; document.getElementById('rc-client').classList.remove('selected'); document.getElementById('rc-cuisinier').classList.remove('selected'); document.getElementById('reg-dot-1').classList.add('active'); document.getElementById('reg-dot-2').classList.remove('active'); }
+    return;
+  }
+  _originalGo(page, params);
+};
+
+// Init app
+appInit();
+
+/* ================================================================
+   PWA — SERVICE WORKER + INSTALL PROMPT
+================================================================ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[DarnaFood] SW registered:', reg.scope))
+      .catch(err => console.log('[DarnaFood] SW error:', err));
+  });
+}
+
+// Install prompt banner
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (document.getElementById('pwa-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'pwa-banner';
+  banner.innerHTML = `
+    <div style="
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:500;
+      background:var(--bg-elevated); border:1px solid rgba(232,144,26,.4);
+      border-radius:var(--r-lg); padding:14px 20px;
+      display:flex; align-items:center; gap:14px;
+      box-shadow:var(--shadow-xl); max-width:420px; width:90%;
+      animation:fadeUp .4s ease both;
+    ">
+      <div style="font-size:32px;">📱</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px;">Installer DarnaFood</div>
+        <div style="font-size:12px;color:var(--text-muted);">Accès rapide depuis votre écran d'accueil</div>
+      </div>
+      <button onclick="installPWA()" style="
+        background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));
+        color:#fff; padding:8px 16px; border-radius:var(--r-sm);
+        font-size:13px; font-weight:700; border:none; cursor:pointer; white-space:nowrap;
+      ">Installer</button>
+      <button onclick="this.closest('#pwa-banner').remove()" style="
+        background:none; border:none; color:var(--text-muted);
+        font-size:18px; cursor:pointer; padding:4px;
+      ">✕</button>
+    </div>`;
+  document.body.appendChild(banner);
+}
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(result => {
+    if (result.outcome === 'accepted') toast('🎉 DarnaFood installé sur votre téléphone !', 'success');
+    deferredPrompt = null;
+    const b = document.getElementById('pwa-banner');
+    if (b) b.remove();
+  });
+}
+</script>
+
+<!-- ================================================================
+     PAGE: LOGIN
+================================================================ -->
+<div class="page" id="page-login">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo" onclick="go('home')">
+        <div class="nav-logo-icon">🍽️</div>
+        <div class="nav-logo-en" style="font-size:22px;">DarnaFood</div>
+      </div>
+      <h1 class="auth-title">Bon retour ! 👋</h1>
+      <p class="auth-sub">Connectez-vous à votre compte DarnaFood</p>
+
+      <div class="form-group">
+        <label class="form-label">Adresse email</label>
+        <input type="email" class="form-input" id="l-email" placeholder="votre@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" class="form-input" id="l-pwd" placeholder="••••••••">
+      </div>
+      <div style="text-align:right;margin:-6px 0 18px;">
+        <a style="font-size:13px;color:var(--primary-light);cursor:pointer;">Mot de passe oublié ?</a>
+      </div>
+      <button class="btn-primary btn-block" onclick="doLogin()">Se connecter →</button>
+      <div class="auth-footer">Pas encore de compte ? <a onclick="go('register')">S'inscrire gratuitement</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: REGISTER
+================================================================ -->
+<div class="page" id="page-register">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo" onclick="go('home')">
+        <div class="nav-logo-icon">🍽️</div>
+        <div class="nav-logo-en" style="font-size:22px;">DarnaFood</div>
+      </div>
+      <h1 class="auth-title">Créer un compte</h1>
+      <p class="auth-sub">Rejoignez la communauté DarnaFood 🇩🇿</p>
+      <div class="steps-indicator">
+        <div class="step-dot active" id="reg-dot-1"></div>
+        <div class="step-dot" id="reg-dot-2"></div>
+      </div>
+      <!-- Step 1: Role picker -->
+      <div id="reg-step1">
+        <p style="font-size:14px;font-weight:600;text-align:center;margin-bottom:16px;color:var(--text-muted);">Je suis...</p>
+        <div class="role-grid">
+          <div class="role-card" id="rc-client" onclick="selectRole('client')">
+            <span class="role-icon">🛒</span>
+            <div class="role-name">Client</div>
+            <div class="role-desc">Je veux commander de la cuisine maison</div>
+          </div>
+          <div class="role-card" id="rc-cuisinier" onclick="selectRole('cuisinier')">
+            <span class="role-icon">👩‍🍳</span>
+            <div class="role-name">Cuisinier</div>
+            <div class="role-desc">Je veux vendre mes plats maison</div>
+          </div>
+        </div>
+        <button class="btn-primary btn-block" onclick="nextRegStep()" style="margin-top:8px;">Continuer →</button>
+      </div>
+      <!-- Step 2: Form -->
+      <div id="reg-step2" style="display:none;">
+        <div id="reg-form-client">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Prénom *</label><input type="text" class="form-input" id="r-fn" placeholder="Votre prénom"></div>
+            <div class="form-group"><label class="form-label">Nom *</label><input type="text" class="form-input" id="r-ln" placeholder="Votre nom"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" id="r-email" placeholder="votre@email.com"></div>
+          <div class="form-group"><label class="form-label">Téléphone *</label><input type="tel" class="form-input" id="r-phone" placeholder="06 XX XX XX XX"></div>
+          <div class="form-group">
+            <label class="form-label">Wilaya *</label>
+            <select class="form-select" id="r-wilaya" onchange="populateCommunes('r-wilaya','r-commune')">
+              <option value="">Sélectionner votre wilaya...</option>
+              <option>Adrar</option><option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option><option>Batna</option><option>Béjaïa</option><option>Biskra</option><option>Béchar</option><option>Blida</option><option>Bouira</option><option>Tamanrasset</option><option>Tébessa</option><option>Tlemcen</option><option>Tiaret</option><option>Tizi Ouzou</option><option>Alger</option><option>Djelfa</option><option>Jijel</option><option>Sétif</option><option>Saïda</option><option>Skikda</option><option>Sidi Bel Abbès</option><option>Annaba</option><option>Guelma</option><option>Constantine</option><option>Médéa</option><option>Mostaganem</option><option>M'Sila</option><option>Mascara</option><option>Ouargla</option><option>Oran</option><option>El Bayadh</option><option>Illizi</option><option>Bordj Bou Arréridj</option><option>Boumerdès</option><option>El Tarf</option><option>Tindouf</option><option>Tissemsilt</option><option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option><option>Tipaza</option><option>Mila</option><option>Aïn Defla</option><option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option><option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option><option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option><option>In Guezzam</option><option>Touggourt</option><option>Djanet</option><option>El M'Ghair</option><option>El Meniaa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Commune *</label>
+            <select class="form-select" id="r-commune" disabled><option value="">Sélectionnez d'abord une wilaya</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Mot de passe *</label><input type="password" class="form-input" id="r-pwd" placeholder="Minimum 6 caractères"></div>
+        </div>
+        <div id="reg-form-cuisinier" style="display:none;">
+
+          <!-- IDENTITY SECTION -->
+          <div style="background:var(--primary-glow);border:1px solid rgba(232,144,26,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:20px;flex-shrink:0">📍</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--primary-light);margin-bottom:2px;">Vérification d'identité</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Ces informations sont nécessaires pour activer votre compte cuisinier. Elles restent confidentielles.</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Identité personnelle</div>
+
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Prénom *</label><input type="text" class="form-input" id="r-kfn" placeholder="Votre prénom"></div>
+            <div class="form-group"><label class="form-label">Nom *</label><input type="text" class="form-input" id="r-kln" placeholder="Votre nom de famille"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Date de naissance *</label><input type="date" class="form-input" id="r-kdob"></div>
+          <div class="form-group">
+            <label class="form-label">Wilaya de naissance *</label>
+            <select class="form-select" id="r-kbwilaya">
+              <option value="">Sélectionner...</option>
+              <option>Adrar</option><option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option><option>Batna</option><option>Béjaïa</option><option>Biskra</option><option>Béchar</option><option>Blida</option><option>Bouira</option><option>Tamanrasset</option><option>Tébessa</option><option>Tlemcen</option><option>Tiaret</option><option>Tizi Ouzou</option><option>Alger</option><option>Djelfa</option><option>Jijel</option><option>Sétif</option><option>Saïda</option><option>Skikda</option><option>Sidi Bel Abbès</option><option>Annaba</option><option>Guelma</option><option>Constantine</option><option>Médéa</option><option>Mostaganem</option><option>M'Sila</option><option>Mascara</option><option>Ouargla</option><option>Oran</option><option>El Bayadh</option><option>Illizi</option><option>Bordj Bou Arréridj</option><option>Boumerdès</option><option>El Tarf</option><option>Tindouf</option><option>Tissemsilt</option><option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option><option>Tipaza</option><option>Mila</option><option>Aïn Defla</option><option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option><option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option><option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option><option>In Guezzam</option><option>Touggourt</option><option>Djanet</option><option>El M'Ghair</option><option>El Meniaa</option>
+            </select>
+          </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">N° Carte Nationale d'Identité (CIN) *</label>
+            <input type="text" class="form-input" id="r-kcin" placeholder="Ex: 123456789" maxlength="18" style="letter-spacing:2px;font-family:monospace;font-size:15px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">Votre CIN est utilisée uniquement pour la vérification de votre identité.</div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:18px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Votre cuisine</div>
+
+          <div class="form-group"><label class="form-label">Nom de votre cuisine *</label><input type="text" class="form-input" id="r-kname" placeholder="Ex: Dar Lalla Fatima"></div>
+          <div class="form-group">
+            <label class="form-label">Spécialité principale *</label>
+            <input type="text" class="form-input" id="r-kcat"
+              list="kcat-suggestions"
+              placeholder="Ex: Couscous, Berkoukes, Chakhchoukha..."
+              autocomplete="off">
+            <datalist id="kcat-suggestions">
+              <!-- Plats principaux -->
+              <option value="Couscous">
+              <option value="Couscous au Poulet">
+              <option value="Couscous Royal">
+              <option value="Couscous 7 Légumes">
+              <option value="Couscous Tfaya">
+              <option value="Rechta">
+              <option value="Chakhchoukha">
+              <option value="Berkoukes">
+              <option value="Tchicha">
+              <option value="Tarhouna">
+              <option value="Doubara">
+              <option value="Tamina">
+              <option value="Tagine">
+              <option value="Tagine Zitoune">
+              <option value="Tagine Lham">
+              <option value="Tagine Kefta">
+              <option value="Tagine Djaj">
+              <!-- Grillades & Viandes -->
+              <option value="Grillades">
+              <option value="Merguez Maison">
+              <option value="Brochettes d'Agneau">
+              <option value="Kefta Grillée">
+              <option value="Poulet Grillé">
+              <option value="Méchoui">
+              <option value="Ojja">
+              <option value="Matlouh Viande">
+              <!-- Spécialités kabyles -->
+              <option value="Cuisine Kabyle">
+              <option value="Aftit">
+              <option value="Aghrum">
+              <option value="Tafraout">
+              <option value="Tighrifine">
+              <option value="Abzin">
+              <option value="Iflane">
+              <!-- Spécialités du Sud / Sahara -->
+              <option value="Cuisine Saharienne">
+              <option value="Tibkhine">
+              <option value="Assida">
+              <option value="Marmita">
+              <option value="Cherchem">
+              <option value="Baghrira">
+              <!-- Soupes & Chorbas -->
+              <option value="Soupes & Chorbas">
+              <option value="Chorba Frik">
+              <option value="Chorba Hamra">
+              <option value="Chorba Beïda">
+              <option value="Harira">
+              <option value="Harira Ramadaniya">
+              <option value="Lablabi">
+              <!-- Pâtisseries & Sucreries -->
+              <option value="Pâtisseries Orientales">
+              <option value="Baklawa">
+              <option value="Makrout">
+              <option value="Qalb Ellouz">
+              <option value="Samsa">
+              <option value="Tamina au Miel">
+              <option value="Zlabia">
+              <option value="Griwech">
+              <option value="Chrik">
+              <option value="Sfinj">
+              <option value="Mhajeb">
+              <!-- Sandwichs & Snacks -->
+              <option value="Sandwichs Maison">
+              <option value="Kesra Farcie">
+              <option value="Matlouh">
+              <option value="M'hadjeb">
+              <!-- Salades & Entrées -->
+              <option value="Salades & Entrées">
+              <option value="Zaalouk">
+              <option value="Slata Mechouia">
+              <option value="Salade Fenouil">
+            </datalist>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">
+              💡 Choisissez dans la liste ou tapez le nom exact de votre spécialité
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Wilaya *</label>
+            <select class="form-select" id="r-kwilaya" onchange="populateCommunes('r-kwilaya','r-kcommune')">
+              <option value="">Sélectionner votre wilaya...</option>
+              <option>Adrar</option><option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option><option>Batna</option><option>Béjaïa</option><option>Biskra</option><option>Béchar</option><option>Blida</option><option>Bouira</option><option>Tamanrasset</option><option>Tébessa</option><option>Tlemcen</option><option>Tiaret</option><option>Tizi Ouzou</option><option>Alger</option><option>Djelfa</option><option>Jijel</option><option>Sétif</option><option>Saïda</option><option>Skikda</option><option>Sidi Bel Abbès</option><option>Annaba</option><option>Guelma</option><option>Constantine</option><option>Médéa</option><option>Mostaganem</option><option>M'Sila</option><option>Mascara</option><option>Ouargla</option><option>Oran</option><option>El Bayadh</option><option>Illizi</option><option>Bordj Bou Arréridj</option><option>Boumerdès</option><option>El Tarf</option><option>Tindouf</option><option>Tissemsilt</option><option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option><option>Tipaza</option><option>Mila</option><option>Aïn Defla</option><option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option><option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option><option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option><option>In Guezzam</option><option>Touggourt</option><option>Djanet</option><option>El M'Ghair</option><option>El Meniaa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Commune *</label>
+            <select class="form-select" id="r-kcommune" disabled><option value="">Sélectionnez d'abord une wilaya</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="r-kdesc" placeholder="Décrivez votre cuisine maison..."></textarea></div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:18px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Contact &amp; accès</div>
+
+          <div class="form-group"><label class="form-label">Téléphone *</label><input type="tel" class="form-input" id="r-kphone" placeholder="06 XX XX XX XX"></div>
+          <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" id="r-kemail" placeholder="votre@email.com"></div>
+          <div class="form-group"><label class="form-label">Mot de passe *</label><input type="password" class="form-input" id="r-kpwd" placeholder="Minimum 6 caractères"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button class="btn-ghost" style="padding:12px;" onclick="prevRegStep()">← Retour</button>
+          <button class="btn-primary" style="flex:1;justify-content:center;" onclick="doRegister()">Créer mon compte →</button>
+        </div>
+      </div>
+      <div class="auth-footer">Déjà un compte ? <a onclick="go('login')">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: CUISINIER DASHBOARD
+================================================================ -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dash-sidebar">
+      <div style="padding:8px 12px 16px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+        <div style="font-size:15px;font-weight:700;" id="dash-kitchen-name">Ma Cuisine</div>
+        <div id="dash-kitchen-wilaya" style="font-size:12px;color:var(--text-muted);"></div>
+      </div>
+      <span class="dash-sidebar-title">Navigation</span>
+      <div class="dash-nav-item active" id="dn-overview" onclick="showDashPanel('overview')"><span class="dash-nav-icon">📊</span> Vue d'ensemble</div>
+      <div class="dash-nav-item" id="dn-orders"   onclick="showDashPanel('orders')"><span class="dash-nav-icon">📦</span> Commandes <span id="new-orders-badge" style="margin-left:auto;background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;display:none;"></span></div>
+      <div class="dash-nav-item" id="dn-menu"     onclick="showDashPanel('menu')"><span class="dash-nav-icon">🍽️</span> Mon Menu</div>
+      <div class="dash-nav-item" id="dn-settings" onclick="showDashPanel('settings')"><span class="dash-nav-icon">⚙️</span> Paramètres</div>
+      <div style="flex:1;"></div>
+      <div class="dash-nav-item danger" onclick="logout()" style="color:var(--danger);margin-top:8px;"><span class="dash-nav-icon">🚪</span> Déconnexion</div>
+    </aside>
+    <!-- Main area -->
+    <main class="dash-main">
+      <!-- Overview panel -->
+      <div class="dash-panel active" id="dp-overview">
+        <div class="dash-header">
+          <h1 class="dash-title">Bonjour, <span id="dash-chef-name">Chef</span> ! 👋</h1>
+          <p class="dash-subtitle">Voici le résumé de votre activité aujourd'hui</p>
+        </div>
+        <div class="toggle-wrap">
+          <div class="toggle-label">
+            <strong>Statut de ma cuisine</strong>
+            <span id="toggle-status-label">Votre cuisine est actuellement ouverte aux commandes</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="kitchen-toggle" checked onchange="toggleKitchenStatus()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><span class="stat-card-icon">📦</span><div class="stat-card-val" id="sc-orders">0</div><div class="stat-card-label">Commandes aujourd'hui</div><div class="stat-card-delta">+2 cette semaine</div></div>
+          <div class="stat-card"><span class="stat-card-icon">💵</span><div class="stat-card-val" id="sc-revenue">0 DA</div><div class="stat-card-label">Revenus du jour</div><div class="stat-card-delta">+12% vs hier</div></div>
+          <div class="stat-card"><span class="stat-card-icon">⭐</span><div class="stat-card-val" id="sc-rating">4.9</div><div class="stat-card-label">Note moyenne</div><div class="stat-card-delta">237 avis</div></div>
+          <div class="stat-card"><span class="stat-card-icon">👥</span><div class="stat-card-val">18</div><div class="stat-card-label">Clients fidèles</div><div class="stat-card-delta">+3 ce mois</div></div>
+        </div>
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:14px;">Commandes récentes</h3>
+        <div class="orders-list" id="overview-orders"></div>
+      </div>
+      <!-- Orders panel -->
+      <div class="dash-panel" id="dp-orders">
+        <div class="dash-header">
+          <h1 class="dash-title">📦 Commandes</h1>
+          <p class="dash-subtitle">Gérez les commandes en temps réel</p>
+        </div>
+        <div class="orders-list" id="all-orders-list"></div>
+      </div>
+      <!-- Menu panel -->
+      <div class="dash-panel" id="dp-menu">
+        <div class="dash-header">
+          <h1 class="dash-title">🍽️ Mon Menu</h1>
+          <p class="dash-subtitle">Tous vos plats disponibles à la commande</p>
+        </div>
+        <div id="dash-menu-list"></div>
+      </div>
+      <!-- Settings panel -->
+      <div class="dash-panel" id="dp-settings">
+        <div class="dash-header">
+          <h1 class="dash-title">⚙️ Paramètres</h1>
+          <p class="dash-subtitle">Informations de votre cuisine</p>
+        </div>
+        <div class="form-card" id="settings-info"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE: CLIENT — MES COMMANDES
+================================================================ -->
+<div class="page" id="page-myorders">
+  <div class="my-orders-page">
+    <button class="back-btn" onclick="go('home')">← Retour à l'accueil</button>
+    <h1 class="page-title" style="margin-bottom:6px;">Mon espace</h1>
+    <p class="page-sub" style="margin-bottom:28px;">Gérez votre profil et vos commandes</p>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:8px;margin-bottom:28px;border-bottom:2px solid var(--border);">
+      <button id="tab-profile-btn" onclick="switchClientTab('profile')" style="background:none;border:none;padding:10px 18px;font-size:14px;font-weight:700;color:var(--primary-light);border-bottom:2px solid var(--primary-light);margin-bottom:-2px;cursor:pointer;">👤 Mon profil</button>
+      <button id="tab-orders-btn" onclick="switchClientTab('orders')" style="background:none;border:none;padding:10px 18px;font-size:14px;font-weight:700;color:var(--text-muted);cursor:pointer;">📦 Mes commandes</button>
+    </div>
+
+    <!-- Profile panel -->
+    <div id="client-tab-profile">
+      <div id="client-profile-section"></div>
+    </div>
+
+    <!-- Orders panel -->
+    <div id="client-tab-orders" style="display:none;">
+      <div id="my-orders-list"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
