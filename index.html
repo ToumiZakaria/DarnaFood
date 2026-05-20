@@ -2886,6 +2886,130 @@ function renderDashboard() {
   }
 }
 
+/* ================================================================
+   MENU — ADD / REMOVE DISHES
+================================================================ */
+function toggleAddDishForm() {
+  const form = document.getElementById('add-dish-form');
+  if (!form) return;
+  const isHidden = form.style.display === 'none';
+  form.style.display = isHidden ? '' : 'none';
+  if (isHidden) {
+    document.getElementById('dish-name').focus();
+  }
+}
+
+async function addDish() {
+  const name  = document.getElementById('dish-name')?.value.trim();
+  const price = parseFloat(document.getElementById('dish-price')?.value);
+  const cat   = document.getElementById('dish-cat')?.value.trim() || 'Plat principal';
+  const desc  = document.getElementById('dish-desc')?.value.trim() || '';
+
+  if (!name) { toast('⚠️ Le nom du plat est obligatoire', 'error'); return; }
+  if (!price || price <= 0) { toast('⚠️ Le prix doit être supérieur à 0', 'error'); return; }
+
+  const btn = document.querySelector('#add-dish-form .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Ajout...'; }
+
+  // Get current menu
+  const accounts = getAccounts();
+  const acct = AUTH ? accounts.find(a => a.email === AUTH.email) : null;
+  const currentMenu = acct?.menu || [];
+
+  // Build new dish
+  const newDish = {
+    id: 'dish_' + Date.now(),
+    name, cat, price, desc,
+    emoji: '🍽️',
+    createdAt: new Date().toISOString()
+  };
+
+  const newMenu = [...currentMenu, newDish];
+
+  // Save via API
+  const result = await apiCall('profile', 'PUT', { menu: newMenu });
+
+  if (btn) { btn.disabled = false; btn.textContent = '✅ Ajouter au menu'; }
+
+  if (result.success) {
+    // Update local cache
+    if (acct) acct.menu = newMenu;
+    saveAccounts(accounts);
+    // Clear form
+    document.getElementById('dish-name').value = '';
+    document.getElementById('dish-price').value = '';
+    document.getElementById('dish-cat').value = '';
+    document.getElementById('dish-desc').value = '';
+    toggleAddDishForm();
+    toast(`✅ "${name}" ajouté au menu !`, 'success');
+    renderMenuList(newMenu);
+  } else {
+    toast('❌ ' + (result.error || 'Erreur lors de l\'ajout'), 'error');
+  }
+}
+
+async function removeDish(dishId) {
+  if (!confirm('Supprimer ce plat du menu ?')) return;
+
+  const accounts = getAccounts();
+  const acct = AUTH ? accounts.find(a => a.email === AUTH.email) : null;
+  const currentMenu = acct?.menu || [];
+  const newMenu = currentMenu.filter(d => d.id !== dishId);
+
+  const result = await apiCall('profile', 'PUT', { menu: newMenu });
+
+  if (result.success) {
+    if (acct) acct.menu = newMenu;
+    saveAccounts(accounts);
+    toast('🗑️ Plat supprimé', 'default');
+    renderMenuList(newMenu);
+  } else {
+    toast('❌ Erreur lors de la suppression', 'error');
+  }
+}
+
+function renderMenuList(menu) {
+  const el = document.getElementById('dash-menu-list');
+  if (!el) return;
+
+  if (!menu || menu.length === 0) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:48px 24px;color:var(--text-muted);">
+        <div style="font-size:48px;margin-bottom:12px;">🍽️</div>
+        <div style="font-weight:700;font-size:16px;margin-bottom:8px;">Votre menu est vide</div>
+        <div style="font-size:13px;">Cliquez sur "Ajouter un plat" pour commencer</div>
+      </div>`;
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  menu.forEach(d => {
+    const cat = d.cat || 'Autres';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(d);
+  });
+
+  el.innerHTML = Object.entries(grouped).map(([cat, dishes]) => `
+    <div style="margin-bottom:24px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">${cat}</div>
+      ${dishes.map(d => `
+        <div class="menu-list-item" style="position:relative;">
+          <div class="menu-list-icon" style="background:var(--bg-elevated);font-size:24px;display:flex;align-items:center;justify-content:center;">🍽️</div>
+          <div class="menu-list-info">
+            <div class="menu-list-name">${d.name}</div>
+            ${d.desc ? `<div class="menu-list-cat">${d.desc}</div>` : `<div class="menu-list-cat">${cat}</div>`}
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="menu-list-price">${dzd(d.price)}</div>
+            <button onclick="removeDish('${d.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:4px;line-height:1;" title="Supprimer">🗑️</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
 function toggleCin(realCin) {
   const field = document.getElementById('cin-field');
   if (!field || !realCin) return;
@@ -2933,7 +3057,14 @@ function showDashPanel(panel) {
     document.getElementById(`dp-${p}`).classList.toggle('active', p === panel);
     document.getElementById(`dn-${p}`).classList.toggle('active', p === panel);
   });
+  // Load menu when switching to menu panel
+  if (panel === 'menu') {
+    const accounts = getAccounts();
+    const acct = AUTH ? accounts.find(a => a.email === AUTH.email) : null;
+    renderMenuList(acct?.menu || []);
+  }
 }
+
 
 /* ================================================================
    CLIENT — MES COMMANDES
@@ -3365,10 +3496,63 @@ function installPWA() {
       <div class="dash-panel" id="dp-menu">
         <div class="dash-header">
           <h1 class="dash-title">🍽️ Mon Menu</h1>
-          <p class="dash-subtitle">Tous vos plats disponibles à la commande</p>
+          <p class="dash-subtitle">Gérez vos plats disponibles à la commande</p>
         </div>
+
+        <!-- Add dish button -->
+        <button class="btn-primary" style="margin-bottom:20px;width:100%;justify-content:center;" onclick="toggleAddDishForm()">
+          ➕ Ajouter un plat
+        </button>
+
+        <!-- Add dish form (hidden by default) -->
+        <div id="add-dish-form" style="display:none;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:24px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:16px;">🍽️ Nouveau plat</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nom du plat *</label>
+              <input class="form-input" id="dish-name" placeholder="Ex: Couscous Royal, Berkoukes...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prix (DA) *</label>
+              <input class="form-input" id="dish-price" type="number" min="0" placeholder="Ex: 800">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catégorie</label>
+            <input class="form-input" id="dish-cat" list="dish-cat-list" placeholder="Ex: Plat principal, Dessert, Soupe...">
+            <datalist id="dish-cat-list">
+              <option value="Plat principal">
+              <option value="Entrée">
+              <option value="Soupe">
+              <option value="Dessert">
+              <option value="Pâtisserie">
+              <option value="Boisson">
+              <option value="Sandwich">
+              <option value="Salade">
+              <option value="Grillades">
+              <option value="Couscous">
+              <option value="Tajine">
+              <option value="Chorba">
+            </datalist>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description (optionnel)</label>
+            <textarea class="form-textarea" id="dish-desc" placeholder="Décrivez votre plat..." style="height:70px;"></textarea>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:4px;">
+            <button class="btn-primary" style="flex:1;justify-content:center;" onclick="addDish()">✅ Ajouter au menu</button>
+            <button class="btn-ghost" style="padding:12px 20px;" onclick="toggleAddDishForm()">Annuler</button>
+          </div>
+        </div>
+
+        <!-- Dish list -->
         <div id="dash-menu-list"></div>
       </div>
+
       <!-- Settings panel -->
       <div class="dash-panel" id="dp-settings">
         <div class="dash-header">
