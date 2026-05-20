@@ -10,13 +10,17 @@ let cachedClient = null;
 async function getDb() {
   if (!cachedClient || !cachedClient.topology?.isConnected()) {
     cachedClient = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+      socketTimeoutMS: 30000,
+      tls: true,
+      tlsAllowInvalidCertificates: false,
     });
     await cachedClient.connect();
   }
   return cachedClient.db('darnafood');
 }
+
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
