@@ -1,8 +1,10 @@
 <script setup>
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
 import { useUIStore } from '../stores/ui'
+import { House, Store, ShoppingCart, User } from '@lucide/vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -10,7 +12,18 @@ const auth = useAuthStore()
 const cart = useCartStore()
 const ui = useUIStore()
 
-const tabs = ['home', 'kitchens', 'cart', 'profile']
+const tabs = [
+  { id: 'home', label: 'Accueil', icon: House },
+  { id: 'kitchens', label: 'Cuisines', icon: Store },
+  { id: 'cart', label: 'Panier', icon: ShoppingCart },
+  { id: 'profile', label: 'Profil', icon: User },
+]
+
+const activeTab = computed(() => {
+  const name = route.name
+  if (name === 'home' || name === 'kitchens' || name === 'cart' || name === 'profile' || name === 'myorders') return name
+  return null
+})
 
 function navigate(tab) {
   if (tab === 'cart') { ui.openCart(); return }
@@ -25,27 +38,45 @@ function navigate(tab) {
 </script>
 
 <template>
-  <nav class="pwa-bottom-nav">
-    <button v-for="tab in tabs" :key="tab" class="pwa-tab" :class="{ active: route.name === tab }" @click="navigate(tab)">
-      <div class="pwa-tab-wrap">
-        <span class="pwa-tab-icon">{{ { home:'🏠', kitchens:'🍽️', cart:'🛒', profile:'👤' }[tab] }}</span>
-        <span class="pwa-tab-badge" v-if="tab === 'cart' && cart.count > 0">{{ cart.count > 9 ? '9+' : cart.count }}</span>
+  <nav class="mobile-bottom-nav">
+    <button v-for="t in tabs" :key="t.id" class="mb-tab" :class="{ active: activeTab === t.id }" @click="navigate(t.id)">
+      <div class="mb-tab-inner">
+        <component :is="t.icon" :size="22" class="mb-tab-icon" />
+        <span class="mb-tab-label">{{ t.label }}</span>
+        <span v-if="t.id === 'cart' && cart.count > 0" class="mb-tab-badge">{{ cart.count > 9 ? '9+' : cart.count }}</span>
       </div>
-      <span>{{ { home:'Accueil', kitchens:'Cuisines', cart:'Panier', profile:'Profil' }[tab] }}</span>
     </button>
   </nav>
 </template>
 
 <style scoped>
-.pwa-bottom-nav { display:none; }
-@media(display-mode:standalone) {
-  .pwa-bottom-nav { display:flex; position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:390px; height:62px; background:var(--bg-card); border-top:1px solid var(--border-light); z-index:2000; align-items:stretch; }
-  @supports(padding-bottom:env(safe-area-inset-bottom)) { .pwa-bottom-nav { height:calc(62px + env(safe-area-inset-bottom)); padding-bottom:env(safe-area-inset-bottom); } }
+.mobile-bottom-nav {
+  display:none;
+  position:fixed; bottom:0; left:0; right:0; z-index:1000;
+  height:60px; background:#141414; border-top:1px solid #262626;
+  align-items:stretch;
+  padding-bottom:env(safe-area-inset-bottom, 0px);
 }
-.pwa-tab { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; flex:1; min-height:48px; cursor:pointer; color:var(--text-muted); font-size:11px; font-weight:600; border:none; background:none; padding:0; position:relative; }
-.pwa-tab.active { color:var(--primary-light); }
-.pwa-tab.active::before { content:''; position:absolute; top:0; left:20%; right:20%; height:2px; background:var(--primary-light); border-radius:0 0 4px 4px; }
-.pwa-tab-icon { font-size:24px; line-height:1; }
-.pwa-tab-badge { position:absolute; top:4px; right:-2px; background:#E05555; color:#fff; font-size:9px; font-weight:800; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
-.pwa-tab-wrap { position:relative; display:flex; flex-direction:column; align-items:center; }
+.mb-tab {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  background:none; border:none; cursor:pointer; padding:0; position:relative;
+  color:#52525B;
+}
+.mb-tab.active { color:#E8813A; }
+.mb-tab.active::before {
+  content:''; position:absolute; top:0; left:25%; right:25%; height:2px;
+  background:#E8813A; border-radius:0 0 4px 4px;
+}
+.mb-tab-inner {
+  display:flex; flex-direction:column; align-items:center; gap:2px; position:relative;
+}
+.mb-tab-icon { display:block; }
+.mb-tab-label { font-size:10px; font-weight:600; }
+.mb-tab-badge {
+  position:absolute; top:-4px; right:-10px;
+  background:#EF4444; color:#fff; font-size:9px; font-weight:800;
+  min-width:16px; height:16px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; padding:0 4px;
+}
+@media(max-width:768px) { .mobile-bottom-nav { display:flex; } }
 </style>

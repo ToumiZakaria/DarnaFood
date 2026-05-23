@@ -9,20 +9,15 @@ import Toast from './components/Toast.vue'
 
 const route = useRoute()
 const noLayout = computed(() => ['welcome'].includes(route.name))
-const isApp = computed(() => route.path.startsWith('/app'))
+const isDashboard = computed(() => route.path.startsWith('/dashboard'))
 </script>
 
 <template>
-  <div class="min-h-screen" :class="isApp ? 'bg-[#0A0A0A]' : 'bg-[#0C0B09]'">
-    <template v-if="isApp">
-      <router-view />
-    </template>
-    <template v-else>
-      <Navbar v-if="!noLayout" />
-      <router-view />
-      <Footer v-if="!noLayout" />
-      <PWABottomNav v-if="!noLayout" />
-    </template>
+  <div class="min-h-screen bg-[#0C0B09]">
+    <Navbar v-if="!noLayout && !isDashboard" />
+    <router-view />
+    <Footer v-if="!noLayout && !isDashboard" />
+    <PWABottomNav v-if="!noLayout && !isDashboard" />
     <CartDrawer />
     <div id="toast-host" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none" />
     <Teleport to="body">

@@ -34,23 +34,23 @@ function toggleUserMenu() {
       </div>
     </div>
     <ul class="nav-links">
-      <li><a href="#" @click.prevent="go('home')" class="active">Accueil</a></li>
+      <li><a href="#" @click.prevent="go('home')">Accueil</a></li>
       <li><a href="#" @click.prevent="go('kitchens')">Cuisines</a></li>
     </ul>
     <div class="nav-spacer"></div>
-    <div v-if="!auth.isAuthenticated" style="display:flex;gap:8px;">
-      <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" @click="go('login')">Se connecter</button>
-      <button class="btn-primary" style="padding:8px 16px;font-size:13px;" @click="go('register')">S'inscrire</button>
+    <div v-if="!auth.isAuthenticated" class="nav-auth-btns">
+      <button class="btn-ghost nav-btn" @click="go('login')">Se connecter</button>
+      <button class="btn-primary nav-btn" @click="go('register')">S'inscrire</button>
     </div>
     <div v-else class="nav-user-wrap">
       <button class="nav-user-btn" @click="toggleUserMenu">
         <div class="nav-user-avatar">{{ initials }}</div>
         <span>{{ auth.user.firstName || auth.user.name }}</span>
-        <span style="font-size:10px;color:var(--text-muted)">▾</span>
+        <span class="nav-chevron">▾</span>
       </button>
       <div class="user-dropdown" id="user-dropdown">
-        <div style="padding:10px 12px 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
-          <div style="font-size:13px;font-weight:700;">{{ auth.user.firstName }} {{ auth.user.lastName }}</div>
+        <div class="user-drop-header">
+          <div class="user-drop-name">{{ auth.user.firstName }} {{ auth.user.lastName }}</div>
           <div v-if="auth.isCuisinier" class="role-badge cuisinier">👨‍🍳 Cuisinier</div>
           <div v-else class="role-badge client">🛒 Client</div>
         </div>
@@ -78,6 +78,8 @@ function toggleUserMenu() {
 .nav-links a { padding:8px 15px; border-radius:var(--r-sm); font-size:14px; font-weight:500; color:var(--text-muted); text-decoration:none; }
 .nav-links a:hover, .nav-links a.active { color:var(--text); background:var(--bg-elevated); }
 .nav-spacer { flex:1; }
+.nav-auth-btns { display:flex; gap:8px; }
+.nav-btn { padding:8px 16px; font-size:13px; }
 .nav-cart { position:relative; display:flex; align-items:center; gap:8px; background:var(--bg-elevated); border:1px solid var(--border-light); color:var(--text); padding:9px 18px; border-radius:var(--r-sm); font-size:14px; font-weight:600; cursor:pointer; }
 .nav-cart:hover { border-color:var(--primary); background:var(--primary-glow); color:var(--primary-light); }
 .cart-badge { position:absolute; top:-8px; right:-8px; width:20px; height:20px; border-radius:50%; background:var(--primary); color:#fff; font-size:11px; font-weight:700; display:none; align-items:center; justify-content:center; }
@@ -86,8 +88,11 @@ function toggleUserMenu() {
 .nav-user-btn { display:flex; align-items:center; gap:8px; background:var(--bg-elevated); border:1px solid var(--border-light); color:var(--text); padding:7px 14px; border-radius:var(--r-sm); font-size:13px; font-weight:600; cursor:pointer; }
 .nav-user-btn:hover { border-color:var(--primary); }
 .nav-user-avatar { width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--primary-light),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#fff; }
+.nav-chevron { font-size:10px; color:var(--text-muted); }
 .user-dropdown { position:absolute; top:calc(100% + 8px); right:0; z-index:300; background:var(--bg-elevated); border:1px solid var(--border-light); border-radius:var(--r); padding:6px; min-width:180px; box-shadow:var(--shadow-lg); display:none; }
 .user-dropdown.open { display:block; }
+.user-drop-header { padding:10px 12px 8px; border-bottom:1px solid var(--border); margin-bottom:4px; }
+.user-drop-name { font-size:13px; font-weight:700; }
 .user-drop-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--r-sm); font-size:13px; font-weight:500; cursor:pointer; color:var(--text-muted); }
 .user-drop-item:hover { background:var(--bg-card); color:var(--text); }
 .user-drop-item.danger:hover { color:var(--danger); }
@@ -95,4 +100,6 @@ function toggleUserMenu() {
 .role-badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; }
 .role-badge.client { background:rgba(45,140,100,.15); color:var(--accent-light); }
 .role-badge.cuisinier { background:var(--primary-glow); color:var(--primary-light); }
+
+@media(max-width:768px) { .navbar { display:none; } }
 </style>

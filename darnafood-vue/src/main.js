@@ -4,12 +4,6 @@ import App from './App.vue'
 import router from './router'
 import './style.css'
 
-// PWA class detection
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-  document.body.classList.add('pwa')
-}
-
-// Global toast helper
 window.showToast = (message, type = 'success') => {
   const host = document.getElementById('toast-host')
   if (!host) return
@@ -18,13 +12,6 @@ window.showToast = (message, type = 'success') => {
   t.textContent = message
   host.appendChild(t)
   setTimeout(() => t.remove(), 3000)
-}
-
-// Service worker registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-  })
 }
 
 const app = createApp(App)

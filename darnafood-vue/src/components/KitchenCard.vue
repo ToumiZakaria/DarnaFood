@@ -1,16 +1,12 @@
 <script setup>
-import { computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { dzd } from '../utils'
 
 const props = defineProps({ kitchen: Object })
 const router = useRouter()
-const route = useRoute()
-
-const detailRouteName = computed(() => route.path.startsWith('/app') ? 'app-kitchen-detail' : 'kitchen-detail')
 
 function openDetail() {
-  router.push({ name: detailRouteName.value, params: { id: props.kitchen.id } })
+  router.push({ name: 'kitchen-detail', params: { id: props.kitchen.id } })
 }
 </script>
 
