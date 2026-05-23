@@ -19,7 +19,8 @@ onMounted(async () => {
   try {
     const data = await apiGetDishes()
     if (data.success) dishes.value = data.dishes || []
-  } catch {}
+    else console.warn('apiGetDishes error:', data.error)
+  } catch (e) { console.error('apiGetDishes exception:', e) }
   loading.value = false
 })
 
@@ -92,6 +93,16 @@ function addIngredient() {
 function removeIngredient(i) { form.value.ingredients.splice(i, 1) }
 function onIngredientKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); addIngredient() } }
 
+function toast(msg, type = 'default') {
+  const host = document.getElementById('toast-host')
+  if (!host) { alert(msg); return }
+  const el = document.createElement('div')
+  el.className = 'toast ' + type
+  el.textContent = msg
+  host.appendChild(el)
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300) }, 3000)
+}
+
 async function saveDish() {
   if (!form.value.name || !form.value.price) return
   const payload = {
@@ -105,23 +116,34 @@ async function saveDish() {
     available: form.value.available,
     photo: photoPreview.value,
   }
-  if (editDish.value) {
-    const data = await apiUpdateDish({ ...payload, id: editDish.value.id })
-    if (data.success) Object.assign(editDish.value, payload)
-  } else {
-    const data = await apiAddDish(payload)
-    if (data.success && data.dish) dishes.value.push(data.dish)
-  }
+  let data
+  try {
+    if (editDish.value) {
+      data = await apiUpdateDish({ ...payload, id: editDish.value.id })
+      if (data.success) { Object.assign(editDish.value, payload); toast('✅ Plat modifié', 'success') }
+      else toast('❌ ' + (data.error || 'Erreur'), 'error')
+    } else {
+      data = await apiAddDish(payload)
+      if (data.success && data.dish) { dishes.value.push(data.dish); toast('✅ Plat ajouté', 'success') }
+      else toast('❌ ' + (data.error || 'Erreur'), 'error')
+    }
+  } catch (e) { toast('❌ Erreur réseau', 'error'); console.error(e) }
   closeModal()
 }
 
 async function deleteDish(d) {
-  const data = await apiDeleteDish(d.id)
-  if (data.success) dishes.value = dishes.value.filter(x => x.id !== d.id)
+  try {
+    const data = await apiDeleteDish(d.id)
+    if (data.success) { dishes.value = dishes.value.filter(x => x.id !== d.id); toast('🗑️ Plat supprimé', 'success') }
+    else toast('❌ ' + (data.error || 'Erreur'), 'error')
+  } catch (e) { toast('❌ Erreur réseau', 'error'); console.error(e) }
 }
 async function toggleAvailable(d) {
   d.available = !d.available
-  await apiUpdateDish({ id: d.id, available: d.available })
+  try {
+    const data = await apiUpdateDish({ id: d.id, available: d.available })
+    if (!data.success) { d.available = !d.available; toast('❌ ' + (data.error || 'Erreur'), 'error') }
+  } catch (e) { d.available = !d.available; console.error(e) }
 }
 </script>
 

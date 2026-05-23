@@ -67,18 +67,27 @@ const formDirty = computed(() => dirty.value)
 function markDirty() { dirty.value = true }
 async function saveSettings() {
   dirty.value = false
-  const data = await apiUpdateProfile({
-    firstName: form.value.name,
-    lastName: form.value.lastName,
-    phone: form.value.phone,
-    name: form.value.kitchenName,
-    desc: form.value.bio,
-    wilaya: form.value.wilaya,
-    commune: form.value.commune,
-  })
-  if (data.success && data.user) {
-    auth.setUser(data.user)
-    window.showToast?.('✅ Modifications enregistrées', 'success')
+  try {
+    const data = await apiUpdateProfile({
+      firstName: form.value.name,
+      lastName: form.value.lastName,
+      phone: form.value.phone,
+      name: form.value.kitchenName,
+      desc: form.value.bio,
+      wilaya: form.value.wilaya,
+      commune: form.value.commune,
+    })
+    if (data.success && data.user) {
+      auth.setUser(data.user)
+      window.showToast?.('✅ Modifications enregistrées', 'success')
+    } else {
+      dirty.value = true
+      window.showToast?.('❌ ' + (data.error || 'Erreur'), 'error')
+    }
+  } catch (e) {
+    dirty.value = true
+    window.showToast?.('❌ Erreur réseau', 'error')
+    console.error(e)
   }
 }
 
