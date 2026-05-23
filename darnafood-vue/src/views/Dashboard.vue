@@ -31,10 +31,6 @@ function logout() {
 <template>
   <div class="dash-root">
     <aside class="dash-sidebar" :class="{ collapsed: !sidebarOpen }">
-      <div class="ds-logo">
-        <div class="ds-logo-icon">🍽️</div>
-        <span v-if="sidebarOpen" class="ds-logo-text">DarnaFood</span>
-      </div>
       <div class="ds-profile">
         <div class="ds-avatar">{{ (auth.user?.firstName || 'C').charAt(0) }}</div>
         <div v-if="sidebarOpen" class="ds-user">
@@ -77,9 +73,6 @@ function logout() {
   transition:width .25s,min-width .25s;
 }
 .dash-sidebar.collapsed { width:60px; min-width:60px; }
-.ds-logo { display:flex; align-items:center; gap:10px; padding:0 8px 20px; border-bottom:1px solid #262626; margin-bottom:16px; }
-.ds-logo-icon { width:36px; height:36px; background:#E8813A; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-.ds-logo-text { font-size:18px; font-weight:800; color:#FAFAFA; }
 .ds-profile { display:flex; align-items:center; gap:10px; padding:0 8px 16px; border-bottom:1px solid #262626; margin-bottom:12px; }
 .ds-avatar { width:40px; height:40px; border-radius:50%; background:#E8813A; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:#fff; flex-shrink:0; }
 .ds-user { overflow:hidden; }
