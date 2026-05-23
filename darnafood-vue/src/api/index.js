@@ -1,9 +1,11 @@
-import { getToken, getAuthUser } from '../utils'
+import { getToken } from '../utils'
 
-const API = '/api/auth'
+const BASE = import.meta.env.VITE_API_URL || ''
+const AUTH_API = `${BASE}/api/auth`
+const DISHES_API = `${BASE}/api/dishes`
 
 export async function apiRegister(data) {
-  const res = await fetch(`${API}?action=register`, {
+  const res = await fetch(`${AUTH_API}?action=register`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
@@ -11,7 +13,7 @@ export async function apiRegister(data) {
 }
 
 export async function apiLogin(email, password) {
-  const res = await fetch(`${API}?action=login`, {
+  const res = await fetch(`${AUTH_API}?action=login`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   })
@@ -21,7 +23,7 @@ export async function apiLogin(email, password) {
 export async function apiGetProfile() {
   const token = getToken()
   if (!token) return null
-  const res = await fetch(`${API}?action=me`, {
+  const res = await fetch(`${AUTH_API}?action=me`, {
     headers: { Authorization: `Bearer ${token}` },
   })
   return res.json()
@@ -30,7 +32,7 @@ export async function apiGetProfile() {
 export async function apiUpdateProfile(data) {
   const token = getToken()
   if (!token) return null
-  const res = await fetch(`${API}?action=profile`, {
+  const res = await fetch(`${AUTH_API}?action=profile`, {
     method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(data),
   })
@@ -38,26 +40,33 @@ export async function apiUpdateProfile(data) {
 }
 
 export async function apiGetCook(id) {
-  const res = await fetch(`/api/auth?action=cook&id=${id}`)
+  const res = await fetch(`${AUTH_API}?action=cook&id=${id}`)
   return res.json()
 }
 
 export async function apiGetCooks() {
-  const res = await fetch('/api/auth?action=cooks')
+  const res = await fetch(`${AUTH_API}?action=cooks`)
   return res.json()
 }
 
+/* ── Dish CRUD (RESTful) ─────────────────────── */
+
 export async function apiGetDishes() {
   const token = getToken()
-  const res = await fetch('/api/auth?action=dishes', {
+  const res = await fetch(DISHES_API, {
     headers: { Authorization: `Bearer ${token}` },
   })
   return res.json()
 }
 
+export async function apiGetCookDishes(cookId) {
+  const res = await fetch(`${DISHES_API}?cookId=${cookId}`)
+  return res.json()
+}
+
 export async function apiAddDish(dish) {
   const token = getToken()
-  const res = await fetch('/api/auth?action=dish-add', {
+  const res = await fetch(DISHES_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(dish),
@@ -67,7 +76,7 @@ export async function apiAddDish(dish) {
 
 export async function apiUpdateDish(dish) {
   const token = getToken()
-  const res = await fetch('/api/auth?action=dish-update', {
+  const res = await fetch(DISHES_API, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(dish),
@@ -77,19 +86,9 @@ export async function apiUpdateDish(dish) {
 
 export async function apiDeleteDish(id) {
   const token = getToken()
-  const res = await fetch(`/api/auth?action=dish-remove&id=${id}`, {
+  const res = await fetch(`${DISHES_API}?id=${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
-  })
-  return res.json()
-}
-
-export async function apiChangePassword(currentPassword, newPassword) {
-  const token = getToken()
-  if (!token) return null
-  const res = await fetch(`${API}?action=password`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ currentPassword, newPassword }),
   })
   return res.json()
 }
