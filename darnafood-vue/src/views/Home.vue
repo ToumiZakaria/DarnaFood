@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import { KITCHENS, CATS, DISH_PHOTOS } from '../data'
+import { KITCHENS, CATS } from '../data'
 import KitchenCard from '../components/KitchenCard.vue'
 
 const router = useRouter()
@@ -23,7 +23,32 @@ function setCat(cat) {
 </script>
 
 <template>
-  <div class="main-content page-home">
+  <!-- CUISINIER HOME -->
+  <div v-if="auth.isCuisinier" class="main-content page-home">
+    <section class="chef-hero">
+      <div class="hero-glow"></div>
+      <div class="chef-hero-content">
+        <div class="chef-avatar">{{ (auth.user?.firstName || 'C').charAt(0) }}</div>
+        <h1 class="chef-title">Bonjour, {{ auth.user?.firstName || 'Chef' }} ! 👋</h1>
+        <p class="chef-sub">Bienvenue sur votre espace cuisinier DarnaFood</p>
+        <div class="chef-actions">
+          <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'dashboard'})">📊 Tableau de bord</button>
+          <button class="btn-outline btn-lg hero-btn" @click="router.push({name:'kitchens'})">🍽️ Voir les cuisines</button>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="chef-stats">
+        <div class="chef-stat-card"><span class="chef-stat-icon">📦</span><div class="chef-stat-val">8</div><div class="chef-stat-label">Commandes aujourd'hui</div></div>
+        <div class="chef-stat-card"><span class="chef-stat-icon">💵</span><div class="chef-stat-val">4 500 DA</div><div class="chef-stat-label">Revenus du jour</div></div>
+        <div class="chef-stat-card"><span class="chef-stat-icon">⭐</span><div class="chef-stat-val">4.9</div><div class="chef-stat-label">Note moyenne</div></div>
+        <div class="chef-stat-card"><span class="chef-stat-icon">👥</span><div class="chef-stat-val">18</div><div class="chef-stat-label">Clients fidèles</div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- CLIENT / GUEST HOME -->
+  <div v-else class="main-content page-home">
     <section class="hero">
       <div class="hero-glow"></div>
       <div class="hero-bg-float">
@@ -34,8 +59,7 @@ function setCat(cat) {
         <p class="hero-sub">Découvrez des plats faits maison par des cuisiniers algériens près de chez vous.</p>
         <div class="hero-actions">
           <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'kitchens'})">🍽️ Commander maintenant</button>
-          <button v-if="!auth.isCuisinier" class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
-          <button v-else class="btn-outline btn-lg hero-btn" @click="router.push({name:'dashboard'})">📊 Mon tableau de bord</button>
+          <button class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
         </div>
       </div>
     </section>
@@ -55,7 +79,7 @@ function setCat(cat) {
         <button class="btn-ghost-sm" @click="router.push({name:'kitchens'})">Voir tout →</button>
       </div>
       <div class="cats-scroll">
-        <button v-for="c in CATS" :key="c.id" class="cat-chip" :class="{ active: activeCat === c.id }" @click="setCat(c.id)">
+        <button v-for="c in CATS" :key="c.id" class="cat-chip" @click="setCat(c.id)">
           <span>{{ c.emoji }}</span>{{ c.label }}
         </button>
       </div>
@@ -71,7 +95,7 @@ function setCat(cat) {
       </div>
     </section>
 
-    <section v-if="!auth.isCuisinier" class="section cta-section">
+    <section class="section cta-section">
       <div class="cta-card">
         <h2 class="cta-title">Vous cuisinez ? Rejoignez-nous !</h2>
         <p class="cta-desc">Transformez votre passion en revenus. Créez votre cuisine virtuelle et commencez à recevoir des commandes dès aujourd'hui.</p>
@@ -83,8 +107,24 @@ function setCat(cat) {
 
 <style scoped>
 .main-content { min-height:calc(100vh - 68px); }
-.hero { position:relative; min-height:540px; display:flex; align-items:center; justify-content:center; text-align:center; padding:120px 20px 80px; overflow:hidden; }
+
+/* Chef home */
+.chef-hero { position:relative; min-height:400px; display:flex; align-items:center; justify-content:center; text-align:center; padding:80px 20px 40px; overflow:hidden; }
 .hero-glow { position:absolute; top:-40%; left:50%; transform:translateX(-50%); width:700px; height:700px; background:radial-gradient(circle,rgba(232,144,26,.12) 0%,transparent 70%); pointer-events:none; }
+.chef-hero-content { position:relative; }
+.chef-avatar { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,var(--primary-light),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:800; color:#fff; margin:0 auto 16px; box-shadow:0 8px 32px rgba(232,144,26,.3); }
+.chef-title { font-size:36px; font-weight:800; margin-bottom:8px; }
+.chef-sub { font-size:16px; color:var(--text-muted); margin-bottom:28px; }
+.chef-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.hero-btn { padding:16px 32px; font-size:16px; border-radius:var(--r); }
+.chef-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.chef-stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:24px 20px; text-align:center; }
+.chef-stat-icon { font-size:32px; display:block; margin-bottom:10px; }
+.chef-stat-val { font-size:26px; font-weight:800; color:var(--primary-light); }
+.chef-stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+/* Guest/client home */
+.hero { position:relative; min-height:540px; display:flex; align-items:center; justify-content:center; text-align:center; padding:120px 20px 80px; overflow:hidden; }
 .hero-bg-float { position:absolute; inset:0; pointer-events:none; }
 .hero-bg-float span { position:absolute; font-size:36px; opacity:.18; animation:float 18s ease-in-out infinite; }
 .hero-bg-float span:nth-child(1){top:15%;left:8%;animation-delay:0s;font-size:42px;}
@@ -101,7 +141,6 @@ function setCat(cat) {
 .hero-title .gold { background:linear-gradient(135deg,var(--primary-light),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .hero-sub { font-size:18px; color:var(--text-muted); margin-bottom:36px; max-width:480px; margin-left:auto; margin-right:auto; }
 .hero-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
-.hero-btn { padding:16px 32px; font-size:16px; border-radius:var(--r); }
 .section { padding:60px 28px; max-width:1180px; margin:0 auto; }
 .section-heading { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
 .section-title { font-size:24px; font-weight:800; }
@@ -119,5 +158,5 @@ function setCat(cat) {
 .cta-card { background:linear-gradient(145deg,var(--bg-card),var(--bg-elevated)); border:1px solid var(--border); border-radius:var(--r-lg); padding:64px 40px; text-align:center; }
 .cta-title { font-size:32px; font-weight:800; margin-bottom:12px; }
 .cta-desc { color:var(--text-muted); max-width:480px; margin:0 auto 28px; font-size:15px; line-height:1.7; }
-@media(max-width:768px){.hero-title{font-size:36px;}.how-grid{grid-template-columns:1fr;}}
+@media(max-width:768px){.hero-title{font-size:36px;}.chef-title{font-size:26px;}.how-grid{grid-template-columns:1fr;}.chef-stats{grid-template-columns:1fr 1fr;}}
 </style>
