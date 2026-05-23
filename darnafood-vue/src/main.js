@@ -14,14 +14,10 @@ window.showToast = (message, type = 'success') => {
   const host = document.getElementById('toast-host')
   if (!host) return
   const t = document.createElement('div')
-  t.className = `toast toast-${type}`
+  t.className = `toast${type ? ' ' + type : ''}`
   t.textContent = message
   host.appendChild(t)
-  setTimeout(() => { t.classList.add('show') }, 10)
-  setTimeout(() => {
-    t.classList.remove('show')
-    setTimeout(() => t.remove(), 400)
-  }, 2800)
+  setTimeout(() => t.remove(), 3000)
 }
 
 // Service worker registration

@@ -6,17 +6,19 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const auth = useAuthStore()
 
-const form = ref({ email: '', password: '' })
+const email = ref('')
+const password = ref('')
 const loading = ref(false)
 const error = ref('')
 
-async function handleLogin() {
+async function doLogin() {
   error.value = ''
+  if (!email.value || !password.value) { window.showToast?.('⚠️ Veuillez remplir tous les champs', 'error'); return }
   loading.value = true
   try {
-    const result = await auth.login(form.value)
+    const result = await auth.login({ email: email.value, password: password.value })
     if (result.success) {
-      window.showToast('Connecté avec succès', 'success')
+      window.showToast?.(`✅ Bienvenue !`, 'success')
       router.push(auth.isCuisinier ? { name: 'dashboard' } : { name: 'home' })
     } else {
       error.value = result.error || 'Identifiants incorrects'
@@ -30,47 +32,55 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="auth-page">
-    <div class="auth-card">
-      <div class="auth-logo" @click="router.push({name:'home'})">
-        <div class="auth-logo-icon">🍽️</div>
-        <div class="auth-logo-txt">DarnaFood</div>
+  <div class="page active" style="display:block">
+
+    <!-- NAVBAR -->
+    <nav class="navbar" style="position:static;">
+      <div class="nav-logo" @click="router.push({name:'home'})">
+        <div class="nav-logo-icon">🍽️</div>
+        <div class="nav-logo-wordmark">
+          <div class="nav-logo-en">DarnaFood</div>
+          <div class="nav-logo-ar">دارنا فود</div>
+        </div>
       </div>
-      <h1 class="auth-title">Connexion</h1>
-      <p class="auth-sub">Connectez-vous pour commander ou gérer votre cuisine</p>
-      <div v-if="error" class="auth-error">{{ error }}</div>
-      <form @submit.prevent="handleLogin">
-        <div class="field-wrap">
-          <label>Email</label>
-          <input v-model="form.email" type="email" class="field-input" placeholder="vous@exemple.com" required>
+      <ul class="nav-links">
+        <li><a href="#" @click.prevent="router.push({name:'home'})">Accueil</a></li>
+        <li><a href="#" @click.prevent="router.push({name:'kitchens'})" class="active">Cuisines</a></li>
+      </ul>
+      <div class="nav-spacer"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" @click="router.push({name:'register'})">S'inscrire</button>
+      </div>
+    </nav>
+
+    <div class="auth-page">
+      <div class="auth-card">
+        <div class="auth-logo" @click="router.push({name:'home'})">
+          <div class="nav-logo-icon">🍽️</div>
+          <div class="nav-logo-en" style="font-size:22px;">DarnaFood</div>
         </div>
-        <div class="field-wrap">
-          <label>Mot de passe</label>
-          <input v-model="form.password" type="password" class="field-input" placeholder="•••••••" required>
-        </div>
-        <button type="submit" class="btn-primary btn-block btn-lg" :disabled="loading" style="margin-top:6px;">
-          {{ loading ? 'Connexion...' : 'Se connecter' }}
-        </button>
-      </form>
-      <p class="auth-link">Pas de compte ? <a href="#" @click.prevent="router.push({name:'register'})">S'inscrire</a></p>
+        <h1 class="auth-title">Bon retour ! 👋</h1>
+        <p class="auth-sub">Connectez-vous à votre compte DarnaFood</p>
+
+        <div v-if="error" style="background:rgba(200,60,60,.12);border:1px solid rgba(200,60,60,.3);color:var(--danger);font-size:13px;padding:10px 14px;border-radius:var(--r-sm);margin-bottom:14px;text-align:center;">{{ error }}</div>
+
+        <form @submit.prevent="doLogin">
+          <div class="form-group">
+            <label class="form-label">Adresse email</label>
+            <input type="email" class="form-input" v-model="email" placeholder="votre@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" class="form-input" v-model="password" placeholder="••••••••">
+          </div>
+          <div style="text-align:right;margin:-6px 0 18px;">
+            <a style="font-size:13px;color:var(--primary-light);cursor:pointer;">Mot de passe oublié ?</a>
+          </div>
+          <button type="submit" class="btn-primary btn-block" :disabled="loading">{{ loading ? 'Connexion...' : 'Se connecter →' }}</button>
+        </form>
+
+        <div class="auth-footer">Pas encore de compte ? <a @click="router.push({name:'register'})">S'inscrire gratuitement</a></div>
+      </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); padding:20px; }
-.auth-card { width:100%; max-width:400px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:40px 32px; }
-.auth-logo { display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:24px; cursor:pointer; }
-.auth-logo-icon { width:44px; height:44px; background:linear-gradient(135deg,var(--primary-light),var(--primary-dark)); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:24px; }
-.auth-logo-txt { font-size:24px; font-weight:800; background:linear-gradient(135deg,var(--primary-light),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.auth-title { font-size:22px; font-weight:800; text-align:center; margin-bottom:4px; }
-.auth-sub { font-size:13px; text-align:center; color:var(--text-muted); margin-bottom:24px; }
-.auth-error { background:rgba(200,60,60,.12); border:1px solid rgba(200,60,60,.3); color:var(--danger); font-size:13px; padding:10px 14px; border-radius:var(--r-sm); margin-bottom:14px; text-align:center; }
-.field-wrap { margin-bottom:14px; }
-.field-wrap label { display:block; font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.5px; }
-.field-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:13px 14px; border-radius:var(--r-sm); font-size:14px; outline:none; }
-.field-input:focus { border-color:var(--primary); }
-.btn-block { width:100%; justify-content:center; }
-.auth-link { text-align:center; margin-top:18px; font-size:13px; color:var(--text-muted); }
-.auth-link a { color:var(--primary-light); font-weight:600; text-decoration:none; }
-</style>
