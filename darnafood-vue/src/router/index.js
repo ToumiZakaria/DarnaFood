@@ -5,6 +5,7 @@ const routes = [
   { path: '/', name: 'home', component: Home },
   { path: '/welcome', name: 'welcome', component: () => import('../views/Welcome.vue') },
   { path: '/cuisines', name: 'kitchens', alias: '/kitchens', component: () => import('../views/Kitchens.vue') },
+  { path: '/cuisinier/:id', name: 'cook-public-profile', component: () => import('../views/CookPublicProfile.vue') },
   { path: '/dish/:id', name: 'kitchen-detail', alias: '/kitchen/:id', component: () => import('../views/KitchenDetail.vue') },
   { path: '/cart', name: 'cart', component: () => import('../views/Checkout.vue') },
   { path: '/confirm', name: 'confirm', component: () => import('../views/Confirm.vue') },

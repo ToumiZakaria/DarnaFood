@@ -6,7 +6,7 @@ const props = defineProps({ kitchen: Object })
 const router = useRouter()
 
 function openDetail() {
-  router.push({ name: 'kitchen-detail', params: { id: props.kitchen.id } })
+  router.push({ name: 'cook-public-profile', params: { id: props.kitchen.id } })
 }
 </script>
 
