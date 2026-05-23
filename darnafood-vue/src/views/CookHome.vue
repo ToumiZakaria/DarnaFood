@@ -25,13 +25,16 @@ const actions = [
   { icon: ClipboardList, label: 'Voir les commandes', desc: 'Gérez les commandes en cours', route: '/dashboard', tab: 'orders' },
   { icon: UtensilsCrossed, label: 'Gérer mon menu', desc: 'Ajoutez ou modifiez vos plats', route: '/dashboard', tab: 'menu' },
   { icon: Settings, label: 'Paramètres', desc: 'Modifiez vos informations', route: '/dashboard', tab: 'settings' },
-  { icon: Eye, label: 'Voir ma page publique', desc: 'Ce que voient vos clients', route: '/cuisines' },
+  { icon: Eye, label: 'Voir ma page publique', desc: 'Ce que voient vos clients', route: 'profile' },
 ]
 
 function go(action) {
   if (action.route === '/dashboard') {
     router.push({ name: 'dashboard' })
     localStorage.setItem('df_dash_tab', action.tab)
+  } else if (action.route === 'profile') {
+    const id = auth.user?._id || 'new'
+    router.push({ name: 'cook-public-profile', params: { id } })
   } else {
     router.push(action.route)
   }
