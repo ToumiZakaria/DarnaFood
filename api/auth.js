@@ -156,6 +156,36 @@ module.exports = async function handler(req, res) {
       return ok(res, { message: 'Mot de passe mis à jour' });
     }
 
+    /* ── SINGLE COOK BY ID (public, no auth) ─────────────────── */
+    if (action === 'cook') {
+      if (req.method !== 'GET') return err(res, 'GET requis');
+      const { ObjectId } = require('mongodb');
+      let cookId;
+      try { cookId = new ObjectId(req.query.id); }
+      catch { return err(res, 'ID invalide', 400); }
+      const cook = await users.findOne({ _id: cookId, role: 'cuisinier' }, {
+        projection: { passwordHash: 0, cin: 0, dob: 0, birthWilaya: 0 }
+      });
+      if (!cook) return err(res, 'Cuisinier introuvable', 404);
+      const { _id, ...rest } = cook;
+      return ok(res, {
+        cook: {
+          id: _id.toString(),
+          ...rest,
+          name: cook.name || (cook.firstName || '') + ' ' + (cook.lastName || ''),
+          tagline: cook.desc ? cook.desc.slice(0, 80) : 'Cuisine maison',
+          rating: cook.rating || 0,
+          reviews: cook.reviews || 0,
+          minOrder: cook.minOrder || 300,
+          deliveryFee: cook.deliveryFee || 0,
+          deliveryTime: cook.deliveryTime || 45,
+          open: cook.isKitchenOpen !== false,
+          gradient: cook.gradient || 'linear-gradient(135deg,#4A3020,#8B6040)',
+          emoji: cook.emoji || '🍽️',
+        }
+      });
+    }
+
     /* ── LIST COOKS ──────────────────────────────────────────── */
     if (action === 'cooks') {
       if (req.method !== 'GET') return err(res, 'GET requis');

@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { KITCHENS } from '../data'
-import { apiGetCooks } from '../api'
+import { apiGetCook } from '../api'
 import { dzd } from '../utils'
 import { useCartStore } from '../stores/cart'
 import { useAuthStore } from '../stores/auth'
@@ -15,18 +15,20 @@ const router = useRouter()
 const cart = useCartStore()
 const auth = useAuthStore()
 const favorite = ref(false)
+const loading = ref(true)
 const apiKitchen = ref(null)
 
 onMounted(async () => {
   const id = route.params.id
   const mock = KITCHENS.find(k => k.id === Number(id) || k.id === id)
-  if (mock) return
+  if (mock) { loading.value = false; return }
   try {
-    const data = await apiGetCooks()
+    const data = await apiGetCook(id)
     if (data.success) {
-      apiKitchen.value = data.cooks?.find(c => c.id === id || c._id === id) || null
+      apiKitchen.value = data.cook || null
     }
   } catch {}
+  loading.value = false
 })
 
 const kitchen = computed(() => {
@@ -58,7 +60,8 @@ function addDish(dish) {
 </script>
 
 <template>
-  <div v-if="kitchen" class="cpp">
+  <div v-if="loading" class="cpp-loading"><div class="cpp-spinner"></div></div>
+  <div v-else-if="kitchen" class="cpp">
     <!-- Sticky Header -->
     <div class="cpp-header">
       <button class="cpp-header-btn" @click="router.back()"><ArrowLeft :size="20" /></button>
@@ -131,7 +134,7 @@ function addDish(dish) {
       </div>
     </div>
   </div>
-  <div v-else class="cpp-not-found">
+  <div v-else-if="!loading" class="cpp-not-found">
     <h2>Cuisinier introuvable</h2>
     <p>Ce cuisinier n'existe pas ou a été supprimé.</p>
     <button class="cpp-back-btn" @click="router.push({name:'kitchens'})">← Retour aux cuisines</button>
@@ -468,4 +471,20 @@ function addDish(dish) {
   font-weight: 600;
   cursor: pointer;
 }
+.cpp-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #0A0A0A;
+}
+.cpp-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #262626;
+  border-top-color: #E8813A;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg) } }
 </style>

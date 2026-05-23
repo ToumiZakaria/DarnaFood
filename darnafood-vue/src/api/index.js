@@ -37,6 +37,11 @@ export async function apiUpdateProfile(data) {
   return res.json()
 }
 
+export async function apiGetCook(id) {
+  const res = await fetch(`/api/auth?action=cook&id=${id}`)
+  return res.json()
+}
+
 export async function apiGetCooks() {
   const res = await fetch('/api/auth?action=cooks')
   return res.json()
