@@ -194,9 +194,9 @@ const currentStep = computed(() => selectedOrder.value ? statusSteps.indexOf(sel
 .cell-id { font-family:monospace; font-size:12px; color:#E8813A; font-weight:600; }
 .cell-price { font-weight:700; color:#22C55E; }
 .status-pill { display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; }
-.status-pill.pending { background:rgba(232,129,58,.12); color:#E8813A; }
+.status-pill.pending { background:rgba(234,179,8,.12); color:#EAB308; }
 .status-pill.confirmed { background:rgba(59,130,246,.12); color:#3B82F6; }
-.status-pill.preparing { background:rgba(234,179,8,.12); color:#EAB308; }
+.status-pill.preparing { background:rgba(59,130,246,.12); color:#3B82F6; }
 .status-pill.ready { background:rgba(34,197,94,.12); color:#22C55E; }
 .status-pill.delivered { background:rgba(255,255,255,.05); color:#A1A1AA; }
 .empty-state { padding:40px; text-align:center; color:#A1A1AA; font-size:14px; }
