@@ -35,18 +35,24 @@ const kitchen = computed(() => {
   const id = route.params.id
   return KITCHENS.find(k => k.id === Number(id) || k.id === id) || apiKitchen.value
 })
+function isFlatMenu(m) { return m?.length && m[0]?.id !== undefined }
 const activeCat = ref('Tous')
 const dishCats = computed(() => {
-  if (!kitchen.value) return ['Tous']
-  const cats = ['Tous', ...kitchen.value.menu.map(d => d.cat || 'Principal')]
-  return cats
+  if (!kitchen.value?.menu) return ['Tous']
+  if (isFlatMenu(kitchen.value.menu)) {
+    const cats = [...new Set(kitchen.value.menu.map(d => d.cat || 'Principal'))]
+    return ['Tous', ...cats]
+  }
+  return ['Tous', ...kitchen.value.menu.map(g => g.cat || 'Principal')]
 })
 const filteredMenu = computed(() => {
-  if (!kitchen.value) return []
-  if (activeCat.value === 'Tous') {
-    return kitchen.value.menu.flatMap(g => g.dishes || [])
+  if (!kitchen.value?.menu) return []
+  if (isFlatMenu(kitchen.value.menu)) {
+    if (activeCat.value === 'Tous') return kitchen.value.menu
+    return kitchen.value.menu.filter(d => (d.cat || 'Principal') === activeCat.value)
   }
-  const group = kitchen.value.menu.find(d => (d.cat || 'Principal') === activeCat.value)
+  if (activeCat.value === 'Tous') return kitchen.value.menu.flatMap(g => g.dishes || [])
+  const group = kitchen.value.menu.find(g => (g.cat || 'Principal') === activeCat.value)
   return group ? group.dishes : []
 })
 
