@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import { KITCHENS, CATS, DISH_PHOTOS } from '../data'
 import KitchenCard from '../components/KitchenCard.vue'
 
 const router = useRouter()
+const auth = useAuthStore()
 const featured = ref([])
 const topRated = ref([])
 const activeCat = ref(null)
@@ -32,7 +34,8 @@ function setCat(cat) {
         <p class="hero-sub">Découvrez des plats faits maison par des cuisiniers algériens près de chez vous.</p>
         <div class="hero-actions">
           <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'kitchens'})">🍽️ Commander maintenant</button>
-          <button class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
+          <button v-if="!auth.isCuisinier" class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
+          <button v-else class="btn-outline btn-lg hero-btn" @click="router.push({name:'dashboard'})">📊 Mon tableau de bord</button>
         </div>
       </div>
     </section>
@@ -68,7 +71,7 @@ function setCat(cat) {
       </div>
     </section>
 
-    <section class="section cta-section">
+    <section v-if="!auth.isCuisinier" class="section cta-section">
       <div class="cta-card">
         <h2 class="cta-title">Vous cuisinez ? Rejoignez-nous !</h2>
         <p class="cta-desc">Transformez votre passion en revenus. Créez votre cuisine virtuelle et commencez à recevoir des commandes dès aujourd'hui.</p>
