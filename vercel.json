@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd darnafood-vue && npm install && npm run build",
+  "buildCommand": "npm install --prefix darnafood-vue && npm run --prefix darnafood-vue build",
   "outputDirectory": "darnafood-vue/dist",
   "rewrites": [
     { "source": "/((?!api/)(?!.*\\.\\w+$).*)", "destination": "/index.html" }
