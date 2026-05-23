@@ -126,8 +126,8 @@ function addDish(dish) {
       </div>
       <div class="cpp-dishes">
         <div v-for="dish in filteredMenu" :key="dish.id" class="cpp-dish">
-          <div class="cpp-dish-img" :style="{ background: dish.gradient || kitchen.gradient + '22' }">
-            <div class="cpp-dish-emoji">{{ dish.emoji || '🍽️' }}</div>
+          <div class="cpp-dish-img" :style="dish.photo ? { backgroundImage: 'url('+dish.photo+')', backgroundSize:'cover', backgroundPosition:'center' } : { background: dish.gradient || kitchen.gradient }">
+            <div v-if="!dish.photo" class="cpp-dish-emoji">{{ dish.emoji || '🍽️' }}</div>
             <div v-if="dish.portion" class="cpp-dish-badge">{{ dish.portion }}</div>
           </div>
           <div class="cpp-dish-body">
