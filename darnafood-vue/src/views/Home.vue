@@ -23,32 +23,7 @@ function setCat(cat) {
 </script>
 
 <template>
-  <!-- CUISINIER HOME -->
-  <div v-if="auth.isCuisinier" class="main-content page-home">
-    <section class="chef-hero">
-      <div class="hero-glow"></div>
-      <div class="chef-hero-content">
-        <div class="chef-avatar">{{ (auth.user?.firstName || 'C').charAt(0) }}</div>
-        <h1 class="chef-title">Bonjour, {{ auth.user?.firstName || 'Chef' }} ! 👋</h1>
-        <p class="chef-sub">Bienvenue sur votre espace cuisinier DarnaFood</p>
-        <div class="chef-actions">
-          <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'dashboard'})">📊 Tableau de bord</button>
-          <button class="btn-outline btn-lg hero-btn" @click="router.push({name:'kitchens'})">🍽️ Voir les cuisines</button>
-        </div>
-      </div>
-    </section>
-    <section class="section">
-      <div class="chef-stats">
-        <div class="chef-stat-card"><span class="chef-stat-icon">📦</span><div class="chef-stat-val">8</div><div class="chef-stat-label">Commandes aujourd'hui</div></div>
-        <div class="chef-stat-card"><span class="chef-stat-icon">💵</span><div class="chef-stat-val">4 500 DA</div><div class="chef-stat-label">Revenus du jour</div></div>
-        <div class="chef-stat-card"><span class="chef-stat-icon">⭐</span><div class="chef-stat-val">4.9</div><div class="chef-stat-label">Note moyenne</div></div>
-        <div class="chef-stat-card"><span class="chef-stat-icon">👥</span><div class="chef-stat-val">18</div><div class="chef-stat-label">Clients fidèles</div></div>
-      </div>
-    </section>
-  </div>
-
-  <!-- CLIENT / GUEST HOME -->
-  <div v-else class="main-content page-home">
+  <div class="main-content page-home">
     <section class="hero">
       <div class="hero-glow"></div>
       <div class="hero-bg-float">
@@ -114,20 +89,8 @@ function setCat(cat) {
 <style scoped>
 .main-content { min-height:calc(100vh - 68px); }
 
-/* Chef home */
-.chef-hero { position:relative; min-height:400px; display:flex; align-items:center; justify-content:center; text-align:center; padding:80px 20px 40px; overflow:hidden; }
 .hero-glow { position:absolute; top:-40%; left:50%; transform:translateX(-50%); width:700px; height:700px; background:radial-gradient(circle,rgba(232,144,26,.12) 0%,transparent 70%); pointer-events:none; }
-.chef-hero-content { position:relative; }
-.chef-avatar { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,var(--primary-light),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:800; color:#fff; margin:0 auto 16px; box-shadow:0 8px 32px rgba(232,144,26,.3); }
-.chef-title { font-size:36px; font-weight:800; margin-bottom:8px; }
-.chef-sub { font-size:16px; color:var(--text-muted); margin-bottom:28px; }
-.chef-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 .hero-btn { padding:16px 32px; font-size:16px; border-radius:var(--r); }
-.chef-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-.chef-stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:24px 20px; text-align:center; }
-.chef-stat-icon { font-size:32px; display:block; margin-bottom:10px; }
-.chef-stat-val { font-size:26px; font-weight:800; color:var(--primary-light); }
-.chef-stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
 
 /* Guest/client home */
 .hero { position:relative; min-height:540px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 20px 40px; overflow:hidden; }
@@ -169,5 +132,5 @@ function setCat(cat) {
 .cta-card { background:linear-gradient(145deg,var(--bg-card),var(--bg-elevated)); border:1px solid var(--border); border-radius:var(--r-lg); padding:64px 40px; text-align:center; }
 .cta-title { font-size:32px; font-weight:800; margin-bottom:12px; }
 .cta-desc { color:var(--text-muted); max-width:480px; margin:0 auto 28px; font-size:15px; line-height:1.7; }
-@media(max-width:768px){.hero-title{font-size:36px;}.chef-title{font-size:26px;}.how-grid{grid-template-columns:1fr;}.chef-stats{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){.hero-title{font-size:36px;}.how-grid{grid-template-columns:1fr;}}
 </style>

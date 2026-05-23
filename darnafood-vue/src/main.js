@@ -4,6 +4,12 @@ import App from './App.vue'
 import router from './router'
 import './style.css'
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister())
+  })
+}
+
 window.showToast = (message, type = 'success') => {
   const host = document.getElementById('toast-host')
   if (!host) return

@@ -3,7 +3,7 @@
   "short_name": "DarnaFood",
   "description": "Commandez chez les meilleurs cuisiniers à domicile en Algérie",
   "start_url": "./index.html",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#0C0B09",
   "theme_color": "#E8901A",
   "orientation": "portrait-primary",

@@ -25,11 +25,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = JSON.parse(localStorage.getItem('df_user') || 'null')
-  if (to.meta.requiresAuth && !auth) {
-    next('/auth/login')
-  } else {
-    next()
+  const isAuth = !!auth && !!localStorage.getItem('df_token')
+  if (to.meta.requiresAuth && !isAuth) {
+    return next('/auth/login')
   }
+  if (to.path === '/' && isAuth) {
+    const isCuisinier = auth.role === 'cuisinier'
+    return next(isCuisinier ? '/dashboard' : '/cuisines')
+  }
+  next()
 })
 
 export default router
