@@ -2,7 +2,6 @@ import { getToken } from '../utils'
 
 const BASE = import.meta.env.VITE_API_URL || ''
 const AUTH_API = `${BASE}/api/auth`
-const DISHES_API = `${BASE}/api/dishes`
 
 export async function apiRegister(data) {
   const res = await fetch(`${AUTH_API}?action=register`, {
@@ -49,24 +48,21 @@ export async function apiGetCooks() {
   return res.json()
 }
 
-/* ── Dish CRUD (RESTful) ─────────────────────── */
+/* ── Dish CRUD ────────────────────────────────── */
+/* Uses auth endpoint with ?action= param (already deployed).
+   When Vercel deploys the rewrite, /api/dishes will also work. */
 
 export async function apiGetDishes() {
   const token = getToken()
-  const res = await fetch(DISHES_API, {
+  const res = await fetch(`${AUTH_API}?action=dishes`, {
     headers: { Authorization: `Bearer ${token}` },
   })
   return res.json()
 }
 
-export async function apiGetCookDishes(cookId) {
-  const res = await fetch(`${DISHES_API}?cookId=${cookId}`)
-  return res.json()
-}
-
 export async function apiAddDish(dish) {
   const token = getToken()
-  const res = await fetch(DISHES_API, {
+  const res = await fetch(`${AUTH_API}?action=dish-add`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(dish),
@@ -76,7 +72,7 @@ export async function apiAddDish(dish) {
 
 export async function apiUpdateDish(dish) {
   const token = getToken()
-  const res = await fetch(DISHES_API, {
+  const res = await fetch(`${AUTH_API}?action=dish-update`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(dish),
@@ -86,7 +82,7 @@ export async function apiUpdateDish(dish) {
 
 export async function apiDeleteDish(id) {
   const token = getToken()
-  const res = await fetch(`${DISHES_API}?id=${id}`, {
+  const res = await fetch(`${AUTH_API}?action=dish-remove&id=${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })
