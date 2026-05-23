@@ -2,6 +2,7 @@
   "buildCommand": "npm install --prefix darnafood-vue && npm run --prefix darnafood-vue build",
   "outputDirectory": "darnafood-vue/dist",
   "rewrites": [
+    { "source": "/api/dishes", "destination": "/api/auth?action=_dishes" },
     { "source": "/((?!api/)(?!.*\\.\\w+$).*)", "destination": "/index.html" }
   ],
   "github": {

@@ -285,6 +285,66 @@ module.exports = async function handler(req, res) {
       return ok(res, { cooks: mapped });
     }
 
+    /* ── DISHES REST (routed via rewrite from /api/dishes) ─────── */
+    if (action === '_dishes') {
+      if (req.method === 'GET') {
+        const cookId = req.query.cookId;
+        if (cookId) {
+          try {
+            const { ObjectId } = require('mongodb');
+            const objId = new ObjectId(cookId);
+            const cook = await users.findOne({ _id: objId, role: 'cuisinier' }, { projection: { menu: 1 } });
+            return ok(res, { dishes: cook?.menu || [] });
+          } catch { return err(res, 'ID invalide', 400); }
+        }
+        const payload = verifyToken(req);
+        if (!payload) return err(res, 'Non autorisé', 401);
+        const user = await users.findOne({ email: payload.email });
+        return ok(res, { dishes: user?.menu || [] });
+      }
+      if (req.method === 'POST') {
+        const payload = verifyToken(req);
+        if (!payload) return err(res, 'Non autorisé', 401);
+        const dish = {
+          id: Date.now(),
+          name: req.body.name || '',
+          cat: req.body.cat || 'Plats principaux',
+          price: Number(req.body.price) || 0,
+          desc: req.body.desc || '',
+          emoji: req.body.emoji || '🍽️',
+          portion: req.body.portion || 'Individuel',
+          ingredients: req.body.ingredients || [],
+          available: req.body.available !== false,
+          photo: req.body.photo || null,
+        };
+        if (!dish.name || !dish.price) return err(res, 'Nom et prix requis');
+        await users.updateOne({ email: payload.email }, { $push: { menu: dish } });
+        return ok(res, { dish });
+      }
+      if (req.method === 'PUT') {
+        const payload = verifyToken(req);
+        if (!payload) return err(res, 'Non autorisé', 401);
+        const dishId = Number(req.body.id);
+        if (!dishId) return err(res, 'ID plat requis');
+        const setFields = {};
+        ['name','cat','price','desc','emoji','portion','ingredients','available','photo'].forEach(f => {
+          if (req.body[f] !== undefined) setFields['menu.$.' + f] = req.body[f];
+        });
+        if (req.body.price !== undefined) setFields['menu.$.price'] = Number(req.body.price) || 0;
+        await users.updateOne({ email: payload.email, 'menu.id': dishId }, { $set: setFields });
+        return ok(res, { message: 'Plat mis à jour' });
+      }
+      if (req.method === 'DELETE') {
+        const payload = verifyToken(req);
+        if (!payload) return err(res, 'Non autorisé', 401);
+        const dishId = Number(req.query.id);
+        if (!dishId) return err(res, 'ID plat requis');
+        await users.updateOne({ email: payload.email }, { $pull: { menu: { id: dishId } } });
+        return ok(res, { message: 'Plat supprimé' });
+      }
+      return err(res, 'Méthode non supportée', 405);
+    }
+
     return err(res, 'Action inconnue: ' + action, 404);
 
   } catch (globalErr) {
