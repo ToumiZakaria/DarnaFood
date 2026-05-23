@@ -47,6 +47,43 @@ export async function apiGetCooks() {
   return res.json()
 }
 
+export async function apiGetDishes() {
+  const token = getToken()
+  const res = await fetch('/api/auth?action=dishes', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return res.json()
+}
+
+export async function apiAddDish(dish) {
+  const token = getToken()
+  const res = await fetch('/api/auth?action=dish-add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(dish),
+  })
+  return res.json()
+}
+
+export async function apiUpdateDish(dish) {
+  const token = getToken()
+  const res = await fetch('/api/auth?action=dish-update', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(dish),
+  })
+  return res.json()
+}
+
+export async function apiDeleteDish(id) {
+  const token = getToken()
+  const res = await fetch(`/api/auth?action=dish-remove&id=${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return res.json()
+}
+
 export async function apiChangePassword(currentPassword, newPassword) {
   const token = getToken()
   if (!token) return null

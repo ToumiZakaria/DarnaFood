@@ -156,6 +156,71 @@ module.exports = async function handler(req, res) {
       return ok(res, { message: 'Mot de passe mis à jour' });
     }
 
+    /* ── LIST DISHES ─────────────────────────────────────────── */
+    if (action === 'dishes') {
+      if (req.method !== 'GET') return err(res, 'GET requis');
+      const payload = verifyToken(req);
+      if (!payload) return err(res, 'Non autorisé', 401);
+      const user = await users.findOne({ email: payload.email });
+      if (!user) return err(res, 'Compte introuvable', 404);
+      return ok(res, { dishes: user.menu || [] });
+    }
+
+    /* ── ADD DISH ──────────────────────────────────────────────── */
+    if (action === 'dish-add') {
+      if (req.method !== 'POST') return err(res, 'POST requis');
+      const payload = verifyToken(req);
+      if (!payload) return err(res, 'Non autorisé', 401);
+      const dish = {
+        id: Date.now(),
+        name: req.body.name || '',
+        cat: req.body.cat || 'Plats principaux',
+        price: Number(req.body.price) || 0,
+        desc: req.body.desc || '',
+        emoji: req.body.emoji || '🍽️',
+        portion: req.body.portion || 'Individuel',
+        ingredients: req.body.ingredients || [],
+        available: req.body.available !== false,
+        photo: req.body.photo || null,
+      };
+      if (!dish.name || !dish.price) return err(res, 'Nom et prix requis');
+      await users.updateOne({ email: payload.email }, { $push: { menu: dish } });
+      return ok(res, { dish });
+    }
+
+    /* ── UPDATE DISH ───────────────────────────────────────────── */
+    if (action === 'dish-update') {
+      if (req.method !== 'PUT') return err(res, 'PUT requis');
+      const payload = verifyToken(req);
+      if (!payload) return err(res, 'Non autorisé', 401);
+      const dishId = Number(req.body.id);
+      if (!dishId) return err(res, 'ID plat requis');
+      const updateFields = {};
+      ['name','cat','price','desc','emoji','portion','ingredients','available','photo'].forEach(f => {
+        if (req.body[f] !== undefined) updateFields['menu.$.' + f] = req.body[f];
+      });
+      updateFields['menu.$.price'] = Number(req.body.price) || 0;
+      await users.updateOne(
+        { email: payload.email, 'menu.id': dishId },
+        { $set: updateFields }
+      );
+      return ok(res, { message: 'Plat mis à jour' });
+    }
+
+    /* ── REMOVE DISH ──────────────────────────────────────────── */
+    if (action === 'dish-remove') {
+      if (req.method !== 'DELETE') return err(res, 'DELETE requis');
+      const payload = verifyToken(req);
+      if (!payload) return err(res, 'Non autorisé', 401);
+      const dishId = Number(req.query.id);
+      if (!dishId) return err(res, 'ID plat requis');
+      await users.updateOne(
+        { email: payload.email },
+        { $pull: { menu: { id: dishId } } }
+      );
+      return ok(res, { message: 'Plat supprimé' });
+    }
+
     /* ── SINGLE COOK BY ID (public, no auth) ─────────────────── */
     if (action === 'cook') {
       if (req.method !== 'GET') return err(res, 'GET requis');

@@ -1,24 +1,27 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   Plus, UtensilsCrossed, Edit3, Trash2, Image, X, Grid3X3, List, Upload
 } from '@lucide/vue'
+import { apiGetDishes, apiAddDish, apiUpdateDish, apiDeleteDish } from '../../api'
 
 const activeCat = ref('Tous')
 const viewMode = ref('grid')
 const showModal = ref(false)
 const editDish = ref(null)
+const loading = ref(true)
 
 const categoryTabs = ['Tous', 'Plats principaux', 'Entrees', 'Desserts', 'Boissons']
 
-const dishes = ref([
-  { id: 1, name: 'Couscous Royal', cat: 'Plats principaux', price: 1200, available: true, desc: 'Couscous aux légumes et poulet', emoji: '🍛', portion: 'Famille (4p)', ingredients: ['Couscous', 'Poulet', 'Légumes', 'Merguez'] },
-  { id: 2, name: 'Harira', cat: 'Entrees', price: 400, available: true, desc: 'Soupe algérienne traditionnelle', emoji: '🍲', portion: 'Individuel', ingredients: ['Tomates', 'Vermicelle', 'Pois chiches'] },
-  { id: 3, name: 'Tagine Zitoune', cat: 'Plats principaux', price: 1200, available: true, desc: 'Tagine aux olives et poulet', emoji: '🥘', portion: 'Famille (2p)', ingredients: ['Poulet', 'Olives', 'Citron'] },
-  { id: 4, name: 'Makrout', cat: 'Desserts', price: 600, available: false, desc: 'Pâtisserie à la semoule et miel', emoji: '🍯', portion: 'Individuel', ingredients: ['Semoule', 'Miel', 'Dattes'] },
-  { id: 5, name: 'Chorba Frik', cat: 'Entrees', price: 350, available: true, desc: 'Soupe frik traditionnelle', emoji: '🥣', portion: 'Individuel', ingredients: ['Frik', 'Tomates', 'Menthe'] },
-  { id: 6, name: 'Jus Orange', cat: 'Boissons', price: 200, available: true, desc: 'Jus d\'orange frais', emoji: '🧃', portion: 'Individuel', ingredients: ['Orange'] },
-])
+const dishes = ref([])
+
+onMounted(async () => {
+  try {
+    const data = await apiGetDishes()
+    if (data.success) dishes.value = data.dishes || []
+  } catch {}
+  loading.value = false
+})
 
 const categoryOptions = ['Entrees', 'Plats principaux', 'Desserts', 'Boissons']
 const portionOptions = ['Individuel', 'Famille (2p)', 'Famille (4p)']
@@ -89,7 +92,7 @@ function addIngredient() {
 function removeIngredient(i) { form.value.ingredients.splice(i, 1) }
 function onIngredientKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); addIngredient() } }
 
-function saveDish() {
+async function saveDish() {
   if (!form.value.name || !form.value.price) return
   const payload = {
     name: form.value.name,
@@ -103,15 +106,23 @@ function saveDish() {
     photo: photoPreview.value,
   }
   if (editDish.value) {
-    Object.assign(editDish.value, payload)
+    const data = await apiUpdateDish({ ...payload, id: editDish.value.id })
+    if (data.success) Object.assign(editDish.value, payload)
   } else {
-    dishes.value.push({ id: Date.now(), ...payload })
+    const data = await apiAddDish(payload)
+    if (data.success && data.dish) dishes.value.push(data.dish)
   }
   closeModal()
 }
 
-function deleteDish(d) { dishes.value = dishes.value.filter(x => x.id !== d.id) }
-function toggleAvailable(d) { d.available = !d.available }
+async function deleteDish(d) {
+  const data = await apiDeleteDish(d.id)
+  if (data.success) dishes.value = dishes.value.filter(x => x.id !== d.id)
+}
+async function toggleAvailable(d) {
+  d.available = !d.available
+  await apiUpdateDish({ id: d.id, available: d.available })
+}
 </script>
 
 <template>

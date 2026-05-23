@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { WILAYAS, COMMUNES } from '../../data'
+import { apiUpdateProfile } from '../../api'
 import {
   Save, User, Store, Bell, Shield, Eye, EyeOff, Camera, MapPin, Upload,
   Trash2, Clock, Smartphone, Laptop, LogOut
@@ -20,14 +21,14 @@ const tabs = [
 ]
 
 const form = ref({
-  name: auth.user?.firstName || '',
-  lastName: auth.user?.lastName || '',
-  email: auth.user?.email || '',
-  phone: auth.user?.phone || '',
+  name: '',
+  lastName: '',
+  email: '',
+  phone: '',
   cin: '',
   birthDate: '',
   birthWilaya: '',
-  kitchenName: auth.user?.name || 'Ma Cuisine',
+  kitchenName: '',
   bio: '',
   wilaya: '',
   commune: '',
@@ -37,13 +38,48 @@ const form = ref({
   notifPush: true,
 })
 
+onMounted(() => {
+  const u = auth.user
+  if (!u) return
+  form.value = {
+    name: u.firstName || '',
+    lastName: u.lastName || '',
+    email: u.email || '',
+    phone: u.phone || '',
+    cin: u.cin || '',
+    birthDate: u.dob || '',
+    birthWilaya: u.birthWilaya || '',
+    kitchenName: u.name || 'Ma Cuisine',
+    bio: u.desc || '',
+    wilaya: u.wilaya || '',
+    commune: u.commune || '',
+    hygieneCert: false,
+    notifEmail: true,
+    notifSMS: false,
+    notifPush: true,
+  }
+})
+
 const wilayas = WILAYAS
 const communes = computed(() => form.value.wilaya ? (COMMUNES[form.value.wilaya] || []) : [])
 const formDirty = computed(() => dirty.value)
 
 function markDirty() { dirty.value = true }
-function saveSettings() {
+async function saveSettings() {
   dirty.value = false
+  const data = await apiUpdateProfile({
+    firstName: form.value.name,
+    lastName: form.value.lastName,
+    phone: form.value.phone,
+    name: form.value.kitchenName,
+    desc: form.value.bio,
+    wilaya: form.value.wilaya,
+    commune: form.value.commune,
+  })
+  if (data.success && data.user) {
+    auth.setUser(data.user)
+    window.showToast?.('✅ Modifications enregistrées', 'success')
+  }
 }
 
 const sessions = ref([
