@@ -70,10 +70,10 @@ function logout() {
 </template>
 
 <style scoped>
-.dash-root { display:flex; min-height:100vh; background:#0A0A0A; }
+.dash-root { display:flex; min-height:100vh; background:#0A0A0A; padding-top:68px; }
 .dash-sidebar {
   width:240px; min-width:240px; background:#141414; border-right:1px solid #262626;
-  display:flex; flex-direction:column; padding:20px 12px; position:sticky; top:0; height:100vh;
+  display:flex; flex-direction:column; padding:20px 12px; position:sticky; top:0; height:calc(100vh - 68px);
   transition:width .25s,min-width .25s;
 }
 .dash-sidebar.collapsed { width:60px; min-width:60px; }
