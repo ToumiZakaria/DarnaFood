@@ -256,8 +256,6 @@ module.exports = async function handler(req, res) {
       if (req.method !== 'GET') return err(res, 'GET requis');
       const cursor = users.find({
         role: 'cuisinier',
-        isVerified: true,
-        isKitchenOpen: true,
       }, {
         projection: {
           passwordHash: 0,
