@@ -58,29 +58,21 @@
        RESET & BASE
     ================================================================ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html {
-      scroll-behavior: smooth;
-      background: #070605;
-      min-height: 100vh;
-    }
+    html { scroll-behavior: smooth; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
-      font-size: 16px;
       min-height: 100vh;
-      min-height: 100dvh;
       overflow-x: hidden;
       line-height: 1.5;
-      /* Phone frame: max 390px centered */
-      max-width: 390px;
-      margin: 0 auto;
-      position: relative;
     }
+    body.pwa { font-size: 16px; min-height: 100dvh; max-width: 390px; margin: 0 auto; position: relative; }
     a { color: inherit; text-decoration: none; }
     button { font-family: inherit; border: none; cursor: pointer; }
     img { max-width: 100%; display: block; }
     input, select, textarea { font-family: inherit; }
+
 
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -99,8 +91,18 @@
     /* ================================================================
        NAVBAR
     ================================================================ */
-    /* Navbar hidden — replaced by bottom tab bar everywhere */
-    .navbar { display: none !important; }
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 68px;
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 28px;
+      background: rgba(12,11,9,.88);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow var(--ease);
+    }
+    .navbar.scrolled { box-shadow: var(--shadow); }
+    body.pwa .navbar { display: none !important; }
 
     .nav-logo {
       display: flex; align-items: center; gap: 10px;
@@ -1108,8 +1110,9 @@
     /* ═══════════════════════════════════════════════
        BOTTOM TAB BAR — always visible, 390px centered
     ═══════════════════════════════════════════════ */
-    .pwa-bottom-nav {
-      display: flex;            /* always on */
+    .pwa-bottom-nav { display: none; }
+    body.pwa .pwa-bottom-nav {
+      display: flex;
       position: fixed;
       bottom: 0;
       left: 50%;
@@ -1122,10 +1125,9 @@
       z-index: 2000;
       align-items: stretch;
     }
-
     /* iOS notch safe area */
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
-      .pwa-bottom-nav {
+      body.pwa .pwa-bottom-nav {
         height: calc(62px + env(safe-area-inset-bottom));
         padding-bottom: env(safe-area-inset-bottom);
       }
@@ -1188,7 +1190,8 @@
     /* ═══════════════════════════════════════════════
        APP PAGE HEADER — sticky per-screen title bar
     ═══════════════════════════════════════════════ */
-    .pwa-app-header {
+    .pwa-app-header { display: none; }
+    body.pwa .pwa-app-header {
       display: flex;
       position: sticky;
       top: 0;
@@ -1202,14 +1205,14 @@
       padding: 0 16px;
       gap: 12px;
     }
-    .pwa-app-title {
+    body.pwa .pwa-app-title {
       flex: 1;
       text-align: center;
       font-size: 17px;
       font-weight: 700;
       letter-spacing: -0.4px;
     }
-    .pwa-app-back {
+    body.pwa .pwa-app-back {
       width: 40px; height: 40px;
       border: none;
       background: var(--bg-elevated);
@@ -1223,53 +1226,35 @@
       -webkit-tap-highlight-color: transparent;
       flex-shrink: 0;
     }
-    .pwa-app-action {
+    body.pwa .pwa-app-action {
       width: 40px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
     }
 
-    /* ═══════════════════════════════════════════════
-       GLOBAL MOBILE-FIRST OVERRIDES
-    ═══════════════════════════════════════════════ */
-
-    /* All pages need bottom padding for tab bar */
-    .page, #page-home, #page-welcome {
+    /* PWA only overrides */
+    body.pwa .page, body.pwa #page-home, body.pwa #page-welcome {
       padding-bottom: 70px;
     }
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
-      .page, #page-home, #page-welcome {
+      body.pwa .page, body.pwa #page-home, body.pwa #page-welcome {
         padding-bottom: calc(70px + env(safe-area-inset-bottom));
       }
     }
-
-    /* Hide footer — bottom tab replaces it */
-    .page-footer { display: none !important; }
-
-    /* Hide PWA install banner */
-    #pwa-banner { display: none !important; }
-
-    /* Button touch targets */
-    .btn-primary, .btn-ghost, .btn-outline {
-      min-height: 48px;
-    }
-
-    /* Smooth native scroll */
-    * { -webkit-overflow-scrolling: touch; }
-
-    /* Hero compact for mobile */
-    .hero { min-height: 55vh; border-radius: 0 0 28px 28px; }
-
-    /* Welcome screen fill */
-    #page-welcome { min-height: 100dvh; }
+    body.pwa .page-footer { display: none !important; }
+    body.pwa #pwa-banner { display: none !important; }
+    body.pwa .btn-primary, body.pwa .btn-ghost, body.pwa .btn-outline { min-height: 48px; }
+    body.pwa * { -webkit-overflow-scrolling: touch; }
+    body.pwa .hero { min-height: 55vh; border-radius: 0 0 28px 28px; }
+    body.pwa #page-welcome { min-height: 100dvh; }
   </style>
 </head>
 <body>
 
 <!-- ================================================================
      SPLASH SCREEN
-================================================================ -->
+=============================================================== -->
 <div id="splash">
   <div class="splash-ring">🍽️</div>
   <div class="splash-brand">DarnaFood</div>
