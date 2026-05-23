@@ -55,12 +55,18 @@ function setCat(cat) {
         <span>🍲</span><span>🥘</span><span>🧆</span><span>🥗</span><span>🫓</span><span>🍛</span><span>🥩</span><span>🍖</span>
       </div>
       <div class="hero-content">
-        <h1 class="hero-title">Manger chez soi<br>comme chez <span class="gold">nous</span> 🇩🇿</h1>
-        <p class="hero-sub">Découvrez des plats faits maison par des cuisiniers algériens près de chez vous.</p>
+        <p class="hero-greeting">Bonjour, dar !</p>
+        <h1 class="hero-title">Des repas faits<br>maison, livrés<br>chez <span class="gold">vous</span></h1>
+        <p class="hero-sub">Découvrez les cuisines maison de Oued Rhiou et ses environs. Des plats authentiques préparés avec amour par vos voisins.</p>
         <div class="hero-actions">
-          <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'kitchens'})">🍽️ Commander maintenant</button>
-          <button v-if="!auth.isAuthenticated" class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
+          <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'kitchens'})">Voir les cuisines</button>
+          <button class="btn-outline btn-lg hero-btn" @click="router.push({name:'kitchens'})">Comment ça marche</button>
         </div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-val">120+</span><span class="hero-stat-label">Cuisines</span></div>
+        <div class="hero-stat"><span class="hero-stat-val">58</span><span class="hero-stat-label">Wilayas</span></div>
+        <div class="hero-stat"><span class="hero-stat-val">4.8</span><span class="hero-stat-label">Note</span></div>
       </div>
     </section>
 
@@ -124,7 +130,7 @@ function setCat(cat) {
 .chef-stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
 
 /* Guest/client home */
-.hero { position:relative; min-height:540px; display:flex; align-items:center; justify-content:center; text-align:center; padding:120px 20px 80px; overflow:hidden; }
+.hero { position:relative; min-height:540px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 20px 40px; overflow:hidden; }
 .hero-bg-float { position:absolute; inset:0; pointer-events:none; }
 .hero-bg-float span { position:absolute; font-size:36px; opacity:.18; animation:float 18s ease-in-out infinite; }
 .hero-bg-float span:nth-child(1){top:15%;left:8%;animation-delay:0s;font-size:42px;}
@@ -137,10 +143,15 @@ function setCat(cat) {
 .hero-bg-float span:nth-child(8){top:38%;left:35%;animation-delay:14s;font-size:30px;}
 @keyframes float { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-25px) rotate(8deg)} }
 .hero-content { position:relative; max-width:700px; }
-.hero-title { font-size:52px; font-weight:900; line-height:1.1; margin-bottom:18px; }
+.hero-greeting { font-size:14px; font-weight:600; color:var(--primary-light); margin-bottom:12px; text-transform:uppercase; letter-spacing:2px; }
+.hero-title { font-size:52px; font-weight:900; line-height:1.05; margin-bottom:18px; }
 .hero-title .gold { background:linear-gradient(135deg,var(--primary-light),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .hero-sub { font-size:18px; color:var(--text-muted); margin-bottom:36px; max-width:480px; margin-left:auto; margin-right:auto; }
 .hero-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.hero-stats { display:flex; gap:40px; justify-content:center; margin-top:48px; padding-top:32px; border-top:1px solid var(--border); width:100%; max-width:400px; }
+.hero-stat { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.hero-stat-val { font-size:28px; font-weight:800; color:var(--primary-light); }
+.hero-stat-label { font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
 .section { padding:60px 28px; max-width:1180px; margin:0 auto; }
 .section-heading { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
 .section-title { font-size:24px; font-weight:800; }
