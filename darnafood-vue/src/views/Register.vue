@@ -50,7 +50,7 @@ async function doRegister() {
     const result = await auth.register(payload)
     if (result.success) {
       window.showToast?.('🎉 Compte créé !', 'success')
-      router.push(result.user?.role === 'cuisinier' ? { name: 'dashboard' } : { name: 'home' })
+      router.push(result.user?.role === 'cuisinier' ? { name: 'cook-home' } : { name: 'home' })
     } else {
       error.value = result.error || 'Erreur lors de la création'
     }

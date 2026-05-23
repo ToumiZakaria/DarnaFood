@@ -13,7 +13,7 @@ import SettingsPanel from '../components/dashboard/SettingsPanel.vue'
 const router = useRouter()
 const auth = useAuthStore()
 const sidebarOpen = ref(true)
-const activeTab = ref('overview')
+const activeTab = ref(localStorage.getItem('df_dash_tab') || 'overview')
 
 const tabs = [
   { id: 'overview', label: 'Vue d\'ensemble', icon: LayoutDashboard },
@@ -39,7 +39,7 @@ function logout() {
         </div>
       </div>
       <div class="ds-nav">
-        <button v-for="tab in tabs" :key="tab.id" class="ds-nav-item" :class="{ active: activeTab === tab.id }" @click="activeTab = tab.id">
+        <button v-for="tab in tabs" :key="tab.id" class="ds-nav-item" :class="{ active: activeTab === tab.id }" @click="activeTab = tab.id; localStorage.removeItem('df_dash_tab')">
           <component :is="tab.icon" :size="18" />
           <span v-if="sidebarOpen">{{ tab.label }}</span>
         </button>

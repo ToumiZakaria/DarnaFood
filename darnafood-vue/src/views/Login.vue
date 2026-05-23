@@ -19,7 +19,7 @@ async function doLogin() {
     const result = await auth.login(email.value, password.value)
     if (result.success) {
       window.showToast?.(`✅ Bienvenue !`, 'success')
-      router.push(result.user?.role === 'cuisinier' ? { name: 'dashboard' } : { name: 'home' })
+      router.push(result.user?.role === 'cuisinier' ? { name: 'cook-home' } : { name: 'home' })
     } else {
       error.value = result.error || 'Identifiants incorrects'
     }

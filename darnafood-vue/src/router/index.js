@@ -14,6 +14,7 @@ const routes = [
   { path: '/auth/register', name: 'register', alias: '/register', component: () => import('../views/Register.vue') },
   { path: '/auth/role', name: 'auth-role', component: () => import('../views/Register.vue') },
   { path: '/myorders', name: 'myorders', component: () => import('../views/MyOrders.vue'), meta: { requiresAuth: true } },
+  { path: '/cook-home', name: 'cook-home', component: () => import('../views/CookHome.vue'), meta: { requiresAuth: true } },
   { path: '/dashboard', name: 'dashboard', component: () => import('../views/Dashboard.vue'), meta: { requiresAuth: true } },
 ]
 
@@ -31,7 +32,7 @@ router.beforeEach((to, from, next) => {
   }
   if (to.path === '/' && isAuth) {
     const isCuisinier = auth.role === 'cuisinier'
-    return next(isCuisinier ? '/dashboard' : '/cuisines')
+    return next(isCuisinier ? '/cook-home' : '/cuisines')
   }
   next()
 })
