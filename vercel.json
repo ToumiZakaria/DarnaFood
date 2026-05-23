@@ -1,5 +1,10 @@
 {
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "installCommand": "npm install"
+  "buildCommand": "cd darnafood-vue && npm ci && npm run build",
+  "outputDirectory": "darnafood-vue/dist",
+  "rewrites": [
+    { "source": "/((?!api/)(?!.*\\.\\w+$).*)", "destination": "/index.html" }
+  ],
+  "github": {
+    "silent": true
+  }
 }
