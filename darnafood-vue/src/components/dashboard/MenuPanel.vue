@@ -100,6 +100,8 @@ function toggleAvailable(d) {
       <button class="btn-primary-add" @click="openAdd"><Plus :size="16" /> Ajouter un plat</button>
     </div>
 
+    <button class="fab-add" @click="openAdd"><Plus :size="22" /></button>
+
     <Teleport to="body">
       <div class="modal-overlay" :class="{ open: showModal }" @click="closeModal"></div>
       <div class="modal" :class="{ open: showModal }">
@@ -189,6 +191,13 @@ function toggleAvailable(d) {
 .empty-state p { font-size:13px; color:#A1A1AA; margin:0 0 20px; }
 
 /* Modal */
+.fab-add {
+  position:fixed; bottom:32px; right:32px; z-index:100; width:56px; height:56px; border-radius:16px;
+  background:#E8813A; color:#fff; border:none; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 4px 20px rgba(232,129,58,.4); transition:transform .2s,box-shadow .2s;
+}
+.fab-add:hover { transform:translateY(-2px); box-shadow:0 6px 28px rgba(232,129,58,.5); }
+
 .modal-overlay { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,.6); opacity:0; pointer-events:none; transition:opacity .25s; }
 .modal-overlay.open { opacity:1; pointer-events:all; }
 .modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(.95); z-index:301; width:480px; max-width:90vw; background:#141414; border:1px solid #262626; border-radius:12px; opacity:0; pointer-events:none; transition:all .25s; }

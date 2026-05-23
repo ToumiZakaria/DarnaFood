@@ -81,11 +81,11 @@ export const KITCHENS = [
 ]
 
 export const MOCK_DASH_ORDERS = [
-  {id:"DRC-1001", client:"Sofiane B.", items:"Couscous au Poulet, Chorba Frik", total:1270, status:"nouveau", time:"12:30"},
-  {id:"DRC-1002", client:"Lina M.", items:"Rechta, Baklawa Royale", total:1580, status:"preparation", time:"11:45"},
-  {id:"DRC-1003", client:"Amine K.", items:"Merguez Maison (x2), Salade Oranaise", total:1700, status:"livre", time:"10:20"},
-  {id:"DRC-1004", client:"Yasmine H.", items:"Couscous Royal", total:1450, status:"nouveau", time:"13:00"},
-  {id:"DRC-1005", client:"Rachid T.", items:"Tagine d'Agneau, Jus d'orange", total:1250, status:"preparation", time:"12:10"},
+  {id:"DRC-1001", client:"Sofiane B.", items:"Couscous au Poulet, Chorba Frik", total:1270, status:"pending", time:"12:30"},
+  {id:"DRC-1002", client:"Lina M.", items:"Rechta, Baklawa Royale", total:1580, status:"preparing", time:"11:45"},
+  {id:"DRC-1003", client:"Amine K.", items:"Merguez Maison (x2), Salade Oranaise", total:1700, status:"delivered", time:"10:20"},
+  {id:"DRC-1004", client:"Yasmine H.", items:"Couscous Royal", total:1450, status:"pending", time:"13:00"},
+  {id:"DRC-1005", client:"Rachid T.", items:"Tagine d'Agneau, Jus d'orange", total:1250, status:"preparing", time:"12:10"},
 ]
 
 export const COMMUNES = {

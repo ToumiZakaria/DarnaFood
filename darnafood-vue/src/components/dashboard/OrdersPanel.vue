@@ -80,7 +80,7 @@ const currentStep = computed(() => selectedOrder.value ? statusSteps.indexOf(sel
           <tr v-for="o in paged" :key="o.id" class="table-row" @click="openDrawer(o)">
             <td class="cell-id">{{ o.id }}</td>
             <td>{{ o.client }}</td>
-            <td>{{ o.plat }}</td>
+            <td>{{ o.items }}</td>
             <td class="cell-price">{{ dzd(o.total) }}</td>
             <td><span class="status-pill" :class="o.status">{{ statusLabels[o.status] || o.status }}</span></td>
           </tr>
@@ -142,9 +142,9 @@ const currentStep = computed(() => selectedOrder.value ? statusSteps.indexOf(sel
             <h4>Articles</h4>
             <div class="d-items">
               <div class="d-item">
-                <span>{{ selectedOrder.plat }}</span>
-                <span class="d-item-qty">×{{ selectedOrder.qty || 1 }}</span>
-                <span class="d-item-price">{{ dzd(selectedOrder.total / (selectedOrder.qty || 1)) }}</span>
+                <span>{{ selectedOrder.items }}</span>
+                <span class="d-item-qty">×1</span>
+                <span class="d-item-price">{{ dzd(selectedOrder.total) }}</span>
               </div>
             </div>
             <div class="d-total">

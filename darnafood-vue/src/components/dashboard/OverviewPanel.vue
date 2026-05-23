@@ -122,7 +122,7 @@ const monthProgress = ref(42)
           <tr v-for="o in orders.slice(0,5)" :key="o.id">
             <td class="cell-id">{{ o.id }}</td>
             <td>{{ o.client }}</td>
-            <td>{{ o.plat }}</td>
+            <td>{{ o.items }}</td>
             <td class="cell-price">{{ dzd(o.total) }}</td>
             <td><span class="status-pill" :class="o.status">{{ { pending:'Nouveau', confirmed:'Confirmée', preparing:'En préparation', ready:'Prête', delivered:'Livrée' }[o.status] || o.status }}</span></td>
             <td>
