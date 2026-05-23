@@ -117,25 +117,39 @@ function addDish(dish) {
 
     <!-- Menu Section -->
     <div class="cpp-menu">
-      <h2 class="cpp-menu-title">Menu</h2>
+      <div class="cpp-menu-head">
+        <h2 class="cpp-menu-title">Notre Menu</h2>
+        <span class="cpp-menu-count">{{ filteredMenu.length }} plat{{ filteredMenu.length > 1 ? 's' : '' }}</span>
+      </div>
       <div class="cpp-cats">
         <button v-for="c in dishCats" :key="c" class="cpp-cat" :class="{ active: activeCat === c }" @click="activeCat = c">{{ c }}</button>
       </div>
       <div class="cpp-dishes">
         <div v-for="dish in filteredMenu" :key="dish.id" class="cpp-dish">
-          <div class="cpp-dish-icon" :style="{ background: dish.gradient || kitchen.gradient }">{{ dish.emoji }}</div>
+          <div class="cpp-dish-img" :style="{ background: dish.gradient || kitchen.gradient + '22' }">
+            <div class="cpp-dish-emoji">{{ dish.emoji || '🍽️' }}</div>
+            <div v-if="dish.portion" class="cpp-dish-badge">{{ dish.portion }}</div>
+          </div>
           <div class="cpp-dish-body">
             <div class="cpp-dish-name">{{ dish.name }}</div>
-            <div class="cpp-dish-desc">{{ dish.desc }}</div>
+            <div class="cpp-dish-desc">{{ dish.desc || 'Préparation maison avec des ingrédients frais' }}</div>
+            <div v-if="dish.ingredients?.length" class="cpp-dish-ingredients">
+              <span v-for="(ing, i) in dish.ingredients.slice(0, 3)" :key="i" class="cpp-ing">{{ ing }}</span>
+              <span v-if="dish.ingredients.length > 3" class="cpp-ing-more">+{{ dish.ingredients.length - 3 }}</span>
+            </div>
             <div class="cpp-dish-bottom">
-              <span class="cpp-dish-price">{{ dzd(dish.price) }}</span>
-              <button v-if="kitchen.open" class="cpp-add-btn" @click="addDish(dish)"><ShoppingCart :size="15" /> Ajouter</button>
-              <span v-else class="cpp-closed-label">Fermé</span>
+              <div class="cpp-dish-price">{{ dish.price.toLocaleString('fr-DZ') }} <span class="cpp-currency">DA</span></div>
+              <button v-if="kitchen.open" class="cpp-add-btn" @click="addDish(dish)">
+                <ShoppingCart :size="14" />
+                <span>Ajouter</span>
+              </button>
+              <span v-else class="cpp-closed-label">Indisponible</span>
             </div>
           </div>
         </div>
         <div v-if="!filteredMenu.length" class="cpp-empty">
-          Aucun plat dans cette catégorie
+          <div class="cpp-empty-icon">🍽️</div>
+          <p>Aucun plat dans cette catégorie</p>
         </div>
       </div>
     </div>
@@ -342,115 +356,111 @@ function addDish(dish) {
 }
 
 /* Menu */
-.cpp-menu {
-  padding: 0 20px;
+.cpp-menu { padding: 24px 20px; }
+.cpp-menu-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
 }
 .cpp-menu-title {
-  font-size: 20px;
-  font-weight: 800;
-  color: #FAFAFA;
-  margin: 0 0 14px;
+  font-size: 22px; font-weight: 800; color: #FAFAFA; margin: 0;
+}
+.cpp-menu-count {
+  font-size: 12px; color: #A1A1AA; font-weight: 600;
+  background: #141414; border: 1px solid #262626;
+  padding: 4px 14px; border-radius: 99px;
 }
 .cpp-cats {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 16px;
-  -webkit-overflow-scrolling: touch;
+  display: flex; gap: 6px; overflow-x: auto;
+  padding-bottom: 20px; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.cpp-cats::-webkit-scrollbar { display: none; }
 .cpp-cat {
-  background: #141414;
-  border: 1px solid #262626;
-  color: #A1A1AA;
-  padding: 8px 20px;
-  border-radius: 99px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .2s;
+  background: transparent; border: 1px solid #262626;
+  color: #A1A1AA; padding: 8px 18px; border-radius: 99px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; transition: all .25s; flex-shrink: 0;
 }
-.cpp-cat.active,
-.cpp-cat:hover {
-  border-color: #E8813A;
-  background: rgba(232,129,58,.1);
-  color: #E8813A;
+.cpp-cat.active {
+  background: #E8813A; border-color: #E8813A; color: #fff;
 }
+.cpp-cat:hover:not(.active) { border-color: #E8813A; color: #FAFAFA; }
 
-/* Dishes */
+/* Dish Grid */
 .cpp-dishes {
-  display: flex;
-  flex-direction: column;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
 }
 .cpp-dish {
-  display: flex;
-  gap: 14px;
-  padding: 16px 0;
-  border-bottom: 1px solid #1A1A1A;
+  background: #141414; border: 1px solid #262626;
+  border-radius: 14px; overflow: hidden;
+  transition: all .25s;
 }
-.cpp-dish-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  flex-shrink: 0;
+.cpp-dish:hover { border-color: #333; transform: translateY(-2px); }
+.cpp-dish-img {
+  height: 110px; display: flex; align-items: center;
+  justify-content: center; position: relative;
 }
-.cpp-dish-body {
-  flex: 1;
-  min-width: 0;
+.cpp-dish-emoji { font-size: 40px; }
+.cpp-dish-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+  color: #FAFAFA; font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 99px;
 }
+.cpp-dish-body { padding: 12px 14px 14px; }
 .cpp-dish-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: #FAFAFA;
+  font-size: 14px; font-weight: 700; color: #FAFAFA;
+  line-height: 1.3;
 }
 .cpp-dish-desc {
-  font-size: 12px;
-  color: #A1A1AA;
-  margin-top: 2px;
-  line-height: 1.5;
+  font-size: 11px; color: #A1A1AA; margin-top: 4px;
+  line-height: 1.5; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.cpp-dish-ingredients {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;
+}
+.cpp-ing {
+  background: rgba(232,129,58,.08); color: #E8813A;
+  font-size: 9px; font-weight: 600; padding: 2px 8px;
+  border-radius: 99px;
+}
+.cpp-ing-more {
+  font-size: 9px; color: #A1A1AA; font-weight: 600;
+  padding: 2px 6px;
 }
 .cpp-dish-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.04);
 }
 .cpp-dish-price {
-  font-size: 17px;
-  font-weight: 800;
-  color: #E8813A;
+  font-size: 18px; font-weight: 800; color: #FAFAFA;
+}
+.cpp-currency {
+  font-size: 12px; font-weight: 600; color: #A1A1AA;
 }
 .cpp-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #E8813A;
-  color: #fff;
-  border: none;
-  padding: 7px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #E8813A; color: #fff; border: none;
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 11px; font-weight: 700; cursor: pointer;
   transition: all .2s;
 }
-.cpp-add-btn:hover {
-  background: #d6732e;
-}
+.cpp-add-btn:hover { background: #d6732e; transform: scale(1.03); }
+.cpp-add-btn:active { transform: scale(.97); }
 .cpp-closed-label {
-  font-size: 12px;
-  color: #A1A1AA;
-  font-weight: 600;
+  font-size: 11px; color: #52525B; font-weight: 600;
 }
 .cpp-empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: #A1A1AA;
-  font-size: 14px;
+  grid-column: 1 / -1; text-align: center;
+  padding: 50px 20px; color: #A1A1AA; font-size: 14px;
+}
+.cpp-empty-icon { font-size: 40px; margin-bottom: 8px; }
+.cpp-empty p { margin: 0; }
+
+@media (max-width: 480px) {
+  .cpp-dishes { grid-template-columns: 1fr; }
 }
 
 /* Not found */
