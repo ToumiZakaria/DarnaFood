@@ -71,6 +71,7 @@ module.exports = async function handler(req, res) {
       if (existing) return err(res, 'Cet email est déjà utilisé');
 
       const passwordHash = await bcrypt.hash(body.password, 10);
+      const isCuisinier = body.role === 'cuisinier'
       const newUser = {
         email:       body.email.toLowerCase().trim(),
         passwordHash,
@@ -87,6 +88,8 @@ module.exports = async function handler(req, res) {
         dob:         body.dob       || '',
         birthWilaya: body.birthWilaya || '',
         menu:        [],
+        isKitchenOpen: isCuisinier ? true : undefined,
+        isVerified:    isCuisinier ? true : undefined,
         createdAt:   new Date()
       };
 
@@ -151,6 +154,40 @@ module.exports = async function handler(req, res) {
       const passwordHash = await bcrypt.hash(newPassword, 10);
       await users.updateOne({ email: payload.email }, { $set: { passwordHash } });
       return ok(res, { message: 'Mot de passe mis à jour' });
+    }
+
+    /* ── LIST COOKS ──────────────────────────────────────────── */
+    if (action === 'cooks') {
+      if (req.method !== 'GET') return err(res, 'GET requis');
+      const cursor = users.find({
+        role: 'cuisinier',
+        isVerified: true,
+        isKitchenOpen: true,
+      }, {
+        projection: {
+          passwordHash: 0,
+          cin: 0,
+          dob: 0,
+          birthWilaya: 0,
+        }
+      });
+      const cooks = await cursor.toArray();
+      const mapped = cooks.map(c => ({
+        ...c,
+        id: c._id.toString(),
+        name: c.name || c.firstName + ' ' + c.lastName,
+        tagline: c.desc ? c.desc.slice(0, 80) : 'Cuisine maison',
+        rating: c.rating || 0,
+        reviews: c.reviews || 0,
+        minOrder: c.minOrder || 300,
+        deliveryFee: c.deliveryFee || 0,
+        deliveryTime: c.deliveryTime || 45,
+        open: c.isKitchenOpen !== false,
+        gradient: c.gradient || 'linear-gradient(135deg,#4A3020,#8B6040)',
+        emoji: c.emoji || '🍽️',
+        featured: false,
+      }));
+      return ok(res, { cooks: mapped });
     }
 
     return err(res, 'Action inconnue: ' + action, 404);

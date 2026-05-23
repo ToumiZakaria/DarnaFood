@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { KITCHENS, CATS } from '../data'
+import { apiGetCooks } from '../api'
 import KitchenCard from '../components/KitchenCard.vue'
 
 const router = useRouter()
@@ -12,9 +13,16 @@ const topRated = ref([])
 const activeCat = ref(null)
 const filterCat = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
   featured.value = KITCHENS.filter(k => k.featured)
   topRated.value = [...KITCHENS].sort((a, b) => b.rating - a.rating).slice(0, 4)
+  try {
+    const data = await apiGetCooks()
+    if (data.success && data.cooks?.length) {
+      const recent = data.cooks.slice(0, 4)
+      featured.value = [...featured.value, ...recent]
+    }
+  } catch {}
 })
 
 function setCat(cat) {

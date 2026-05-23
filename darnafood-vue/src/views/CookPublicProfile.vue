@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { KITCHENS } from '../data'
+import { apiGetCooks } from '../api'
 import { dzd } from '../utils'
 import { useCartStore } from '../stores/cart'
 import { useAuthStore } from '../stores/auth'
@@ -14,8 +15,24 @@ const router = useRouter()
 const cart = useCartStore()
 const auth = useAuthStore()
 const favorite = ref(false)
+const apiKitchen = ref(null)
 
-const kitchen = computed(() => KITCHENS.find(k => k.id === Number(route.params.id) || k.id === route.params.id))
+onMounted(async () => {
+  const id = route.params.id
+  const mock = KITCHENS.find(k => k.id === Number(id) || k.id === id)
+  if (mock) return
+  try {
+    const data = await apiGetCooks()
+    if (data.success) {
+      apiKitchen.value = data.cooks?.find(c => c.id === id || c._id === id) || null
+    }
+  } catch {}
+})
+
+const kitchen = computed(() => {
+  const id = route.params.id
+  return KITCHENS.find(k => k.id === Number(id) || k.id === id) || apiKitchen.value
+})
 const activeCat = ref('Tous')
 const dishCats = computed(() => {
   if (!kitchen.value) return ['Tous']

@@ -1,22 +1,36 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { KITCHENS, CATS } from '../data'
+import { apiGetCooks } from '../api'
 import KitchenCard from '../components/KitchenCard.vue'
 
 const search = ref('')
 const activeCat = ref(null)
 const sortBy = ref('')
+const realCooks = ref([])
+
+onMounted(async () => {
+  try {
+    const data = await apiGetCooks()
+    if (data.success) realCooks.value = data.cooks || []
+  } catch {}
+})
+
+const allKitchens = computed(() => [...KITCHENS, ...realCooks.value])
 
 const filtered = computed(() => {
-  let list = [...KITCHENS]
-  if (activeCat.value) list = list.filter(k => k.catId === activeCat.value)
+  let list = [...allKitchens.value]
+  if (activeCat.value) {
+    const cat = CATS.find(c => c.id === activeCat.value)
+    if (cat) list = list.filter(k => k.cat === cat.name || k.cat?.name === cat.name)
+  }
   if (search.value.trim()) {
     const q = search.value.toLowerCase()
-    list = list.filter(k => k.name.toLowerCase().includes(q) || k.tagline.toLowerCase().includes(q) || k.wilaya.toLowerCase().includes(q))
+    list = list.filter(k => k.name?.toLowerCase().includes(q) || k.tagline?.toLowerCase().includes(q) || k.wilaya?.toLowerCase().includes(q) || k.commune?.toLowerCase().includes(q))
   }
-  if (sortBy.value === 'rating') list.sort((a,b) => b.rating - a.rating)
-  else if (sortBy.value === 'delivery') list.sort((a,b) => a.deliveryTime - b.deliveryTime)
-  else if (sortBy.value === 'min') list.sort((a,b) => a.minOrder - b.minOrder)
+  if (sortBy.value === 'rating') list.sort((a,b) => (b.rating||0) - (a.rating||0))
+  else if (sortBy.value === 'delivery') list.sort((a,b) => (a.deliveryTime||99) - (b.deliveryTime||99))
+  else if (sortBy.value === 'min') list.sort((a,b) => (a.minOrder||999) - (b.minOrder||999))
   return list
 })
 </script>
