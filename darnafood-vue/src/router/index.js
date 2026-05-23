@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import AppLayout from '../layouts/AppLayout.vue'
 
 const routes = [
   { path: '/', name: 'home', component: Home },
@@ -12,6 +13,20 @@ const routes = [
   { path: '/register', name: 'register', component: () => import('../views/Register.vue') },
   { path: '/dashboard', name: 'dashboard', component: () => import('../views/Dashboard.vue'), meta: { requiresAuth: true } },
   { path: '/myorders', name: 'myorders', component: () => import('../views/MyOrders.vue'), meta: { requiresAuth: true } },
+
+  // App routes (PWA shell)
+  {
+    path: '/app',
+    component: AppLayout,
+    children: [
+      { path: '', redirect: { name: 'app-home' } },
+      { path: 'home', name: 'app-home', component: () => import('../views/app/AppHome.vue') },
+      { path: 'kitchens', name: 'app-kitchens', component: () => import('../views/Kitchens.vue') },
+      { path: 'kitchen/:id', name: 'app-kitchen-detail', component: () => import('../views/KitchenDetail.vue') },
+      { path: 'cart', name: 'app-cart', redirect: { name: 'app-home' } },
+      { path: 'profile', name: 'app-profile', component: () => import('../views/app/AppProfile.vue') },
+    ],
+  },
 ]
 
 const router = createRouter({
