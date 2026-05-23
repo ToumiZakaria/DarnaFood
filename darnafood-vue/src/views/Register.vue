@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { COMMUNES } from '../data'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -13,6 +14,9 @@ const error = ref('')
 
 const clientForm = ref({ fn: '', ln: '', email: '', phone: '', wilaya: '', commune: '', pwd: '' })
 const cuisinierForm = ref({ fn: '', ln: '', dob: '', bwilaya: '', cin: '', name: '', cat: '', wilaya: '', commune: '', desc: '', phone: '', email: '', pwd: '' })
+
+const clientCommunes = computed(() => COMMUNES[clientForm.value.wilaya] || [])
+const cuisinierCommunes = computed(() => COMMUNES[cuisinierForm.value.wilaya] || [])
 
 function selectRole(r) {
   role.value = r
@@ -113,8 +117,9 @@ async function doRegister() {
             </div>
             <div class="form-group">
               <label class="form-label">Commune *</label>
-              <select class="form-select" v-model="clientForm.commune">
-                <option value="">Sélectionnez d'abord une wilaya</option>
+              <select class="form-select" v-model="clientForm.commune" :disabled="!clientForm.wilaya">
+                <option value="">Sélectionnez une commune...</option>
+                <option v-for="c in clientCommunes" :key="c" :value="c">{{ c }}</option>
               </select>
             </div>
             <div class="form-group"><label class="form-label">Mot de passe *</label><input type="password" class="form-input" v-model="clientForm.pwd" placeholder="Minimum 6 caractères"></div>
@@ -164,8 +169,9 @@ async function doRegister() {
             </div>
             <div class="form-group">
               <label class="form-label">Commune *</label>
-              <select class="form-select" v-model="cuisinierForm.commune">
-                <option value="">Sélectionnez d'abord une wilaya</option>
+              <select class="form-select" v-model="cuisinierForm.commune" :disabled="!cuisinierForm.wilaya">
+                <option value="">Sélectionnez une commune...</option>
+                <option v-for="c in cuisinierCommunes" :key="c" :value="c">{{ c }}</option>
               </select>
             </div>
             <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" v-model="cuisinierForm.desc" placeholder="Décrivez votre cuisine maison..."></textarea></div>
