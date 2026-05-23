@@ -59,7 +59,7 @@ function setCat(cat) {
         <p class="hero-sub">Découvrez des plats faits maison par des cuisiniers algériens près de chez vous.</p>
         <div class="hero-actions">
           <button class="btn-primary btn-lg hero-btn" @click="router.push({name:'kitchens'})">🍽️ Commander maintenant</button>
-          <button class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
+          <button v-if="!auth.isAuthenticated" class="btn-outline btn-lg hero-btn" @click="router.push({name:'register'})">👨‍🍳 Devenir cuisinier</button>
         </div>
       </div>
     </section>
@@ -95,7 +95,7 @@ function setCat(cat) {
       </div>
     </section>
 
-    <section class="section cta-section">
+    <section v-if="!auth.isAuthenticated" class="section cta-section">
       <div class="cta-card">
         <h2 class="cta-title">Vous cuisinez ? Rejoignez-nous !</h2>
         <p class="cta-desc">Transformez votre passion en revenus. Créez votre cuisine virtuelle et commencez à recevoir des commandes dès aujourd'hui.</p>
