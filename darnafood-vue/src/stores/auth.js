@@ -17,7 +17,6 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = data.token
       setAuthUser(data.user)
       setToken(data.token)
-      return true
     }
     return data
   }
@@ -29,7 +28,6 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = data.token
       setAuthUser(data.user)
       setToken(data.token)
-      return true
     }
     return data
   }

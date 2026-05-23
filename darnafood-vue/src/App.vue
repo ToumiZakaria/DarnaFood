@@ -8,7 +8,7 @@ import CartDrawer from './components/CartDrawer.vue'
 import Toast from './components/Toast.vue'
 
 const route = useRoute()
-const noLayout = computed(() => ['login', 'register', 'welcome', 'dashboard', 'myorders'].includes(route.name))
+const noLayout = computed(() => ['welcome'].includes(route.name))
 </script>
 
 <template>

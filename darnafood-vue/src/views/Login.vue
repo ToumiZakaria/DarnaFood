@@ -16,7 +16,7 @@ async function doLogin() {
   if (!email.value || !password.value) { window.showToast?.('⚠️ Veuillez remplir tous les champs', 'error'); return }
   loading.value = true
   try {
-    const result = await auth.login({ email: email.value, password: password.value })
+    const result = await auth.login(email.value, password.value)
     if (result.success) {
       window.showToast?.(`✅ Bienvenue !`, 'success')
       router.push(auth.isCuisinier ? { name: 'dashboard' } : { name: 'home' })
@@ -33,26 +33,6 @@ async function doLogin() {
 
 <template>
   <div class="page active" style="display:block">
-
-    <!-- NAVBAR -->
-    <nav class="navbar" style="position:static;">
-      <div class="nav-logo" @click="router.push({name:'home'})">
-        <div class="nav-logo-icon">🍽️</div>
-        <div class="nav-logo-wordmark">
-          <div class="nav-logo-en">DarnaFood</div>
-          <div class="nav-logo-ar">دارنا فود</div>
-        </div>
-      </div>
-      <ul class="nav-links">
-        <li><a href="#" @click.prevent="router.push({name:'home'})">Accueil</a></li>
-        <li><a href="#" @click.prevent="router.push({name:'kitchens'})" class="active">Cuisines</a></li>
-      </ul>
-      <div class="nav-spacer"></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" @click="router.push({name:'register'})">S'inscrire</button>
-      </div>
-    </nav>
-
     <div class="auth-page">
       <div class="auth-card">
         <div class="auth-logo" @click="router.push({name:'home'})">
