@@ -58,31 +58,33 @@ function onDrop(e) { e.preventDefault(); dragOver.value = false; const file = e.
 
 function removePhoto() { photoPreview.value = null; photoFile.value = null }
 
-const form = ref({ name: '', cat: 'Plats principaux', price: '', desc: '', emoji: '', portion: 'Individuel', ingredients: [], ingredientInput: '', available: true })
+const form = ref({ name: '', cat: 'Plats principaux', price: '', desc: '', emoji: '', portion: 'Individuel', ingredients: [], available: true })
+const ingredientInput = ref('')
 
 function openAdd() {
   editDish.value = null
   photoPreview.value = null
   photoFile.value = null
-  form.value = { name: '', cat: 'Plats principaux', price: '', desc: '', emoji: '', portion: 'Individuel', ingredients: [], ingredientInput: '', available: true }
+  ingredientInput.value = ''
+  form.value = { name: '', cat: 'Plats principaux', price: '', desc: '', emoji: '', portion: 'Individuel', ingredients: [], available: true }
   showModal.value = true
 }
 function openEdit(d) {
   editDish.value = d
-  const stored = d.photo ? d.photo : null
-  photoPreview.value = stored
+  photoPreview.value = d.photo || null
   photoFile.value = null
-  form.value = { name: d.name, cat: d.cat, price: d.price, desc: d.desc, emoji: d.emoji || '', portion: d.portion || 'Individuel', ingredients: [...(d.ingredients || [])], ingredientInput: '', available: d.available }
+  ingredientInput.value = ''
+  form.value = { name: d.name, cat: d.cat, price: d.price, desc: d.desc, emoji: d.emoji || '', portion: d.portion || 'Individuel', ingredients: [...(d.ingredients || [])], available: d.available }
   showModal.value = true
 }
 function closeModal() { showModal.value = false }
 
 function addIngredient() {
-  const val = form.value.ingredientInput.trim()
-  if (val && !form.value.ingredients.includes(val)) {
-    form.value.ingredients.push(val)
-  }
-  form.value.ingredientInput = ''
+  const val = ingredientInput.value.trim()
+  if (!val) return
+  if (form.value.ingredients.includes(val)) return
+  form.value.ingredients.push(val)
+  ingredientInput.value = ''
 }
 function removeIngredient(i) { form.value.ingredients.splice(i, 1) }
 function onIngredientKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); addIngredient() } }
@@ -213,7 +215,7 @@ function toggleAvailable(d) { d.available = !d.available }
           <div class="field">
             <label>Ingrédients</label>
             <div class="ingr-input-wrap">
-              <input v-model="form.ingredientInput" class="field-input ingr-input" placeholder="Ajouter un ingrédient et appuyer sur Entrée" @keydown="onIngredientKeydown">
+              <input v-model="ingredientInput" class="field-input ingr-input" placeholder="Ajouter un ingrédient et appuyer sur Entrée" @keydown="onIngredientKeydown">
               <button class="ingr-add-btn" @click="addIngredient"><Plus :size="14" /></button>
             </div>
             <div v-if="form.ingredients.length" class="ingr-pills">
@@ -337,11 +339,12 @@ function toggleAvailable(d) { d.available = !d.available }
 /* Ingredients */
 .ingr-input-wrap { display:flex; gap:6px; }
 .ingr-input { flex:1; }
-.ingr-add-btn { width:36px; height:36px; border-radius:8px; background:rgba(232,129,58,.12); border:1px solid rgba(232,129,58,.3); color:#E8813A; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
-.ingr-add-btn:hover { background:rgba(232,129,58,.2); }
+.ingr-add-btn { width:36px; height:36px; border-radius:8px; background:#E8813A; border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+.ingr-add-btn:hover { filter:brightness(1.1); }
 .ingr-pills { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-.ingr-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:rgba(232,129,58,.1); border:1px solid rgba(232,129,58,.2); border-radius:99px; font-size:11px; color:#E8813A; }
-.ingr-remove { width:14px; height:14px; border-radius:50%; background:rgba(0,0,0,.3); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+.ingr-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; background:#E8813A; border-radius:99px; font-size:11px; font-weight:600; color:#fff; }
+.ingr-remove { width:16px; height:16px; border-radius:50%; background:rgba(0,0,0,.2); border:none; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; margin-left:2px; flex-shrink:0; }
+.ingr-remove:hover { background:rgba(0,0,0,.4); }
 
 /* Availability */
 .avail-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,.02); border:1px solid #262626; border-radius:8px; }
