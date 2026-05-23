@@ -996,11 +996,27 @@
        CUISINIER DASHBOARD
     ================================================================ */
     .dashboard-layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; padding-top:68px; }
+    .dashboard-layout.sidebar-hidden { grid-template-columns:1fr; }
     .dash-sidebar {
       background:var(--bg-card); border-right:1px solid var(--border);
       padding:28px 16px; position:sticky; top:68px; height:calc(100vh - 68px);
       overflow-y:auto; display:flex; flex-direction:column; gap:4px;
+      transition:margin-left .25s ease;
     }
+    .dash-sidebar.hidden { display:none; }
+    .dash-profile {
+      display:flex; align-items:center; gap:12px;
+      padding:0 8px 16px; border-bottom:1px solid var(--border); margin-bottom:12px;
+    }
+    .dash-avatar {
+      width:48px; height:48px; border-radius:50%;
+      background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; font-weight:800; color:#fff; flex-shrink:0;
+    }
+    .dash-profile-info { flex:1; min-width:0; }
+    .dash-profile-name { font-size:14px; font-weight:700; }
+    .dash-profile-role { font-size:11px; color:var(--text-muted); }
     .dash-sidebar-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:4px 12px; margin:12px 0 4px; }
     .dash-nav-item {
       display:flex; align-items:center; gap:10px;
@@ -1011,6 +1027,14 @@
     .dash-nav-item:hover { background:var(--bg-elevated); color:var(--text); }
     .dash-nav-item.active { background:var(--primary-glow); color:var(--primary-light); border:1px solid rgba(232,144,26,.25); }
     .dash-nav-icon { font-size:18px; }
+    .dash-toggle {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:36px; height:36px; border-radius:var(--r-sm);
+      background:var(--bg-elevated); border:1px solid var(--border);
+      color:var(--text-muted); font-size:16px; cursor:pointer;
+      transition:var(--ease); flex-shrink:0;
+    }
+    .dash-toggle:hover { border-color:var(--primary); color:var(--primary-light); }
 
     .dash-main { padding:32px; overflow-y:auto; }
     .dash-panel { display:none; }
@@ -2992,11 +3016,14 @@ function renderDashboard() {
   if (!acct) return;
 
   // Header — use real account data
-  document.getElementById('dash-chef-name').textContent     = (acct.firstName || acct.name.split(' ')[0]);
-  document.getElementById('dash-kitchen-name').textContent  = acct.name;
-  document.getElementById('dash-kitchen-wilaya').textContent = acct.commune
-    ? `📍 ${acct.commune}, ${acct.wilaya}`
-    : (acct.wilaya ? `📍 ${acct.wilaya}` : '');
+  const firstName = acct.firstName || acct.name.split(' ')[0];
+  document.getElementById('dash-chef-name').textContent     = firstName;
+  document.getElementById('dash-profile-name').textContent  = firstName;
+  const avatarEl = document.getElementById('dash-avatar');
+  if (avatarEl) avatarEl.textContent = firstName.charAt(0).toUpperCase();
+  document.getElementById('dash-profile-role').textContent = acct.commune
+    ? `📍 ${acct.commune}`
+    : 'Cuisinier';
 
   // Stats
   const todayOrders = MOCK_DASH_ORDERS.filter(o => o.status !== 'livre');
@@ -3281,6 +3308,16 @@ function toggleKitchenStatus() {
     isOpen ? 'Votre cuisine est actuellement ouverte aux commandes'
            : 'Votre cuisine est fermée — les clients ne peuvent pas commander';
   toast(isOpen ? '🟢 Votre cuisine est maintenant ouverte' : '🔴 Votre cuisine est maintenant fermée', isOpen ? 'success' : 'default');
+}
+
+function toggleSidebar() {
+  const layout = document.querySelector('.dashboard-layout');
+  const sidebar = document.querySelector('.dash-sidebar');
+  if (!layout || !sidebar) return;
+  const hidden = sidebar.classList.toggle('hidden');
+  layout.classList.toggle('sidebar-hidden', hidden);
+  const btn = document.querySelector('.dash-toggle');
+  if (btn) btn.textContent = hidden ? '☰' : '✕';
 }
 
 function showDashPanel(panel) {
@@ -3682,11 +3719,17 @@ function installPWA() {
   <div class="dashboard-layout">
     <!-- Sidebar -->
     <aside class="dash-sidebar">
-      <div style="padding:8px 12px 16px;border-bottom:1px solid var(--border);margin-bottom:8px;">
-        <div style="font-size:15px;font-weight:700;" id="dash-kitchen-name">Ma Cuisine</div>
-        <div id="dash-kitchen-wilaya" style="font-size:12px;color:var(--text-muted);"></div>
+      <div class="dash-profile">
+        <div class="dash-avatar" id="dash-avatar">👨‍🍳</div>
+        <div class="dash-profile-info">
+          <div class="dash-profile-name" id="dash-profile-name">Chef</div>
+          <div class="dash-profile-role" id="dash-profile-role">Cuisinier</div>
+        </div>
       </div>
-      <span class="dash-sidebar-title">Navigation</span>
+      <div style="display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:8px;">
+        <span class="dash-sidebar-title" style="margin:0;flex:1;">Navigation</span>
+        <button class="dash-toggle" onclick="toggleSidebar()" title="Masquer le menu">☰</button>
+      </div>
       <div class="dash-nav-item active" id="dn-overview" onclick="showDashPanel('overview')"><span class="dash-nav-icon">📊</span> Vue d'ensemble</div>
       <div class="dash-nav-item" id="dn-orders"   onclick="showDashPanel('orders')"><span class="dash-nav-icon">📦</span> Commandes <span id="new-orders-badge" style="margin-left:auto;background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;display:none;"></span></div>
       <div class="dash-nav-item" id="dn-menu"     onclick="showDashPanel('menu')"><span class="dash-nav-icon">🍽️</span> Mon Menu</div>
