@@ -53,14 +53,14 @@ function navigate(tab) {
 .mobile-bottom-nav {
   display:none;
   position:fixed; bottom:0; left:0; right:0; z-index:1000;
-  height:60px; background:#141414; border-top:1px solid #262626;
+  height:60px; background:#fff; border-top:1px solid #E5E7EB;
   align-items:stretch;
   padding-bottom:env(safe-area-inset-bottom, 0px);
 }
 .mb-tab {
   flex:1; display:flex; align-items:center; justify-content:center;
   background:none; border:none; cursor:pointer; padding:0; position:relative;
-  color:#52525B;
+  color:#9CA3AF;
 }
 .mb-tab.active { color:#E8813A; }
 .mb-tab.active::before {

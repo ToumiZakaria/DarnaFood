@@ -30,6 +30,37 @@
   --ease-slow: 0.4s cubic-bezier(.4,0,.2,1);
 }
 
+/* ── CUSTOMER LIGHT THEME ──────────────────────────── */
+.customer-theme {
+  --bg: #F8F7F4;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text: #1A1A1A;
+  --text-muted: #6B7280;
+  --text-faint: #D1D5DB;
+  --border: #E5E7EB;
+  --border-light: #F3F4F6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+  --shadow: 0 4px 12px rgba(0,0,0,.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.1);
+  --shadow-xl: 0 12px 36px rgba(0,0,0,.12);
+  --primary-glow: rgba(232,129,58,0.1);
+  --primary-glow2: rgba(232,129,58,0.2);
+}
+.customer-theme body { background: var(--bg); color: var(--text); }
+.customer-theme .navbar { background: rgba(255,255,255,.92); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); }
+.customer-theme .footer { background: #FFFFFF; border-top: 1px solid var(--border); }
+.customer-theme .form-card { box-shadow: var(--shadow-sm); }
+.customer-theme .btn-ghost { border-color: var(--border); color: var(--text-muted); }
+.customer-theme .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+.customer-theme .form-input, .customer-theme .form-select, .customer-theme .form-textarea { background: #F9FAFB; border-color: var(--border); color: var(--text); }
+.customer-theme .form-input:focus, .customer-theme .form-select:focus, .customer-theme .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.customer-theme .order-hist-card, .customer-theme .summary-card { box-shadow: var(--shadow-sm); }
+.customer-theme .dash-sidebar, .customer-theme .dashboard-layout { background: transparent; }
+.customer-theme::-webkit-scrollbar-track { background: var(--bg); }
+.customer-theme::-webkit-scrollbar-thumb { background: var(--border); }
+
 *, *::before, *::after { box-sizing: border-box; }
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -334,6 +365,16 @@ input, select, textarea { font-family: inherit; }
 .conf-cell-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text-muted); margin-bottom: 4px; }
 .conf-cell-val   { font-size: 14px; font-weight: 600; }
 .conf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* Spinner */
+.cpp-spinner, .btn-spinner {
+  width: 20px; height: 20px; border: 2px solid var(--border-light);
+  border-top-color: var(--primary-light); border-radius: 50%;
+  animation: spin .6s linear infinite;
+  display: inline-block;
+}
+.cpp-spinner { width: 32px; height: 32px; border-width: 3px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Toast */
 .toast-host { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 999; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }

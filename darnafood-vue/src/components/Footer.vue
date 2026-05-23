@@ -3,79 +3,61 @@
 
 <template>
   <footer class="footer">
-    <div class="footer-grid">
-      <div>
-        <div class="nav-logo" style="margin-bottom:2px;">
-          <div class="nav-logo-icon">🍽️</div>
-          <div class="nav-logo-wordmark">
-            <div class="nav-logo-en">DarnaFood</div>
-            <div class="nav-logo-ar">دارنا فود</div>
+    <div class="footer-inner">
+      <div class="footer-col brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">D</div>
+          <div class="footer-logo-word">
+            <span class="footer-logo-name">DarnaFood</span>
+            <span class="footer-logo-ar">دارنا فود</span>
           </div>
         </div>
-        <p class="footer-brand-desc">La première plateforme de livraison de cuisine maison en Algérie.</p>
-        <div class="footer-socials">
-          <a href="#" class="footer-social">📘</a>
-          <a href="#" class="footer-social">📸</a>
-          <a href="#" class="footer-social">🎵</a>
-          <a href="#" class="footer-social">💬</a>
-        </div>
+        <p class="footer-desc">La première plateforme de livraison de cuisine maison en Algérie.</p>
       </div>
-      <div>
+      <div class="footer-col">
         <h4 class="footer-col-title">Plateforme</h4>
-        <ul class="footer-links">
-          <li><a href="#">Cuisines</a></li>
-          <li><a href="#">Catégories</a></li>
-          <li><a href="#">Promotions</a></li>
-        </ul>
+        <a href="#">Cuisines</a>
+        <a href="#">Catégories</a>
+        <a href="#">Promotions</a>
       </div>
-      <div>
+      <div class="footer-col">
         <h4 class="footer-col-title">Cuisiniers</h4>
-        <ul class="footer-links">
-          <li><a href="#">Devenir partenaire</a></li>
-          <li><a href="#">Tableau de bord</a></li>
-          <li><a href="#">Support</a></li>
-        </ul>
+        <a href="#">Devenir partenaire</a>
+        <a href="#">Tableau de bord</a>
+        <a href="#">Support</a>
       </div>
-      <div>
+      <div class="footer-col">
         <h4 class="footer-col-title">Aide</h4>
-        <ul class="footer-links">
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">Conditions</a></li>
-        </ul>
+        <a href="#">FAQ</a>
+        <a href="#">Contact</a>
+        <a href="#">Conditions</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="footer-copy">© 2025 DarnaFood. Tous droits réservés. 🇩🇿</p>
-      <div class="pay-badges">
-        <span class="pay-badge">💵 Cash</span>
-        <span class="pay-badge">📦 Livraison</span>
-        <span class="pay-badge">✅ Paiement à réception</span>
+      <p class="footer-copy">© 2025 DarnaFood. Tous droits réservés.</p>
+      <div class="footer-badges">
+        <span class="footer-badge">Paiement à la livraison</span>
       </div>
     </div>
   </footer>
 </template>
 
 <style scoped>
-.footer { background:var(--bg-card); border-top:1px solid var(--border); padding:56px 32px 28px; }
-.footer-grid { max-width:1180px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:48px; }
-.nav-logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
-.nav-logo-icon { width:40px; height:40px; background:linear-gradient(135deg,var(--primary-light),var(--primary-dark)); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:22px; }
-.nav-logo-en { font-size:20px; font-weight:800; background:linear-gradient(135deg,var(--primary-light),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.nav-logo-ar { font-family:'Cairo',sans-serif; font-size:11px; color:var(--text-muted); }
-.footer-brand-desc { font-size:14px; color:var(--text-muted); line-height:1.75; margin:16px 0 22px; max-width:270px; }
-.footer-socials { display:flex; gap:10px; }
-.footer-social { width:36px; height:36px; border-radius:var(--r-sm); background:var(--bg-elevated); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; text-decoration:none; }
-.footer-social:hover { border-color:var(--primary); background:var(--primary-glow); }
-.footer-col-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:var(--text-muted); margin-bottom:16px; }
-.footer-links { list-style:none; padding:0; }
-.footer-links li { margin-bottom:10px; }
-.footer-links a { font-size:14px; color:var(--text-muted); text-decoration:none; }
-.footer-links a:hover { color:var(--primary-light); }
-.footer-bottom { max-width:1180px; margin:0 auto; padding-top:24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-.footer-copy { font-size:13px; color:var(--text-muted); }
-.pay-badges { display:flex; gap:8px; }
-.pay-badge { background:var(--bg-elevated); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11px; font-weight:600; color:var(--text-muted); }
-@media(max-width:900px) { .footer-grid { grid-template-columns:1fr 1fr; } }
-@media(max-width:600px) { .footer-grid { grid-template-columns:1fr; } }
+.footer { background:#fff; border-top:1px solid #E5E7EB; padding:48px 24px 24px; }
+.footer-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:40px; }
+.footer-logo { display:flex; align-items:center; gap:10px; }
+.footer-logo-icon { width:36px; height:36px; background:linear-gradient(135deg,#E8813A,#D4702A); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#fff; }
+.footer-logo-word { line-height:1; }
+.footer-logo-name { font-size:18px; font-weight:800; color:#1A1A1A; }
+.footer-logo-ar { font-family:'Cairo',sans-serif; font-size:10px; color:#9CA3AF; }
+.footer-desc { font-size:14px; color:#6B7280; line-height:1.7; margin-top:16px; max-width:260px; }
+.footer-col { display:flex; flex-direction:column; gap:10px; }
+.footer-col-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#9CA3AF; margin-bottom:6px; }
+.footer-col a { font-size:14px; color:#6B7280; text-decoration:none; }
+.footer-col a:hover { color:#E8813A; }
+.footer-bottom { max-width:1200px; margin:0 auto; padding-top:20px; border-top:1px solid #F3F4F6; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.footer-copy { font-size:13px; color:#9CA3AF; }
+.footer-badge { background:#F9FAFB; border:1px solid #E5E7EB; padding:4px 12px; border-radius:8px; font-size:11px; font-weight:600; color:#6B7280; }
+@media(max-width:768px) { .footer-inner { grid-template-columns:1fr 1fr; } .brand { grid-column:1/-1; } }
+@media(max-width:480px) { .footer-inner { grid-template-columns:1fr; } }
 </style>

@@ -343,6 +343,57 @@ module.exports = async function handler(req, res) {
       return err(res, 'Méthode non supportée', 405);
     }
 
+    /* ── ORDER : CREATE ───────────────────────────────────────── */
+    if (action === 'order-create') {
+      if (req.method !== 'POST') return err(res, 'POST requis');
+      const payload = verifyToken(req);
+      if (!payload) return err(res, 'Non autorisé', 401);
+      const body = req.body || {};
+      if (!body.cookId || !body.items?.length) return err(res, 'cookId et items requis');
+      const clientUser = await users.findOne({ email: payload.email }, { projection: { _id: 1 } });
+      if (!clientUser) return err(res, 'Client introuvable', 404);
+      const { ObjectId } = require('mongodb');
+      const orders = db.collection('orders');
+      const orderId = 'DF-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+      const order = {
+        orderId,
+        clientId: clientUser._id,
+        clientEmail: payload.email,
+        cookId: new ObjectId(body.cookId),
+        clientName:      body.clientName      || '',
+        clientPhone:     body.clientPhone     || '',
+        deliveryAddress: {
+          wilaya:  body.wilaya  || '',
+          commune: body.commune || '',
+          address: body.address || '',
+          notes:   body.notes   || '',
+        },
+        items:       body.items.map(i => ({ name: i.name, price: i.price, qty: i.qty, emoji: i.emoji })),
+        subtotal:    Number(body.subtotal)    || 0,
+        deliveryFee: Number(body.deliveryFee) || 200,
+        total:       Number(body.total)       || 0,
+        status:      'pending',
+        createdAt:   new Date(),
+        updatedAt:   new Date(),
+      };
+      const result = await orders.insertOne(order);
+      return ok(res, { order: { ...order, _id: result.insertedId.toString(), clientId: order.clientId.toString(), cookId: order.cookId.toString() } });
+    }
+
+    /* ── ORDER : LIST (client) ──────────────────────────────────── */
+    if (action === 'orders') {
+      if (req.method !== 'GET') return err(res, 'GET requis');
+      const payload = verifyToken(req);
+      if (!payload) return err(res, 'Non autorisé', 401);
+      const clientUser = await users.findOne({ email: payload.email }, { projection: { _id: 1 } });
+      if (!clientUser) return err(res, 'Client introuvable', 404);
+      const { ObjectId } = require('mongodb');
+      const orders = db.collection('orders');
+      const list = await orders.find({ clientId: clientUser._id }).sort({ createdAt: -1 }).toArray();
+      const mapped = list.map(o => ({ ...o, _id: o._id.toString(), clientId: o.clientId.toString(), cookId: o.cookId.toString() }));
+      return ok(res, { orders: mapped });
+    }
+
     return err(res, 'Action inconnue: ' + action, 404);
 
   } catch (globalErr) {

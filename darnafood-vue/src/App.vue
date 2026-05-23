@@ -10,10 +10,11 @@ import Toast from './components/Toast.vue'
 const route = useRoute()
 const noLayout = computed(() => ['welcome', 'cook-home'].includes(route.name))
 const isDashboard = computed(() => route.path.startsWith('/dashboard'))
+const isCustomer = computed(() => !isDashboard.value && !noLayout.value)
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#0C0B09]">
+  <div class="min-h-screen" :class="isCustomer ? 'customer-theme' : ''">
     <Navbar v-if="!noLayout && !isDashboard" />
     <router-view />
     <Footer v-if="!noLayout && !isDashboard" />

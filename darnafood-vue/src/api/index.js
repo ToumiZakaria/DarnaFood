@@ -88,3 +88,23 @@ export async function apiDeleteDish(id) {
   })
   return res.json()
 }
+
+/* ── Order API ──────────────────────────────────── */
+
+export async function apiCreateOrder(data) {
+  const token = getToken()
+  const res = await fetch(`${AUTH_API}?action=order-create`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  })
+  return res.json()
+}
+
+export async function apiGetOrders() {
+  const token = getToken()
+  const res = await fetch(`${AUTH_API}?action=orders`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return res.json()
+}
