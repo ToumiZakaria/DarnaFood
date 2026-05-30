@@ -1,0 +1,336 @@
+// DarnaFood - Prisma 7 Schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  COOK
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  DELIVERING
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderType {
+  DELIVERY
+  PICKUP
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  SYSTEM
+}
+
+enum ChatMessageType {
+  TEXT
+  IMAGE
+  SYSTEM
+  LOCATION
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+// ─────────────────────────────────────────────
+// AUTH MODELS (NextAuth v5 required)
+// ─────────────────────────────────────────────
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ─────────────────────────────────────────────
+// CORE MODELS
+// ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  passwordHash       String?
+  twoFactorSecret    String?
+  twoFactorEnabled   Boolean   @default(false)
+  twoFactorBackupCodes String?
+  role          Role      @default(CUSTOMER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // App relations
+  cookProfile      CookProfile?
+  dishes           Dish[]
+  ordersAsCustomer Order[]        @relation("CustomerOrders")
+  ordersAsCook     Order[]        @relation("CookOrders")
+  reviewsGiven     Review[]       @relation("ReviewsGiven")
+  reviewsReceived  Review[]       @relation("ReviewsReceived")
+  notifications    Notification[]
+  chatMessages      ChatMessage[]
+  chatMetaSent      OrderChatMeta[] @relation("OrderChatMetaSender")
+  images            Image[]         @relation("UserImages")
+  userSessions      UserSession[]
+}
+
+model CookProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  bio         String?
+  wilaya      String
+  commune     String
+  address     String
+  isVerified  Boolean  @default(false)
+  avgRating   Float    @default(0)
+  totalOrders Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  avatarId String?
+  bannerId String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id     String  @id @default(cuid())
+  name   String
+  slug   String  @unique
+  icon   String?
+  dishes Dish[]
+}
+
+model Dish {
+  id          String   @id @default(cuid())
+  cookId      String
+  categoryId  String
+  name        String
+  description String
+  price       Float
+  prepTime    Int      // minutes
+  isAvailable Boolean  @default(true)
+  coverImage  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cook       User        @relation(fields: [cookId], references: [id], onDelete: Cascade)
+  category   Category    @relation(fields: [categoryId], references: [id])
+  images     DishImage[]
+  orderItems OrderItem[]
+}
+
+model DishImage {
+  id        String  @id @default(cuid())
+  dishId    String
+  url       String
+  isPrimary Boolean @default(false)
+
+  dish Dish @relation(fields: [dishId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  customerId      String
+  cookId          String
+  status          OrderStatus @default(PENDING)
+  type            OrderType
+  totalAmount     Float
+  deliveryFee     Float       @default(0)
+  deliveryAddress String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  customer User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  cook     User        @relation("CookOrders", fields: [cookId], references: [id])
+  items    OrderItem[]
+  review      Review?
+  chatMessages ChatMessage[]
+  chatMeta      OrderChatMeta?
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  dishId       String?
+  quantity     Int
+  priceAtOrder Float
+  notes        String?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  dish  Dish? @relation(fields: [dishId], references: [id], onDelete: SetNull)
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  customerId String
+  cookId     String
+  orderId    String   @unique
+  rating     Int      // 1-5
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  customer User  @relation("ReviewsGiven", fields: [customerId], references: [id])
+  cook     User  @relation("ReviewsReceived", fields: [cookId], references: [id])
+  order    Order @relation(fields: [orderId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // NEW_ORDER | ORDER_CONFIRMED | ORDER_READY | ORDER_DELIVERED
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String         @id @default(cuid())
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  senderId  String?
+  sender    User?          @relation(fields: [senderId], references: [id])
+
+  content   String
+  type      ChatMessageType @default(TEXT)
+  imageUrl  String?
+  latitude   Float?
+  longitude  Float?
+  locationName String?
+
+  read      Boolean        @default(false)
+  readAt    DateTime?
+  status    MessageStatus  @default(SENT)
+  isDeleted Boolean        @default(false)
+
+  replyToId String?
+  replyTo   ChatMessage?   @relation("MessageReply", fields: [replyToId], references: [id])
+  replies   ChatMessage[]  @relation("MessageReply")
+
+  createdAt DateTime       @default(now())
+
+  @@index([orderId, createdAt])
+  @@index([senderId])
+}
+
+model OrderChatMeta {
+  id        String    @id @default(cuid())
+  orderId   String    @unique
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  customerLastReadAt  DateTime?
+  cookLastReadAt      DateTime?
+  lastMessagePreview  String?
+  lastMessageAt       DateTime?
+  lastMessageSenderId String?
+  lastMessageSender   User?     @relation("OrderChatMetaSender", fields: [lastMessageSenderId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([orderId])
+}
+
+model Image {
+  id           String   @id @default(cuid())
+  url          String
+  publicId     String   @unique
+  thumbnail    String?
+  medium       String?
+  large        String?
+  width        Int?
+  height       Int?
+  format       String?
+  size         Int?
+  resourceType String   @default("dish")
+
+  senderId String?
+  sender   User?   @relation("UserImages", fields: [senderId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([resourceType])
+}
+
+model UserSession {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  device      String?
+  browser     String?
+  os          String?
+  ip          String?
+  lastActiveAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
