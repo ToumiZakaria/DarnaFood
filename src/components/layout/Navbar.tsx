@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { useCartStore } from "@/store/cart";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import DropdownMenu from "@/components/ui/DropdownMenu";
 
 import {
   ShoppingCart, Menu, X, ChefHat, User, LogOut,
@@ -36,10 +37,8 @@ export default function Navbar() {
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [dishesOpen, setDishesOpen] = useState(false);
   const dishesRef = useRef<HTMLDivElement>(null);
-  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -47,11 +46,10 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close dropdowns on outside click
+  // Close dishes dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dishesRef.current && !dishesRef.current.contains(e.target as Node)) setDishesOpen(false);
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -197,57 +195,55 @@ export default function Navbar() {
             {status === "loading" ? (
               <div style={{ width: 80, height: 40, borderRadius: 12, background: "#F1F5F9", animation: "pulse 1.5s infinite" }} />
             ) : session ? (
-              <div ref={profileRef} style={{ position: "relative" }}>
-                <button
-                  id="nav-profile-btn"
-                  onClick={() => setProfileOpen(v => !v)}
-                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.3rem 0.75rem 0.3rem 0.3rem", borderRadius: 9999, border: "1.5px solid #E2E8F0", background: "white", cursor: "pointer", transition: "all 150ms", boxShadow: profileOpen ? "0 4px 12px rgba(0,0,0,0.08)" : "none" }}
-                >
-                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #F97316, #EA580C)", color: "white", fontSize: "13px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {userInitial}
-                  </div>
-                  <span style={{ fontSize: "14px", fontWeight: 500, color: "#0F172A", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} className="desktop-nav">
-                    {session.user?.name?.split(" ")[0] ?? "Profil"}
-                  </span>
-                  <ChevronDown size={14} color="#94A3B8" style={{ transition: "transform 200ms", transform: profileOpen ? "rotate(180deg)" : "rotate(0)" }} className="desktop-nav" />
-                </button>
-
-                {profileOpen && (
-                  <div style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, background: "white", borderRadius: 16, boxShadow: "0 10px 40px rgba(0,0,0,0.12)", border: "1px solid #E2E8F0", padding: "0.5rem", minWidth: 220, zIndex: 200, animation: "fadeIn 150ms ease" }}>
-                    <div style={{ padding: "0.75rem 0.875rem 1rem", borderBottom: "1px solid #F1F5F9", marginBottom: "0.25rem" }}>
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>{session.user?.name}</div>
-                      <div style={{ fontSize: "13px", color: "#94A3B8", marginTop: 2 }}>{session.user?.email}</div>
+              <DropdownMenu
+                align="right"
+                trigger={
+                  <button
+                    id="nav-profile-btn"
+                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.3rem 0.75rem 0.3rem 0.3rem", borderRadius: 9999, border: "1.5px solid #E2E8F0", background: "white", cursor: "pointer", transition: "all 150ms" }}
+                  >
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #F97316, #EA580C)", color: "white", fontSize: "13px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {userInitial}
                     </div>
+                    <span style={{ fontSize: "14px", fontWeight: 500, color: "#0F172A", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} className="desktop-nav">
+                      {session.user?.name?.split(" ")[0] ?? "Profil"}
+                    </span>
+                    <ChevronDown size={14} color="#94A3B8" className="desktop-nav" />
+                  </button>
+                }
+              >
+                <div style={{ padding: "0.75rem 0.875rem 1rem", borderBottom: "1px solid #F1F5F9", marginBottom: "0.25rem" }}>
+                  <div style={{ fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>{session.user?.name}</div>
+                  <div style={{ fontSize: "13px", color: "#94A3B8", marginTop: 2 }}>{session.user?.email}</div>
+                </div>
 
-                    {isCook ? (
-                      <Link href="/cook/dashboard" onClick={() => setProfileOpen(false)} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.875rem", borderRadius: 10, fontSize: "14px", fontWeight: 500, color: "#475569", textDecoration: "none" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "#FFF7ED")}
-                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <LayoutDashboard size={15} /> Tableau de bord cuisinier
-                      </Link>
-                    ) : (
-                      profileMenuItems.map(item => (
-                        <Link key={item.href} href={item.href} onClick={() => setProfileOpen(false)} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.875rem", borderRadius: 10, fontSize: "14px", fontWeight: 500, color: "#475569", textDecoration: "none" }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "#F8FAFC")}
-                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                        >
-                          <item.icon size={15} /> {item.label}
-                        </Link>
-                      ))
-                    )}
-
-                    <div style={{ borderTop: "1px solid #F1F5F9", marginTop: "0.25rem", paddingTop: "0.25rem" }}>
-                      <button onClick={() => signOut({ callbackUrl: "/" })} style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.875rem", borderRadius: 10, fontSize: "14px", fontWeight: 500, color: "#EF4444", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "#FEF2F2")}
-                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <LogOut size={15} /> Se déconnecter
-                      </button>
-                    </div>
-                  </div>
+                {isCook ? (
+                  <Link href="/cook/dashboard" style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.875rem", borderRadius: 10, fontSize: "14px", fontWeight: 500, color: "#475569", textDecoration: "none" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#FFF7ED")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <LayoutDashboard size={15} /> Tableau de bord cuisinier
+                  </Link>
+                ) : (
+                  profileMenuItems.map(item => (
+                    <Link key={item.href} href={item.href} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.875rem", borderRadius: 10, fontSize: "14px", fontWeight: 500, color: "#475569", textDecoration: "none" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "#F8FAFC")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <item.icon size={15} /> {item.label}
+                    </Link>
+                  ))
                 )}
-              </div>
+
+                <div style={{ borderTop: "1px solid #F1F5F9", marginTop: "0.25rem", paddingTop: "0.25rem" }}>
+                  <button onClick={() => signOut({ callbackUrl: "/" })} style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 0.875rem", borderRadius: 10, fontSize: "14px", fontWeight: 500, color: "#EF4444", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#FEF2F2")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <LogOut size={15} /> Se déconnecter
+                  </button>
+                </div>
+              </DropdownMenu>
             ) : (
               <>
                 <Link href="/auth/login" id="nav-login" style={{ height: 40, padding: "0 1rem", borderRadius: 12, border: "1.5px solid #E2E8F0", display: "flex", alignItems: "center", fontSize: "14px", fontWeight: 500, color: "#475569", textDecoration: "none", transition: "all 150ms" }}

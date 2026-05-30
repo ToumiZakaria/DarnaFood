@@ -13,6 +13,12 @@ const nunito = Nunito({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: {
     default: "DarnaFood — Plats faits maison en Algérie",
@@ -44,7 +50,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={nunito.variable}>
-      <body>
+      <body style={{ overflowX: "hidden" }}>
         <AuthProvider>
           <div
             style={{
