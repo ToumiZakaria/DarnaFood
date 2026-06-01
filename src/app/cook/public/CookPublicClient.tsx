@@ -27,17 +27,17 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
           ════════════════════════════════════════ */}
       <div className="card" style={{ background: "white", borderRadius: "20px", overflow: "hidden", boxShadow: "var(--shadow-card)" }}>
         {/* Cover Area */}
-        <div style={{ height: 200, background: "linear-gradient(135deg, #FAEEDA, #FFF7ED)", position: "relative", display: "flex", justifyContent: "flex-end", padding: "1rem" }}>
+        <div className="cook-public-cover" style={{ height: 200, background: "linear-gradient(135deg, #FAEEDA, #FFF7ED)", position: "relative", display: "flex", justifyContent: "flex-end", padding: "1rem" }}>
           <button className="btn btn-ghost" style={{ background: "rgba(255,255,255,0.9)", height: 36, fontSize: "13px", boxShadow: "var(--shadow-sm)" }}>
             Modifier la bannière
           </button>
         </div>
 
         {/* Profile Info Row */}
-        <div style={{ padding: "0 2rem 2rem", position: "relative", display: "flex", gap: "1.5rem", alignItems: "flex-end", marginTop: "-4rem" }}>
+        <div className="cook-public-profile-row" style={{ padding: "0 2rem 2rem", position: "relative", display: "flex", gap: "1.5rem", alignItems: "flex-end", marginTop: "-4rem" }}>
           
           {/* Avatar */}
-          <div style={{ position: "relative", flexShrink: 0, textAlign: "center" }}>
+          <div className="cook-public-avatar" style={{ position: "relative", flexShrink: 0, textAlign: "center" }}>
             <div style={{ width: 128, height: 128, borderRadius: "50%", background: "linear-gradient(135deg, #F97316, #EA580C)", border: "4px solid white", boxShadow: "var(--shadow-lg)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
               {user.image ? (
                 <Image src={user.image} alt="Avatar" fill style={{ objectFit: "cover" }} />
@@ -88,7 +88,7 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
           </div>
 
           {/* Right Actions */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingBottom: "0.5rem" }}>
+          <div className="cook-public-actions" style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingBottom: "0.5rem" }}>
             <Link href="/cook/profile" className="btn btn-primary" style={{ height: 40, borderRadius: "12px", padding: "0 20px", background: "transparent", color: "var(--primary)", border: "2px solid var(--primary)" }}>
               <Edit size={16} /> Modifier le profil
             </Link>
@@ -102,7 +102,7 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
         </div>
 
         {/* Stats Bar */}
-        <div style={{ borderTop: "1px solid var(--border)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", padding: "1.25rem 2rem", textAlign: "center" }}>
+        <div className="cook-public-stats-bar" style={{ borderTop: "1px solid var(--border)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", padding: "1.25rem 2rem", textAlign: "center" }}>
           {[
             { icon: Star, color: "#FBBF24", label: "Note", value: stats.avgRating > 0 ? stats.avgRating.toFixed(1) : "—", trend: "+0.2" },
             { icon: ShoppingBag, color: "#3B82F6", label: "Commandes", value: stats.totalOrders, trend: "" },
@@ -127,7 +127,7 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
       {/* ════════════════════════════════════════
           SECTION 2 — MANAGEMENT TABS + CONTENT
           ════════════════════════════════════════ */}
-      <div style={{ position: "sticky", top: 64, zIndex: 30, background: "rgba(248, 250, 252, 0.95)", backdropFilter: "blur(8px)", padding: "12px 0" }}>
+      <div className="cook-public-tabs-strip" style={{ position: "sticky", top: 64, zIndex: 30, background: "rgba(248, 250, 252, 0.95)", backdropFilter: "blur(8px)", padding: "12px 0" }}>
         <div style={{ display: "flex", gap: "4px", background: "white", padding: "4px", borderRadius: "16px", width: "fit-content", boxShadow: "var(--shadow-sm)" }}>
           {[
             { id: "plats", label: `Mes plats (${stats.totalDishes})` },
@@ -154,7 +154,7 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
         {/* ── TAB 1: MES PLATS ── */}
         {activeTab === "plats" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+            <div className="cook-public-tab-content-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <div style={{ display: "flex", gap: "1.5rem" }}>
                 {["Tous", "Disponibles", "Épuisés"].map((tab, i) => (
                   <button key={tab} style={{ fontSize: "14px", fontWeight: 500, paddingBottom: "8px", borderBottom: i === 0 ? "2px solid var(--primary)" : "2px solid transparent", color: i === 0 ? "#0F172A" : "#94A3B8", background: "transparent", borderTop: "none", borderLeft: "none", borderRight: "none", cursor: "pointer" }}>
@@ -224,9 +224,9 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
         {/* ── TAB 2: AVIS ── */}
         {activeTab === "avis" && (
           <div>
-            <div className="card" style={{ background: "white", borderRadius: "20px", padding: "2rem", display: "flex", gap: "3rem", marginBottom: "1.5rem", boxShadow: "var(--shadow-card)" }}>
+            <div className="card cook-public-rating-distribution" style={{ background: "white", borderRadius: "20px", padding: "2rem", display: "flex", gap: "3rem", marginBottom: "1.5rem", boxShadow: "var(--shadow-card)" }}>
               <div style={{ textAlign: "center", minWidth: 200 }}>
-                <div style={{ fontSize: "72px", fontWeight: 800, color: "#0F172A", lineHeight: 1 }}>{stats.avgRating > 0 ? stats.avgRating.toFixed(1) : "0"}</div>
+                <div className="cook-public-rating-big" style={{ fontSize: "72px", fontWeight: 800, color: "#0F172A", lineHeight: 1 }}>{stats.avgRating > 0 ? stats.avgRating.toFixed(1) : "0"}</div>
                 <div style={{ display: "flex", justifyContent: "center", gap: "4px", margin: "8px 0" }}>
                   {[1,2,3,4,5].map(s => <Star key={s} size={24} fill="var(--primary)" color="var(--primary)" />)}
                 </div>
@@ -284,7 +284,7 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
         {/* ── TAB 3: STATS (Mocked charts) ── */}
         {activeTab === "stats" && (
           <div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.25rem", marginBottom: "2rem" }}>
+            <div className="cook-public-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.25rem", marginBottom: "2rem" }}>
               {[
                 { label: "Vues du profil", v: "1 247", t: "+12% cette semaine" },
                 { label: "Commandes reçues", v: "12", t: "+3 vs mois dernier" },
@@ -299,7 +299,7 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
               ))}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem" }}>
+            <div className="cook-public-charts-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem" }}>
               <div className="card" style={{ background: "white", borderRadius: "20px", padding: "1.5rem", boxShadow: "var(--shadow-card)", height: 320 }}>
                 <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "1rem" }}>Vues du profil (30 derniers jours)</h3>
                 <div style={{ height: "100%", width: "100%", display: "flex", alignItems: "flex-end", gap: "12px", paddingBottom: 40, borderBottom: "1px solid #E2E8F0" }}>
@@ -391,6 +391,40 @@ export default function CookPublicClient({ user, profile, dishes, reviews, stats
         )}
       </div>
 
+      <style>{`
+        @media (max-width: 1024px) {
+          .cook-public-profile-row { flex-direction: column !important; align-items: center !important; gap: 1.25rem !important; padding: 0 1.25rem 1.5rem !important; text-align: center !important; }
+          .cook-public-profile-row > div[style*="flex: 1"] { padding-bottom: 0 !important; }
+          .cook-public-actions { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; }
+        }
+        @media (max-width: 768px) {
+          .cook-public-cover { height: 140px !important; }
+          .cook-public-profile-row { margin-top: -3rem !important; }
+          .cook-public-avatar { width: 96px !important; height: 96px !important; }
+          .cook-public-avatar h1 { font-size: 24px !important; }
+          .cook-public-stats-bar { grid-template-columns: repeat(2, 1fr) !important; padding: 1rem !important; gap: 0.5rem !important; }
+          .cook-public-stats-bar > div:nth-child(1), .cook-public-stats-bar > div:nth-child(2) { border-bottom: 1px solid var(--border) !important; padding-bottom: 0.75rem !important; }
+          .cook-public-stats-bar > div:nth-child(3), .cook-public-stats-bar > div:nth-child(4) { padding-top: 0.75rem !important; }
+          .cook-public-stats-bar > div[style*="position: relative"] > div > div > div > span:first-child { font-size: 22px !important; }
+          .cook-public-tabs-strip { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+          .cook-public-tabs-strip > div { flex-wrap: nowrap !important; }
+          .cook-public-tab-content-header { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
+          .cook-public-tab-content-header > div:last-child { width: 100% !important; }
+          .cook-public-tab-content-header > div:last-child a, .cook-public-tab-content-header > div:last-child button { flex: 1 !important; }
+          .cook-public-rating-distribution { flex-direction: column !important; gap: 1.5rem !important; padding: 1.25rem !important; }
+          .cook-public-rating-distribution > div:first-child { min-width: 0 !important; }
+          .cook-public-rating-big { font-size: 56px !important; }
+          .cook-public-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
+          .cook-public-stats-grid > div { padding: 1rem !important; }
+          .cook-public-stats-grid > div > div:nth-child(2) { font-size: 22px !important; }
+          .cook-public-charts-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .cook-public-stats-bar { padding: 0.75rem !important; }
+          .cook-public-actions { width: 100% !important; }
+          .cook-public-actions a, .cook-public-actions button { flex: 1 !important; min-width: 0 !important; padding: 0 8px !important; font-size: 12px !important; }
+        }
+      `}</style>
     </div>
   );
 }
