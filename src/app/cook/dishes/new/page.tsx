@@ -28,11 +28,11 @@ export default async function NewDishPage() {
         <ArrowLeft size={16} /> Retour aux plats
       </Link>
 
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#0F172A", marginBottom: "4px" }}>
+      <div style={{ marginBottom: "1.5rem" }}>
+        <h1 style={{ fontSize: "clamp(1.25rem, 3vw, 1.75rem)", fontWeight: 800, color: "#0F172A", marginBottom: "4px" }}>
           Ajouter un nouveau plat
         </h1>
-        <p style={{ color: "#64748B", fontSize: "15px", fontWeight: 400 }}>
+        <p style={{ color: "#64748B", fontSize: "13px", fontWeight: 400 }}>
           Remplissez les informations et ajoutez des photos appétissantes
         </p>
       </div>

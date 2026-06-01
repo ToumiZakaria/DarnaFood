@@ -121,13 +121,13 @@ export default function CookOrderManager({ initialOrders, cookId }: { initialOrd
             const statusLabel = statusConfig[order.status] ?? { label: order.status, bg: "#F1F5F9", color: "#64748B" };
 
             return (
-              <div key={order.id} className="card card-hover" style={{ background: "white", borderRadius: "20px", padding: "20px", display: "flex", gap: "20px", flexDirection: "column" }}>
+              <div key={order.id} className="card card-hover cook-order-card" style={{ background: "white", borderRadius: "20px", padding: "20px", display: "flex", gap: "20px", flexDirection: "column" }}>
                 
                 {/* Main Row */}
-                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                <div className="cook-order-row" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
                   {/* Left: Info */}
-                  <div style={{ flex: "1 1 300px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                  <div className="cook-order-info" style={{ flex: "1 1 300px", minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px", flexWrap: "wrap" }}>
                       <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>#{order.id.slice(0, 8).toUpperCase()}</span>
                       <span style={{ padding: "4px 10px", borderRadius: "9999px", fontSize: "12px", fontWeight: 600, background: statusLabel.bg, color: statusLabel.color }}>
                         {statusLabel.label}
@@ -135,8 +135,8 @@ export default function CookOrderManager({ initialOrders, cookId }: { initialOrd
                       <span style={{ fontSize: "13px", color: "#94A3B8" }}>{format(new Date(order.createdAt), "HH:mm")}</span>
                     </div>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <User size={16} color="var(--text-muted)" />
                       </div>
                       <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary)" }}>{order.user?.name || "Client"}</span>
@@ -159,7 +159,7 @@ export default function CookOrderManager({ initialOrders, cookId }: { initialOrd
                   </div>
 
                   {/* Right: Actions */}
-                  <div style={{ flex: "0 0 200px", display: "flex", flexDirection: "column", gap: "8px", justifyContent: "center" }}>
+                  <div className="cook-order-actions" style={{ flex: "0 0 200px", display: "flex", flexDirection: "column", gap: "8px", justifyContent: "center", minWidth: 0 }}>
                     {order.status === "PENDING" && (
                       <>
                         <button onClick={() => updateStatus(order.id, "CONFIRMED")} className="action-btn" style={{ background: "var(--secondary)", color: "white", border: "none" }}>Accepter la commande</button>
@@ -260,6 +260,12 @@ export default function CookOrderManager({ initialOrders, cookId }: { initialOrd
         }
         .hover-bg-gray:hover {
           background: var(--bg-secondary) !important;
+        }
+        @media (max-width: 640px) {
+          .cook-order-card { padding: 0.875rem !important; }
+          .cook-order-row { gap: 0.75rem !important; }
+          .cook-order-info { flex-basis: 100% !important; }
+          .cook-order-actions { flex-basis: 100% !important; }
         }
       `}</style>
     </div>

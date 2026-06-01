@@ -100,6 +100,7 @@ export default function DishForm({ initialData, categories }: DishFormProps) {
   };
 
   return (
+    <>
     <form onSubmit={(e) => handleSubmit(e, false)} style={{ display: "flex", flexDirection: "column", gap: "2rem", paddingBottom: "100px" }}>
       
       {/* ── Section 1: Photos du plat ── */}
@@ -207,7 +208,7 @@ export default function DishForm({ initialData, categories }: DishFormProps) {
       <div className="card" style={{ padding: "24px", background: "white", borderRadius: "20px" }}>
         <h3 style={{ fontSize: "18px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "16px" }}>Prix et disponibilité</h3>
         
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
+        <div className="dish-form-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
           <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "var(--slate-light)", marginBottom: "8px" }}>Prix</label>
             <div style={{ position: "relative" }}>
@@ -228,7 +229,7 @@ export default function DishForm({ initialData, categories }: DishFormProps) {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+        <div className="dish-form-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "var(--slate-light)", marginBottom: "8px" }}>Temps de préparation</label>
             <select
@@ -292,9 +293,10 @@ export default function DishForm({ initialData, categories }: DishFormProps) {
       </div>
 
       {/* ── Sticky Footer Bar ── */}
-      <div style={{
+      <div className="dish-form-footer" style={{
         position: "fixed", bottom: 0, left: 280, right: 0, height: 80,
         background: "rgba(255, 255, 255, 0.9)", backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
         borderTop: "1px solid var(--border)", display: "flex", alignItems: "center",
         justifyContent: "flex-end", padding: "0 32px", gap: "16px", zIndex: 30
       }}>
@@ -325,5 +327,19 @@ export default function DishForm({ initialData, categories }: DishFormProps) {
         </button>
       </div>
     </form>
+    <style>{`
+      @media (min-width: 1025px) {
+        .dish-form-footer { left: 280px !important; }
+      }
+      @media (max-width: 1024px) {
+        .dish-form-footer { left: 0 !important; }
+      }
+      @media (max-width: 640px) {
+        .dish-form-footer { padding: 0 0.75rem !important; gap: 0.5rem !important; height: auto !important; min-height: 64px !important; }
+        .dish-form-footer > a, .dish-form-footer > button { padding: 0 0.75rem !important; font-size: 12px !important; height: 40px !important; }
+        .dish-form-grid-2 { grid-template-columns: 1fr !important; gap: 0.875rem !important; }
+      }
+    `}</style>
+    </>
   );
 }
