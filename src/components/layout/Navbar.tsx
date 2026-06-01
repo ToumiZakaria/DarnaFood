@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { useCartStore } from "@/store/cart";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import DropdownMenu from "@/components/ui/DropdownMenu";
+import SearchBar from "@/components/search/SearchBar";
 
 import {
   ShoppingCart, Menu, X, ChefHat, User, LogOut,
@@ -147,6 +148,13 @@ export default function Navbar() {
               Comment ça marche
             </Link>
           </nav>
+
+          {/* ── Navbar Search ── */}
+          {pathname.startsWith("/dishes") || pathname.startsWith("/cooks") ? (
+            <div style={{ flex: 1, maxWidth: 280, display: "flex", justifyContent: "center" }} className="desktop-nav">
+              <SearchBar variant="navbar" />
+            </div>
+          ) : null}
 
           {/* ── Right Actions ── */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>

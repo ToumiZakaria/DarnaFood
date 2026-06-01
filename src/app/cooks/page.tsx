@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { WILAYA_NAMES } from "@/lib/wilayas";
-import { Star, MapPin, CheckCircle, Search, ChefHat, UtensilsCrossed } from "lucide-react";
+import { Star, MapPin, CheckCircle, ChefHat, UtensilsCrossed, ArrowLeft, ArrowRight } from "lucide-react";
+import CooksSortSelect from "./CooksSortSelect";
 
 export const metadata: Metadata = {
   title: "Nos cuisiniers",
@@ -11,35 +12,57 @@ export const metadata: Metadata = {
 
 const WILAYAS = ["Toutes", ...WILAYA_NAMES];
 
-async function getCooks(wilaya?: string, q?: string) {
-  try {
-    return await prisma.user.findMany({
-      where: {
-        role: "COOK",
-        cookProfile: {
-          ...(wilaya && wilaya !== "Toutes" ? { wilaya } : {})
-        },
-        ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
-      },
-      include: {
-        cookProfile: true,
-        _count: { select: { dishes: { where: { isAvailable: true } } } },
-      },
-      orderBy: { cookProfile: { avgRating: "desc" } },
-      take: 24,
-    });
-  } catch {
-    return [];
-  }
+function cleanParams(params: Record<string, string | undefined>): URLSearchParams {
+  const sp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v); });
+  return sp;
 }
 
 export default async function CooksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ wilaya?: string; q?: string }>;
+  searchParams: Promise<{ wilaya?: string; q?: string; sortBy?: string; page?: string }>;
 }) {
-  const { wilaya, q } = await searchParams;
-  const dbCooks = await getCooks(wilaya, q);
+  const params = await searchParams;
+  const { wilaya, q, sortBy } = params;
+  const page = Math.max(1, parseInt(params.page || "1"));
+
+  const where: any = {
+    role: "COOK",
+    cookProfile: {
+      ...(wilaya && wilaya !== "Toutes" ? { wilaya } : {}),
+    },
+    ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
+  };
+
+  const orderBy: any = sortBy === "orders"
+    ? { cookProfile: { totalOrders: "desc" as const } }
+    : { cookProfile: { avgRating: "desc" as const } };
+
+  const limit = 12;
+
+  async function getCooks() {
+    try {
+      const [users, count] = await Promise.all([
+        prisma.user.findMany({
+          where,
+          include: {
+            cookProfile: true,
+            _count: { select: { dishes: { where: { isAvailable: true } } } },
+          },
+          orderBy,
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.user.count({ where }),
+      ]);
+      return { dbCooks: users, totalCount: count };
+    } catch {
+      return { dbCooks: [], totalCount: 0 };
+    }
+  }
+
+  const { dbCooks, totalCount } = await getCooks();
 
   const filtered = dbCooks.map((c: any) => ({
     id: c.id,
@@ -55,9 +78,10 @@ export default async function CooksPage({
     bio: c.cookProfile?.bio ?? "",
   }));
 
+  const totalPages = Math.ceil(totalCount / limit);
+
   return (
     <div style={{ background: "#F8FAFC", minHeight: "100vh", paddingTop: 72 }}>
-
       {/* ── Page Header ── */}
       <div style={{ background: "linear-gradient(135deg, #FAEEDA, #FFF7ED)", padding: "3.5rem 0 2rem" }}>
         <div style={{ maxWidth: 1152, margin: "0 auto", padding: "0 1.5rem", textAlign: "center" }}>
@@ -66,19 +90,21 @@ export default async function CooksPage({
             Cuisiniers passionnés
           </h1>
           <p style={{ fontSize: "16px", color: "#475569", marginBottom: "1.75rem", maxWidth: 500, margin: "0 auto 1.75rem" }}>
-            {filtered.length} cuisiniers vérifiés prêts à régaler votre table
+            {totalCount} cuisiniers vérifiés prêts à régaler votre table
           </p>
 
-          {/* Search */}
-          <form style={{ maxWidth: 480, margin: "0 auto", display: "flex", gap: "0.625rem" }}>
-            <div style={{ flex: 1, display: "flex", alignItems: "center", background: "white", borderRadius: 14, padding: "0 0.875rem", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-              <Search size={18} color="#94A3B8" style={{ flexShrink: 0 }} />
-              <input name="q" defaultValue={q} placeholder="Rechercher un cuisinier…" style={{ flex: 1, height: 46, padding: "0 0.75rem", background: "transparent", border: "none", outline: "none", fontSize: "14px", color: "#0F172A" }} />
-            </div>
-            <button type="submit" style={{ height: 46, padding: "0 1.25rem", borderRadius: 14, background: "#F97316", color: "white", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
-              Chercher
-            </button>
-          </form>
+          {/* Search + Controls */}
+          <div style={{ display: "flex", justifyContent: "center", gap: "0.625rem", flexWrap: "wrap" }}>
+            <form style={{ maxWidth: 400, flex: 1, minWidth: 200, display: "flex", gap: "0.625rem" }}>
+              <div style={{ flex: 1, display: "flex", alignItems: "center", background: "white", borderRadius: 14, padding: "0 0.875rem", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
+                <input name="q" defaultValue={q} placeholder="Rechercher un cuisinier…" style={{ flex: 1, height: 46, padding: "0 0.75rem", background: "transparent", border: "none", outline: "none", fontSize: "14px", color: "#0F172A" }} />
+              </div>
+              <button type="submit" style={{ height: 46, padding: "0 1.25rem", borderRadius: 14, background: "#F97316", color: "white", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
+                Chercher
+              </button>
+            </form>
+            <CooksSortSelect />
+          </div>
         </div>
       </div>
 
@@ -88,7 +114,7 @@ export default async function CooksPage({
           {WILAYAS.map(w => {
             const isActive = (w === "Toutes" && !wilaya) || wilaya === w;
             return (
-              <Link key={w} href={w === "Toutes" ? "/cooks" : `/cooks?wilaya=${w}`}
+              <Link key={w} href={w === "Toutes" ? "/cooks" : `/cooks?wilaya=${w}${q ? `&q=${q}` : ""}`}
                 style={{ height: 36, padding: "0 0.875rem", borderRadius: 9999, border: `1.5px solid ${isActive ? "#F97316" : "#E2E8F0"}`, background: isActive ? "#F97316" : "white", color: isActive ? "white" : "#475569", fontSize: "13px", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", whiteSpace: "nowrap", transition: "all 150ms", flexShrink: 0 }}>
                 {w}
               </Link>
@@ -111,58 +137,81 @@ export default async function CooksPage({
             </Link>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.5rem" }}>
-            {filtered.map(cook => (
-              <div key={cook.id} className="cook-card" style={{ background: "white", borderRadius: 20, padding: "1.75rem", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", border: "1px solid #F1F5F9", transition: "all 300ms", display: "flex", flexDirection: "column" }}>
-                {/* Avatar */}
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem", marginBottom: "1rem" }}>
-                  <div style={{ position: "relative", flexShrink: 0 }}>
-                    <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #F97316, #FBBF24)", padding: 2.5 }}>
-                      <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#F97316", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "22px", fontWeight: 800 }}>
-                        {cook.initials}
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.5rem" }}>
+              {filtered.map(cook => (
+                <div key={cook.id} className="cook-card" style={{ background: "white", borderRadius: 20, padding: "1.75rem", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", border: "1px solid #F1F5F9", transition: "all 300ms", display: "flex", flexDirection: "column" }}>
+                  {/* Avatar */}
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem", marginBottom: "1rem" }}>
+                    <div style={{ position: "relative", flexShrink: 0 }}>
+                      <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #F97316, #FBBF24)", padding: 2.5 }}>
+                        <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#F97316", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "22px", fontWeight: 800 }}>
+                          {cook.initials}
+                        </div>
+                      </div>
+                      <div style={{ position: "absolute", bottom: 1, right: 1, width: 14, height: 14, borderRadius: "50%", background: cook.online ? "#22C55E" : "#CBD5E1", border: "2.5px solid white" }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "17px", fontWeight: 700, color: "#0F172A" }}>{cook.name}</span>
+                        {cook.isVerified && <CheckCircle size={15} color="#0D9488" fill="#0D9488" style={{ color: "white" }} />}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "13px", color: "#94A3B8", marginTop: 3 }}>
+                        <MapPin size={12} /> {cook.wilaya}
                       </div>
                     </div>
-                    <div style={{ position: "absolute", bottom: 1, right: 1, width: 14, height: 14, borderRadius: "50%", background: cook.online ? "#22C55E" : "#CBD5E1", border: "2.5px solid white" }} />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-                      <span style={{ fontSize: "17px", fontWeight: 700, color: "#0F172A" }}>{cook.name}</span>
-                      {cook.isVerified && <CheckCircle size={15} color="#0D9488" fill="#0D9488" style={{ color: "white" }} />}
+
+                  {/* Bio */}
+                  {cook.bio && (
+                    <p style={{ fontSize: "13px", color: "#64748B", lineHeight: 1.65, marginBottom: "1rem", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {cook.bio}
+                    </p>
+                  )}
+
+                  {/* Stats */}
+                  <div style={{ display: "flex", gap: "1rem", marginBottom: "1.25rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "13px", fontWeight: 700, color: "#F97316" }}>
+                      <Star size={14} fill="#F97316" /> {cook.avgRating > 0 ? cook.avgRating.toFixed(1) : "—"}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "13px", color: "#94A3B8", marginTop: 3 }}>
-                      <MapPin size={12} /> {cook.wilaya}
-                    </div>
+                    <div style={{ fontSize: "13px", color: "#94A3B8" }}>{cook.dishCount} plats</div>
+                    <div style={{ fontSize: "13px", color: "#94A3B8" }}>{cook.totalOrders} commandes</div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: "flex", gap: "0.625rem", marginTop: "auto" }}>
+                    <Link href={`/cooks/${cook.id}`} className="profile-link" style={{ flex: 1, height: 40, borderRadius: 12, border: "1.5px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 600, color: "#475569", textDecoration: "none", transition: "all 150ms" }}>
+                      Voir profil
+                    </Link>
+                    <Link href={`/dishes?cook=${cook.id}`} style={{ flex: 1, height: 40, borderRadius: 12, background: "#F97316", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem", fontSize: "13px", fontWeight: 600, color: "white", textDecoration: "none" }}>
+                      <UtensilsCrossed size={14} /> Commander
+                    </Link>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                {/* Bio */}
-                {cook.bio && (
-                  <p style={{ fontSize: "13px", color: "#64748B", lineHeight: 1.65, marginBottom: "1rem", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    {cook.bio}
-                  </p>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", marginTop: "3rem" }}>
+                {page > 1 && (
+                  <Link href={`/cooks?${cleanParams({ ...params, page: String(page - 1) }).toString()}`} style={{ height: 40, padding: "0 1rem", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "white", color: "#475569", display: "flex", alignItems: "center", gap: 4, fontSize: "14px", fontWeight: 500, textDecoration: "none" }}>
+                    <ArrowLeft size={14} /> Précédent
+                  </Link>
                 )}
-
-                {/* Stats */}
-                <div style={{ display: "flex", gap: "1rem", marginBottom: "1.25rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "13px", fontWeight: 700, color: "#F97316" }}>
-                    <Star size={14} fill="#F97316" /> {cook.avgRating > 0 ? cook.avgRating.toFixed(1) : "—"}
-                  </div>
-                  <div style={{ fontSize: "13px", color: "#94A3B8" }}>{cook.dishCount} plats</div>
-                  <div style={{ fontSize: "13px", color: "#94A3B8" }}>{cook.totalOrders} commandes</div>
-                </div>
-
-                {/* Actions */}
-                <div style={{ display: "flex", gap: "0.625rem", marginTop: "auto" }}>
-                  <Link href={`/cooks/${cook.id}`} className="profile-link" style={{ flex: 1, height: 40, borderRadius: 12, border: "1.5px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 600, color: "#475569", textDecoration: "none", transition: "all 150ms" }}>
-                    Voir profil
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => Math.max(1, Math.min(page - 2, totalPages - 4)) + i).map(p => (
+                  <Link key={p} href={`/cooks?${cleanParams({ ...params, page: String(p) }).toString()}`} style={{ width: 40, height: 40, borderRadius: 10, background: page === p ? "#F97316" : "white", color: page === p ? "white" : "#475569", fontSize: "14px", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: page === p ? "none" : "0 1px 3px rgba(0,0,0,0.05)", border: page === p ? "none" : "1.5px solid #E2E8F0" }}>
+                    {p}
                   </Link>
-                  <Link href={`/dishes?cook=${cook.id}`} style={{ flex: 1, height: 40, borderRadius: 12, background: "#F97316", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem", fontSize: "13px", fontWeight: 600, color: "white", textDecoration: "none" }}>
-                    <UtensilsCrossed size={14} /> Commander
+                ))}
+                {page < totalPages && (
+                  <Link href={`/cooks?${cleanParams({ ...params, page: String(page + 1) }).toString()}`} style={{ height: 40, padding: "0 1rem", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "white", color: "#475569", display: "flex", alignItems: "center", gap: 4, fontSize: "14px", fontWeight: 500, textDecoration: "none" }}>
+                    Suivant <ArrowRight size={14} />
                   </Link>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 

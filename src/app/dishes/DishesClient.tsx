@@ -19,14 +19,14 @@ interface Dish {
   image: string | null;
 }
 
-export default function DishesClient({ dishes }: { dishes: Dish[] }) {
+export default function DishesClient({ dishes, totalCount, currentPage }: { dishes: Dish[]; totalCount?: number; currentPage?: number }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [page, setPage] = useState(1);
+  const total = totalCount ?? dishes.length;
+  const page = currentPage ?? 1;
   const PER_PAGE = 12;
-  const total = dishes.length;
   const pages = Math.ceil(total / PER_PAGE);
-  const pageDishes = dishes.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const pageDishes = dishes;
 
   const toggleFav = (id: string) => {
     setFavorites(prev => {
@@ -148,21 +148,28 @@ export default function DishesClient({ dishes }: { dishes: Dish[] }) {
       </div>
 
       {/* Pagination */}
-      {pages > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", marginTop: "3rem" }}>
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ height: 40, padding: "0 1rem", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "white", color: page === 1 ? "#CBD5E1" : "#475569", cursor: page === 1 ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "14px", fontWeight: 500 }}>
-            <ArrowLeft size={14} /> Précédent
-          </button>
-          {Array.from({ length: Math.min(pages, 5) }, (_, i) => i + 1).map(p => (
-            <button key={p} onClick={() => setPage(p)} style={{ width: 40, height: 40, borderRadius: 10, background: page === p ? "#F97316" : "white", color: page === p ? "white" : "#475569", fontSize: "14px", fontWeight: 600, cursor: "pointer", boxShadow: page === p ? "none" : "0 1px 3px rgba(0,0,0,0.05)", border: page === p ? "none" : "1.5px solid #E2E8F0" }}>
-              {p}
+      {pages > 1 && (() => {
+        function goToPage(p: number) {
+          const sp = new URLSearchParams(window.location.search);
+          sp.set("page", String(p));
+          window.location.href = `/dishes?${sp.toString()}`;
+        }
+        return (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", marginTop: "3rem" }}>
+            <button onClick={() => goToPage(page - 1)} disabled={page <= 1} style={{ height: 40, padding: "0 1rem", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "white", color: page <= 1 ? "#CBD5E1" : "#475569", cursor: page <= 1 ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "14px", fontWeight: 500 }}>
+              <ArrowLeft size={14} /> Précédent
             </button>
-          ))}
-          <button onClick={() => setPage(p => Math.min(pages, p + 1))} disabled={page === pages} style={{ height: 40, padding: "0 1rem", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "white", color: page === pages ? "#CBD5E1" : "#475569", cursor: page === pages ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "14px", fontWeight: 500 }}>
-            Suivant <ArrowRight size={14} />
-          </button>
-        </div>
-      )}
+            {Array.from({ length: Math.min(pages, 5) }, (_, i) => i + 1).map(p => (
+              <button key={p} onClick={() => goToPage(p)} style={{ width: 40, height: 40, borderRadius: 10, background: page === p ? "#F97316" : "white", color: page === p ? "white" : "#475569", fontSize: "14px", fontWeight: 600, cursor: "pointer", boxShadow: page === p ? "none" : "0 1px 3px rgba(0,0,0,0.05)", border: page === p ? "none" : "1.5px solid #E2E8F0" }}>
+                {p}
+              </button>
+            ))}
+            <button onClick={() => goToPage(page + 1)} disabled={page >= pages} style={{ height: 40, padding: "0 1rem", borderRadius: 10, border: "1.5px solid #E2E8F0", background: "white", color: page >= pages ? "#CBD5E1" : "#475569", cursor: page >= pages ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "14px", fontWeight: 500 }}>
+              Suivant <ArrowRight size={14} />
+            </button>
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -134,22 +134,28 @@ model User {
 }
 
 model CookProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  bio         String?
-  wilaya      String
-  commune     String
-  address     String
-  isVerified  Boolean  @default(false)
-  avgRating   Float    @default(0)
-  totalOrders Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  bio          String?
+  wilaya       String
+  commune      String
+  address      String
+  isVerified   Boolean  @default(false)
+  avgRating    Float    @default(0)
+  totalOrders  Int      @default(0)
+  searchVector String?  @db.Text
+  specialties  String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   avatarId String?
   bannerId String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([wilaya])
+  @@index([avgRating])
+  @@index([searchVector])
 }
 
 model Category {
@@ -161,22 +167,35 @@ model Category {
 }
 
 model Dish {
-  id          String   @id @default(cuid())
-  cookId      String
-  categoryId  String
-  name        String
-  description String
-  price       Float
-  prepTime    Int      // minutes
-  isAvailable Boolean  @default(true)
-  coverImage  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  cookId       String
+  categoryId   String
+  name         String
+  description  String
+  price        Float
+  prepTime     Int      // minutes
+  isAvailable  Boolean  @default(true)
+  coverImage   String?
+  searchVector String?  @db.Text
+  orderCount   Int      @default(0)
+  rating       Float    @default(0)
+  reviewCount  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   cook       User        @relation(fields: [cookId], references: [id], onDelete: Cascade)
   category   Category    @relation(fields: [categoryId], references: [id])
   images     DishImage[]
   orderItems OrderItem[]
+
+  @@index([cookId])
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@index([price])
+  @@index([rating])
+  @@index([orderCount])
+  @@index([searchVector])
+  @@index([createdAt])
 }
 
 model DishImage {

@@ -7,15 +7,26 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- BEGIN:anchored-summary -->
 # Session State (as of 30 May 2026)
 
-## What was built (Security Settings — Phase ~9)
-- **Prisma**: Added `twoFactorSecret`, `twoFactorEnabled`, `twoFactorBackupCodes` to `User` model + new `UserSession` model (id, userId, token, device, browser, os, ip, lastActiveAt, createdAt)
-- **API**: `POST /api/auth/change-password` — validates current password + hashes new with bcrypt (min 8 chars, requirements check); `POST /api/auth/2fa/setup` — generates TOTP secret + QR code via speakeasy/qrcode; `POST /api/auth/2fa/verify` — verifies TOTP token + enables 2FA + returns 8 backup codes; `POST /api/auth/2fa/disable` — requires password re-auth; `GET /api/auth/sessions` — list active sessions; `DELETE /api/auth/sessions/[id]` — revoke session (ownership check)
-- **Components** (`src/components/settings/`): `SecuritySection` — card with 3 security links (password/2FA/sessions); `ChangePasswordModal` — password fields with show/hide toggle + requirements checklist + confirmation; `TwoFactorSetupModal` — 4-step flow (menu → scan QR → verify code → backup codes) + disable flow; `SessionsModal` — list sessions with device/browser/os/ip/lastActive + delete each
-- **Integration**: Buyer settings page refactored to server/client split (`page.tsx` → `SettingsContent.tsx`); `twoFactorEnabled` passed as server prop; SecuritySection replaces hardcoded placeholder links
-- **Packages added**: `speakeasy`, `qrcode`, `@types/speakeasy`, `@types/qrcode`
-- **Fix**: `src/app/cook/dashboard/page.tsx:73` — null safety for nullable `OrderItem.dishId`
-- **Cook restructure**: Updated `CookSidebar` — added Page publique + Paramètres nav items; updated `CookHeader` dropdown — 280px, user info header, corrected links (Paramètres → `/cook/settings`); created `/cook/settings` page with SecuritySection, NotificationsSection, DangerZone; created `NotificationsSection` component
+## What was built (Search & Filtering — Phase 9)
+- **Prisma**: Added `searchVector`, `orderCount`, `rating`, `reviewCount` + indexes to `Dish`; added `searchVector`, `specialties` (String[]) + indexes to `CookProfile`
+- **API routes**:
+  - `GET /api/search/dishes` — full-text search with filters (q, category, city/wilaya, price range, min rating, availability) + sort (newest, popular, rating, price_asc/desc) + pagination
+  - `GET /api/search/cooks` — search cooks by name/bio/city with filters (specialty, min rating) + sort (rating, orders) + pagination
+  - `GET /api/search/suggestions` — real-time autocomplete (dishes, cooks, categories) with debounce
+  - `GET /api/search/filters` — returns available categories (with counts), wilayas, price range
+- **Hooks** (`src/hooks/`): `useDebounce` — generic debounce hook; `useSearch` — reusable search state machine
+- **Components** (`src/components/search/`):
+  - `SearchBar` — 3 variants (hero/compact/navbar) with autocomplete suggestions dropdown, debounced API calls
+  - `FilterDrawer` — slide-in drawer with categories (count badges), wilaya select, price range (min/max inputs), min rating chips, availability toggle; fetches filter options from `/api/search/filters`
+  - `ActiveFilters` — pill display with individual remove + "Effacer tout"
+  - `SortSelect` — dropdown with 5 options (newest/popular/rating/price_asc/price_desc)
+- **Page updates**:
+  - `/dishes` — refactored to use `DishesSearchControls` (SearchBar + FilterDrawer + SortSelect), server-side pagination, URL-based filter state
+  - `/cooks` — refactored to use `CooksSortSelect` client component, server-side pagination with `page` param
+  - `/` — `HomeClient` uses the shared `SearchBar` hero variant
+  - `Navbar` — includes compact `SearchBar` on `/dishes` and `/cooks` pages
+- **Pre-existing** (Security Settings): `twoFactorSecret/Enabled/BackupCodes` + `UserSession` model; change-password, 2fa setup/verify/disable, sessions API; SecuritySection, ChangePasswordModal, TwoFactorSetupModal, SessionsModal; `/cook/settings` page with sidebar/header restructure
 
 ## Known remaining issues
-- `prisma db push` must be run locally (db unreachable from this env) to apply `UserSession` model + User security fields
+- `prisma db push` must be run locally (db unreachable from this env) to apply new models + fields
 <!-- END:anchored-summary -->
